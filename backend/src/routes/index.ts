@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { rootRouter } from './root'
+import { rootRouter } from './root.rout'
 import { usersRouter } from './users.rout';
 import { postsRouter } from './posts.rout';
 

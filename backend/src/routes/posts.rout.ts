@@ -17,7 +17,6 @@ postsRouter.get("/", async (req: Request, res: Response) => {
     }
 });
 
-
 //
 // const getUsersHandler = (req, res) => {
 //     res.send('Get users route');

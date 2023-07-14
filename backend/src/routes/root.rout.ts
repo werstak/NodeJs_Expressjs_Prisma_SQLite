@@ -1,6 +1,6 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import * as RootHandler from '../controllers/root';
+import * as RootHandler from '../controllers/root.conroller';
 
 
 export const rootRouter = express.Router();
