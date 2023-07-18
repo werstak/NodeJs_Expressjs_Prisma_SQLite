@@ -1,25 +1,26 @@
 import db from '../utils/db';
 
 /**
- * will be realized through the prism
+ * will be realized through the prisma
  * */
 
 export type User = {
-    // id: number;
-    // email: string;
+    id: number;
+    email: string;
     firstName: string;
     lastName: string;
-    // posts?: []
+    posts?: []
 };
 
 
-export const getUsersHandler = async (): Promise<any[]> => {
+export const getAllUsersHandler = async (): Promise<any[]> => {
     return db.user.findMany({
         select: {
             id: true,
             firstName: true,
             lastName: true,
             email: true,
+            posts: true
         },
     });
 };
@@ -29,6 +30,13 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
     return db.user.findUnique({
         where: {
             id,
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            posts: true
         },
     });
 };
@@ -71,6 +79,39 @@ export const createUserHandler = async (
             id: true,
             firstName: true,
             lastName: true,
+        },
+    });
+};
+
+
+export const updateUserHandler = async (
+    user: Omit<any, "id">,
+    id: number
+): Promise<any> => {
+    const { firstName, lastName, email } = user;
+    return db.user.update({
+        where: {
+            id,
+        },
+        data: {
+            firstName,
+            lastName,
+            email,
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+        },
+    });
+};
+
+
+export const deleteUserHandler = async (id: number): Promise<void> => {
+    await db.user.delete({
+        where: {
+            id,
         },
     });
 };

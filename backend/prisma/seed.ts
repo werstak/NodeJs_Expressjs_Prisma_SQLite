@@ -49,6 +49,24 @@ const userData: Prisma.UserCreateInput[] = [
             ],
         },
     },
+    {
+        firstName: 'Daniel',
+        lastName: 'Duncan',
+        email: 'daniel@prisma.io',
+        posts: {
+            create: [
+                {
+                    title: 'Ask a question about Prisma on GitHub',
+                    description: 'https://www.github.com/prisma/prisma/discussions',
+                    published: true,
+                },
+                {
+                    title: 'Prisma on YouTube',
+                    description: 'https://pris.ly/youtube',
+                },
+            ],
+        },
+    },
 ]
 
 async function main() {

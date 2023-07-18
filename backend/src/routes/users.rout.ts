@@ -10,9 +10,9 @@ export const usersRouter = express.Router();
 /** GET: List of all USERS */
 usersRouter.get("/", async (req: Request, res: Response) => {
 
-    console.log('Root GET - USERS')
+    console.log('Root GET - All USERS')
     try {
-      const users = await UserHandler.getUsersHandler();
+      const users = await UserHandler.getAllUsersHandler();
       return res.status(200).json(users);
     } catch (error: any) {
       return res.status(500).json(error.message);
@@ -23,6 +23,8 @@ usersRouter.get("/", async (req: Request, res: Response) => {
 /** GET: A single USER by ID */
 usersRouter.get("/:id", async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
+
+    console.log('Root GET - single USER')
     try {
         const user = await UserHandler.getUserHandler(id);
         if (user) {
@@ -46,7 +48,7 @@ usersRouter.post(
             return response.status(400).json({ errors: errors.array() });
         }
         try {
-            console.log('111 USER = ', request.body)
+            console.log('Root POST - create USER = ', request.body)
 
             const user = request.body;
             const newUser = await UserHandler.createUserHandler(user);
@@ -57,19 +59,40 @@ usersRouter.post(
     }
 );
 
+/** PUT: Updating an USER */
+usersRouter.put(
+    "/:id",
+    body("firstName").isString(),
+    body("lastName").isString(),
+    body("email").isString(),
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+        const id: number = parseInt(request.params.id, 10);
+        try {
+            console.log('Root PUT - Updating USER = ', request.body)
+
+            const user = request.body;
+            const updateUserHandler = await UserHandler.updateUserHandler(user, id);
+            return response.status(200).json(updateUserHandler);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
 
 
+/**DELETE: Delete an USER based on the id*/
+usersRouter.delete("/:id", async (request: Request, response: Response) => {
+    const id: number = parseInt(request.params.id, 10);
+    try {
+        console.log('Root DELETE - USER = ', request.body)
 
-//
-// const getUsersHandler = (req, res) => {
-//     res.send('Get users route');
-// };
-//
-// const getSingleUserHandler = (req, res) => {
-//     res.send(`Get user route. UserId ${req.params.userId}`);
-// };
-//
-// const postUsersHandler = (req, res) => {
-//     res.send('Post users route');
-// };
-
+        await UserHandler.deleteUserHandler(id);
+        return response.status(204).json("User has been successfully deleted");
+    } catch (error: any) {
+        return response.status(500).json(error.message);
+    }
+});
