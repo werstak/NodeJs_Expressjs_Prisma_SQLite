@@ -1,16 +1,9 @@
 import db from '../utils/db';
+// import { User } from '../models/user.model';
 
 /**
  * will be realized through the prisma
  * */
-
-export type User = {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-    posts?: []
-};
 
 
 export const getAllUsersHandler = async (): Promise<any[]> => {

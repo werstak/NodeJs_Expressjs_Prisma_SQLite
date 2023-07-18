@@ -1,6 +1,8 @@
 import express from "express";
 import type { Request, Response } from "express";
 import * as PostHandler from "../controllers/posts.conroller";
+import { body, validationResult } from 'express-validator';
+import { updatePostHandler } from '../controllers/posts.conroller';
 
 
 export const postsRouter = express.Router();
@@ -8,25 +10,88 @@ export const postsRouter = express.Router();
 /** GET: List of all POSTS */
 postsRouter.get("/", async (req: Request, res: Response) => {
 
-    console.log('Root GET - POSTS')
     try {
-        const posts = await PostHandler.getPostsHandler();
+        console.log('Root GET - All POSTS')
+
+        const posts = await PostHandler.getAllPostsHandler();
         return res.status(200).json(posts);
     } catch (error: any) {
         return res.status(500).json(error.message);
     }
 });
 
-//
-// const getUsersHandler = (req, res) => {
-//     res.send('Get users route');
-// };
-//
-// const getSingleUserHandler = (req, res) => {
-//     res.send(`Get user route. UserId ${req.params.userId}`);
-// };
-//
-// const postUsersHandler = (req, res) => {
-//     res.send('Post users route');
-// };
 
+/** GET: A single POST by ID */
+postsRouter.get("/:id", async (request: Request, response: Response) => {
+    const id: number = parseInt(request.params.id, 10);
+
+    try {
+        console.log('Root GET - single POST')
+
+        const post = await PostHandler.getSinglePostHandler(id);
+        if (post) {
+            return response.status(200).json(post);
+        }
+    } catch (error: any) {
+        return response.status(500).json(error.message);
+    }
+});
+
+
+/** POST: Create a Post */
+postsRouter.post(
+    "/",
+    body("title").isString(),
+    body("description").isString(),
+    body("userId").isInt(),
+    body("published").isBoolean(),
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+        try {
+            const post = request.body;
+            const newPost = await PostHandler.createPostHandler(post);
+            return response.status(201).json(newPost);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/** PUT: Update POST */
+postsRouter.put(
+    "/:id",
+    body("title").isString(),
+    body("description").isString(),
+    body("userId").isInt(),
+    body("published").isBoolean(),
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({ errors: errors.array() });
+        }
+        const id: number = parseInt(request.params.id, 10);
+        try {
+            const post = request.body;
+            const updatedPost = await PostHandler.updatePostHandler(post, id);
+            return response.status(201).json(updatedPost);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**DELETE: Delete an POST based on the ID*/
+postsRouter.delete("/:id", async (request: Request, response: Response) => {
+    const id: number = parseInt(request.params.id, 10);
+    try {
+        await PostHandler.deletePostHandler(id);
+        return response.status(204).json("Post was successfully deleted");
+    } catch (error: any) {
+        return response.status(500).json(error.message);
+    }
+});

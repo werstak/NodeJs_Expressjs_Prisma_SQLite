@@ -1,44 +1,124 @@
+import db from '../utils/db';
+// import { PostModel } from '../models/post.model';
+
 /**
  * will be realized through the prism
  * */
 
-export type Post = {
-    id: number;
-    title: string;
-    description: string;
-    published: boolean;
-    createdAt: string;
-    updatedAt: string;
-    author: string;
-    authorId: number;
+export const getAllPostsHandler = async (): Promise<any[]> => {
+    return db.post.findMany({
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            user: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
+    });
 };
 
-export const getPostsHandler = async (): Promise<Post[]> => {
-    const res = [
-        {
-            id: 1,
-            title: 'Post 1',
-            description: 'description description description description description',
-            published: true,
-            createdAt: '07.07.2023',
-            updatedAt: '10.07.2023',
-            author: 'Ben',
-            authorId: 1
+
+export const getSinglePostHandler = async (id: number): Promise<any | null> => {
+    return db.post.findUnique({
+        where: {
+            id,
         },
-        {
-            id: 2,
-            title: 'Post 1',
-            description: 'description description description description description',
+        select: {
+            id: true,
+            title: true,
+            description: true,
             published: true,
-            createdAt: '07.07.2023',
-            updatedAt: '10.07.2023',
-            author: 'Ben',
-            authorId: 1
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            user: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
         },
+    });
+};
 
-    ];
 
-    console.log('Controller - POSTS')
+export const createPostHandler = async (post: any): Promise<any> => {
+    const { title, description, published, userId } = post;
 
-    return res
+    return db.post.create({
+        data: {
+            title,
+            description,
+            published,
+            userId
+        },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            user: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
+    });
+};
+
+
+export const updatePostHandler = async (post: any, id: number
+): Promise<any> => {
+    const { title, description, published, userId } = post;
+    return db.post.update({
+        where: {
+            id,
+        },
+        data: {
+            title,
+            description,
+            published,
+            userId
+        },
+        select: {
+            id: true,
+            title: true,
+            description: true,
+            published: true,
+            createdAt: true,
+            updatedAt: true,
+            userId: true,
+            user: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                },
+            },
+        },
+    });
+};
+
+
+export const deletePostHandler = async (id: number): Promise<void> => {
+    await db.post.delete({
+        where: {
+            id,
+        },
+    });
 };

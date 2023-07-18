@@ -1,7 +1,6 @@
 import express from "express";
 import type { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
-
 import * as UserHandler from "../controllers/users.conroller";
 
 
@@ -59,6 +58,7 @@ usersRouter.post(
     }
 );
 
+
 /** PUT: Updating an USER */
 usersRouter.put(
     "/:id",
@@ -75,8 +75,8 @@ usersRouter.put(
             console.log('Root PUT - Updating USER = ', request.body)
 
             const user = request.body;
-            const updateUserHandler = await UserHandler.updateUserHandler(user, id);
-            return response.status(200).json(updateUserHandler);
+            const updatedUser = await UserHandler.updateUserHandler(user, id);
+            return response.status(200).json(updatedUser);
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -84,11 +84,11 @@ usersRouter.put(
 );
 
 
-/**DELETE: Delete an USER based on the id*/
+/**DELETE: Delete an USER based on the ID*/
 usersRouter.delete("/:id", async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
-        console.log('Root DELETE - USER = ', request.body)
+        console.log('Root DELETE - POST = ', request.body)
 
         await UserHandler.deleteUserHandler(id);
         return response.status(204).json("User has been successfully deleted");

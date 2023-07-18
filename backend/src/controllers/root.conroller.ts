@@ -10,8 +10,8 @@ export const getRootHandler = async (): Promise<Admin[]> => {
     const res = [{
         id: 1,
         email: 'email@email.com',
-        firstName: 'Dijon',
-        lastName: 'Dap',
+        firstName: 'Johnny',
+        lastName: 'Depp',
         role: 1,
     }];
 
