@@ -4,9 +4,11 @@ export type PostModel = {
     id: number;
     title: string;
     description: string;
+    content?: string;
+    picture?: string;
     published: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
     user: User;
     userId: number;
 };

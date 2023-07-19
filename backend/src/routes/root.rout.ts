@@ -7,11 +7,11 @@ export const rootRouter = express.Router();
 
 console.log('Root - ROUTS')
 
-rootRouter.get('/', async (req: Request, res: Response) => {
+rootRouter.get('/', async (request: Request, response: Response) => {
     try {
         const root = await RootHandler.getRootHandler();
-        return res.status(200).json(root);
+        return response.status(200).json(root);
     } catch (error: any) {
-        return res.status(500).json(error.message);
+        return response.status(500).json(error.message);
     }
 });

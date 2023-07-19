@@ -13,11 +13,14 @@ export const getAllUsersHandler = async (): Promise<any[]> => {
             firstName: true,
             lastName: true,
             email: true,
+            createdAt: true,
+            updatedAt: true,
+            role: true,
+            avatar: true,
             posts: true
         },
     });
 };
-
 
 export const getUserHandler = async (id: number): Promise<any | null> => {
     return db.user.findUnique({
@@ -29,59 +32,45 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
             firstName: true,
             lastName: true,
             email: true,
+            createdAt: true,
+            updatedAt: true,
+            role: true,
+            avatar: true,
             posts: true
         },
     });
 };
 
-
-
-// export const getUsersHandler = async (): Promise<User[]> => {
-//     const res = [
-//         {
-//             id: 1,
-//             email: '1email@email.com',
-//             firstName: 'Bob',
-//             lastName: 'Diver',
-//         },
-//         {
-//             id: 2,
-//             email: '2email@email.com',
-//             firstName: 'Aleks',
-//             lastName: 'Dap',
-//         }
-//     ];
-//     console.log('Controller - USERS')
-//     return res
-// };
-
-
-
-
 export const createUserHandler = async (
-    user: Omit<any, "id">
+    user: Omit<any, 'id'>
 ): Promise<any> => {
-    const { firstName, lastName, email } = user;
+    const {firstName, lastName, email, password, role, avatar} = user;
     return db.user.create({
         data: {
             firstName,
             lastName,
-            email
+            email,
+            password,
+            role,
+            avatar
         },
         select: {
             id: true,
             firstName: true,
             lastName: true,
+            email: true,
+            password: true,
+            role: true,
+            avatar: true
         },
     });
 };
 
-
 export const updateUserHandler = async (
-    user: Omit<any, "id">,
+    user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const { firstName, lastName, email } = user;
+    const {firstName, lastName, email, role, avatar} = user;
     return db.user.update({
         where: {
             id,
@@ -90,12 +79,15 @@ export const updateUserHandler = async (
             firstName,
             lastName,
             email,
+            role,
+            avatar
         },
         select: {
             id: true,
             firstName: true,
             lastName: true,
-            email: true,
+            role: true,
+            avatar: true
         },
     });
 };

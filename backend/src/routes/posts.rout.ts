@@ -7,15 +7,15 @@ import { body, validationResult } from 'express-validator';
 export const postsRouter = express.Router();
 
 /** GET: List of all POSTS */
-postsRouter.get("/", async (req: Request, res: Response) => {
+postsRouter.get("/", async (request: Request, response: Response) => {
 
     try {
         console.log('Root GET - All POSTS')
 
         const posts = await PostHandler.getAllPostsHandler();
-        return res.status(200).json(posts);
+        return response.status(200).json(posts);
     } catch (error: any) {
-        return res.status(500).json(error.message);
+        return response.status(500).json(error.message);
     }
 });
 

@@ -12,6 +12,7 @@ export const getAllPostsHandler = async (): Promise<any[]> => {
             title: true,
             description: true,
             content: true,
+            picture: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -38,6 +39,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
             title: true,
             description: true,
             content: true,
+            picture: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -55,13 +57,13 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 
 
 export const createPostHandler = async (post: any): Promise<any> => {
-    const { title, description, content, published, userId } = post;
-
+    const {title, description, content, picture, published, userId} = post;
     return db.post.create({
         data: {
             title,
             description,
             content,
+            picture,
             published,
             userId
         },
@@ -70,6 +72,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
             title: true,
             description: true,
             content: true,
+            picture: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -88,7 +91,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
 
 export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
-    const { title, description, content, published, userId } = post;
+    const {title, description, content, picture, published, userId} = post;
     return db.post.update({
         where: {
             id,
@@ -97,6 +100,7 @@ export const updatePostHandler = async (post: any, id: number
             title,
             description,
             content,
+            picture,
             published,
             userId
         },
@@ -105,6 +109,7 @@ export const updatePostHandler = async (post: any, id: number
             title: true,
             description: true,
             content: true,
+            picture: true,
             published: true,
             createdAt: true,
             updatedAt: true,

@@ -7,14 +7,14 @@ import * as UserHandler from "../controllers/users.conroller";
 export const usersRouter = express.Router();
 
 /** GET: List of all USERS */
-usersRouter.get("/", async (req: Request, res: Response) => {
+usersRouter.get("/", async (request: Request, response: Response) => {
 
     console.log('Root GET - All USERS')
     try {
       const users = await UserHandler.getAllUsersHandler();
-      return res.status(200).json(users);
+      return response.status(200).json(users);
     } catch (error: any) {
-      return res.status(500).json(error.message);
+      return response.status(500).json(error.message);
     }
   });
 
