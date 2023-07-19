@@ -11,6 +11,7 @@ export const getAllPostsHandler = async (): Promise<any[]> => {
             id: true,
             title: true,
             description: true,
+            content: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -36,6 +37,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
             id: true,
             title: true,
             description: true,
+            content: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -53,12 +55,13 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 
 
 export const createPostHandler = async (post: any): Promise<any> => {
-    const { title, description, published, userId } = post;
+    const { title, description, content, published, userId } = post;
 
     return db.post.create({
         data: {
             title,
             description,
+            content,
             published,
             userId
         },
@@ -66,6 +69,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
             id: true,
             title: true,
             description: true,
+            content: true,
             published: true,
             createdAt: true,
             updatedAt: true,
@@ -84,7 +88,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
 
 export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
-    const { title, description, published, userId } = post;
+    const { title, description, content, published, userId } = post;
     return db.post.update({
         where: {
             id,
@@ -92,6 +96,7 @@ export const updatePostHandler = async (post: any, id: number
         data: {
             title,
             description,
+            content,
             published,
             userId
         },
@@ -99,6 +104,7 @@ export const updatePostHandler = async (post: any, id: number
             id: true,
             title: true,
             description: true,
+            content: true,
             published: true,
             createdAt: true,
             updatedAt: true,

@@ -12,6 +12,7 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     title: 'Join the Prisma Slack',
                     description: 'https://slack.prisma.io',
+                    content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, ',
                     published: true,
                 },
             ],
@@ -26,6 +27,7 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     title: 'Follow Prisma on Twitter',
                     description: 'https://www.twitter.com/prisma',
+                    content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, ',
                     published: true,
                 },
             ],
@@ -40,6 +42,7 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     title: 'Ask a question about Prisma on GitHub',
                     description: 'https://www.github.com/prisma/prisma/discussions',
+                    content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, ',
                     published: true,
                 },
                 {
@@ -58,6 +61,7 @@ const userData: Prisma.UserCreateInput[] = [
                 {
                     title: 'Ask a question about Prisma on GitHub',
                     description: 'https://www.github.com/prisma/prisma/discussions',
+                    content: 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, ',
                     published: true,
                 },
                 {

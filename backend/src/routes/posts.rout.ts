@@ -2,7 +2,6 @@ import express from "express";
 import type { Request, Response } from "express";
 import * as PostHandler from "../controllers/posts.conroller";
 import { body, validationResult } from 'express-validator';
-import { updatePostHandler } from '../controllers/posts.conroller';
 
 
 export const postsRouter = express.Router();
@@ -19,7 +18,6 @@ postsRouter.get("/", async (req: Request, res: Response) => {
         return res.status(500).json(error.message);
     }
 });
-
 
 /** GET: A single POST by ID */
 postsRouter.get("/:id", async (request: Request, response: Response) => {
