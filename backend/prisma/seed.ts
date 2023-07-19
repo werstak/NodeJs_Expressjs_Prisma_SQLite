@@ -7,6 +7,9 @@ const userData: Prisma.UserCreateInput[] = [
         firstName: 'Diana',
         lastName: 'Tool',
         email: 'diana@prisma.io',
+        password: '123456',
+        role: 1,
+        avatar: '',
         posts: {
             create: [
                 {
@@ -22,6 +25,9 @@ const userData: Prisma.UserCreateInput[] = [
         firstName: 'Alex',
         lastName: 'Bird',
         email: 'alex@prisma.io',
+        password: '123456',
+        role: 1,
+        avatar: '',
         posts: {
             create: [
                 {
@@ -37,6 +43,9 @@ const userData: Prisma.UserCreateInput[] = [
         firstName: 'Tom',
         lastName: 'Appleck',
         email: 'tom@prisma.io',
+        password: '123456',
+        role: 1,
+        avatar: '',
         posts: {
             create: [
                 {
@@ -56,6 +65,9 @@ const userData: Prisma.UserCreateInput[] = [
         firstName: 'Daniel',
         lastName: 'Duncan',
         email: 'daniel@prisma.io',
+        password: '123456',
+        role: 1,
+        avatar: '',
         posts: {
             create: [
                 {
