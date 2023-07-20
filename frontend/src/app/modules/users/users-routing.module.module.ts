@@ -1,14 +1,10 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { NavigationComponent } from './navigation/navigation.component';
-// import { AuthComponent } from './auth/auth.component';
-// import { ListDocumentsComponent } from './list-documents/list-documents.component';
-// import { DocumentsComponent } from './documents/documents.component';
-
+import { UsersComponent } from './users/users.component';
 const routes: Routes = [
   {
     path: '',
-    component: NavigationComponent
+    component: UsersComponent
   },
   // {
   //   path: 'auth',
@@ -24,4 +20,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ContainerRoutingModule { }
+export class UsersRoutingModuleModule { }

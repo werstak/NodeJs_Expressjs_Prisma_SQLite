@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ErrorPageComponent } from './layout/error-page/error-page.component';
 import { LayoutModule } from '@angular/cdk/layout';
-// import { MaterialSharedModule } from './shared/material-shared.module';
+import { MaterialSharedModule } from './shared/material-shared.module';
 
 
 @NgModule({
@@ -19,7 +19,7 @@ import { LayoutModule } from '@angular/cdk/layout';
     AppRoutingModule,
     LayoutModule,
     BrowserAnimationsModule,
-    // MaterialSharedModule
+    MaterialSharedModule
   ],
   providers: [],
   bootstrap: [AppComponent]
