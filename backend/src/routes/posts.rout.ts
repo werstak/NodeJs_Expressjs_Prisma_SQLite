@@ -8,7 +8,6 @@ export const postsRouter = express.Router();
 
 /** GET: List of all POSTS */
 postsRouter.get("/", async (request: Request, response: Response) => {
-
     try {
         console.log('Root GET - All POSTS')
 
@@ -30,6 +29,7 @@ postsRouter.get("/:id", async (request: Request, response: Response) => {
         if (post) {
             return response.status(200).json(post);
         }
+        return response.status(404).json("Post could not be found");
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
