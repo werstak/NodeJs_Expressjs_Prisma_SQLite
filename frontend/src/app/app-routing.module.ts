@@ -5,7 +5,6 @@ import { RouterModule, Routes } from '@angular/router';
 // import { PagesComponent } from './pages/pages.component';
 import { ErrorPageComponent } from './layout/error-page/error-page.component';
 // import { AuthRoutingModuleModule } from './modules/auth/auth-routing.module.module';
-// import { ContainerComponent } from './modules/container.component';
 // import { HomeComponent } from './modules/home/home.component';
 // import { HomeModule } from './modules/home/home.module';
 // import { PostsModule } from './modules/posts/posts.module';

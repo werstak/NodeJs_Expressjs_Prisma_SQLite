@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostsComponent } from './posts/posts.component';
+import { PostsComponent } from './components/posts/posts.component';
 import { PostsRoutingModuleModule } from './posts-routing.module.module';
 
 

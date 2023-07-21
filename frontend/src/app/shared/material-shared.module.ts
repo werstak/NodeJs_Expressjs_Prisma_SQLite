@@ -5,6 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+// import { MatTableModule } from '@angular/material/table';
+// import { MatCardModule } from '@angular/material/card';
 
 const modules = [
   CommonModule,
@@ -12,7 +14,9 @@ const modules = [
   MatButtonModule,
   MatSidenavModule,
   MatIconModule,
-  MatListModule
+  MatListModule,
+  // MatTableModule,
+  // MatCardModule
 ];
 
 @NgModule({

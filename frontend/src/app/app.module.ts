@@ -12,7 +12,7 @@ import { MaterialSharedModule } from './shared/material-shared.module';
 @NgModule({
   declarations: [
     AppComponent,
-    ErrorPageComponent
+    ErrorPageComponent,
   ],
   imports: [
     BrowserModule,
