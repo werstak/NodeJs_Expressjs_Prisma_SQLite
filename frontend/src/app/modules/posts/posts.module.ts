@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 const routes: Routes = [
@@ -36,7 +37,8 @@ const routes: Routes = [
     MatCardModule,
     MatButtonModule,
     MatDividerModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ]
 })
 export class PostsModule {

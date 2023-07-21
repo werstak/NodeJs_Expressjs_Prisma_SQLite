@@ -1,35 +1,58 @@
-// import { Component } from '@angular/core';
-//
-// @Component({
-//   selector: 'app-users-table',
-//   templateUrl: './users-table.component.html',
-//   styleUrls: ['./users-table.component.scss']
-// })
-// export class UsersTableComponent {
-//
-// }
-
-
-
-import {Component} from '@angular/core';
-import {MatTableModule} from '@angular/material/table';
+import { Component, OnInit } from '@angular/core';
+import { UsersService } from '../../users.service';
 
 /**
  * @title Table with sticky header
  */
 @Component({
-  // selector: 'table-sticky-header-example',
-  // styleUrls: ['table-sticky-header-example.css'],
-  // templateUrl: 'table-sticky-header-example.html',
   selector: 'app-users-table',
   templateUrl: './users-table.component.html',
   styleUrls: ['./users-table.component.scss'],
-  // imports: [MatTableModule]
 })
-export class UsersTableComponent {
+export class UsersTableComponent implements OnInit {
+
+
+  constructor(
+    public usersService: UsersService
+  ) {
+  }
+
+
   displayedColumns = ['position', 'name', 'weight', 'symbol'];
   dataSource = ELEMENT_DATA;
+
+  subUsers: any;
+  users: any;
+
+
+  ngOnInit(): void {
+
+    this.fetchData();
+
+
+    //
+    // this.segmentsService.segmentById(params.id).subscribe(data => {
+    //   this.selectedSegment = data;
+    //   this.segmentsService.selectedIdSegment(this.selectedSegment._id);
+    // });
+
+
+  }
+
+  fetchData() {
+
+    this.subUsers = this.usersService
+      .getAllUsers()
+      .subscribe(resp => {
+        this.users = resp;
+        console.log(this.users)
+      });
+
+  }
+
+
 }
+
 
 export interface PeriodicElement {
   name: string;
