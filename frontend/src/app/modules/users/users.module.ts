@@ -4,7 +4,6 @@ import { UsersComponent } from './components/users/users.component';
 import { UsersTableComponent } from './components/users-table/users-table.component';
 import { RouterModule, Routes } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
-import { MaterialSharedModule } from '../../shared/material-shared.module';
 import { MatCardModule } from '@angular/material/card';
 
 const routes: Routes = [

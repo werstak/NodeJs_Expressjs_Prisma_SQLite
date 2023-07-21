@@ -1,8 +1,23 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
-import { PostsRoutingModuleModule } from './home-routing.module.module';
+import { RouterModule, Routes } from '@angular/router';
 
+
+const routes: Routes = [
+  {
+    path: '',
+    component: HomeComponent
+  },
+  // {
+  //   path: 'auth',
+  //   component: AuthComponent
+  // },
+  // {
+  //   path: 'documents/:pageId',
+  //   component: DocumentsComponent
+  // }
+];
 
 @NgModule({
   declarations: [
@@ -10,7 +25,7 @@ import { PostsRoutingModuleModule } from './home-routing.module.module';
   ],
   imports: [
     CommonModule,
-    PostsRoutingModuleModule
+    RouterModule.forChild(routes),
   ]
 })
 export class HomeModule { }

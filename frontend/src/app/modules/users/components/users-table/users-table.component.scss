@@ -1,6 +1,10 @@
-.table-container {
-  height: 400px;
-  overflow: auto;
+.users-table {
+  padding: 25px;
+
+  &__container {
+    height: 400px;
+    overflow: auto;
+  }
 }
 
 table {
