@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
+import { Select, Store } from '@ngxs/store';
+import { AppState } from '../../../../store/app.state';
+import { PostsState } from '../../store-posts/posts.state';
+import { SetPostsName } from '../../store-posts/posts.action';
 
 @Component({
   selector: 'app-posts',
@@ -9,7 +13,8 @@ import { PostsService } from '../../posts.service';
 export class PostsComponent implements OnInit {
 
   constructor(
-    public postsService: PostsService
+    public postsService: PostsService,
+    public store: Store
   ) {
   }
 
@@ -18,8 +23,18 @@ export class PostsComponent implements OnInit {
   posts: any;
 
 
+  @Select(AppState.getAppName)
+  public appName$: any;
+
+  @Select(PostsState.getLazy1Name)
+  public name$: any;
+
+
+
   ngOnInit(): void {
     this.fetchData();
+    this.store.dispatch([new SetPostsName('LAZY1')]);
+
   }
 
   fetchData() {

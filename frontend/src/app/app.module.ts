@@ -8,6 +8,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ErrorPageComponent } from './layout/error-page/error-page.component';
 import { LayoutModule } from '@angular/cdk/layout';
 import { MaterialSharedModule } from './shared/material-shared.module';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsModule } from '@ngxs/store';
+import { AppState } from './store/app.state';
 
 
 @NgModule({
@@ -21,7 +24,9 @@ import { MaterialSharedModule } from './shared/material-shared.module';
     AppRoutingModule,
     LayoutModule,
     BrowserAnimationsModule,
-    MaterialSharedModule
+    MaterialSharedModule,
+    NgxsModule.forRoot([AppState]),
+    NgxsReduxDevtoolsPluginModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent]

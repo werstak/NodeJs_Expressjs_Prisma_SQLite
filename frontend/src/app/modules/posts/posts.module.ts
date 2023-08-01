@@ -8,6 +8,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { PostsState } from './store-posts/posts.state';
+import { NgxsModule } from '@ngxs/store';
 
 
 const routes: Routes = [
@@ -33,6 +35,7 @@ const routes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
+    NgxsModule.forFeature([PostsState]),
     MatButtonModule,
     MatCardModule,
     MatButtonModule,

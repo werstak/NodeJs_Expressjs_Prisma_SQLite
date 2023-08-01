@@ -5,6 +5,8 @@ import { UsersTableComponent } from './components/users-table/users-table.compon
 import { RouterModule, Routes } from '@angular/router';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
+import { UsersState } from './store-users/users.state';
+import { NgxsModule } from '@ngxs/store';
 
 const routes: Routes = [
   {
@@ -31,6 +33,7 @@ const routes: Routes = [
     MatTableModule,
     MatCardModule,
     RouterModule.forChild(routes),
+    NgxsModule.forFeature([UsersState])
   ]
 })
 export class UsersModule { }
