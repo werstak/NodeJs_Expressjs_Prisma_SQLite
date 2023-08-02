@@ -1,0 +1,77 @@
+<div class="container">
+
+  <div>
+    <h3 mat-dialog-title>ID: {{data._id}}</h3>
+
+    <!--  BEGIN editForm-->
+    <form [formGroup]="editUserForm" novalidate (ngSubmit)="onSubmit()" class="example-form">
+      <div mat-dialog-content>
+
+          <mat-form-field color="accent" class="example-full-width">
+            <input matInput #email class="form-control" placeholder="Email" formControlName="email"
+                   name="email"
+                   maxlength="50" required>
+            <mat-hint align="end">{{email.value?.length || 0}}/50</mat-hint>
+            <mat-error *ngIf="editUserForm.controls['email'].hasError('required')">
+              Email <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field color="accent" class="example-full-width">
+            <input matInput #firstName class="form-control" placeholder="First Name" formControlName="firstName"
+                   name="firstName"
+                   maxlength="50" required>
+            <mat-hint align="end">{{firstName.value?.length || 0}}/50</mat-hint>
+            <mat-error *ngIf="editUserForm.controls['firstName'].hasError('required')">
+              First Name <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field color="accent" class="example-full-width">
+            <input matInput #lastName class="form-control" placeholder="Last Name" formControlName="lastName"
+                   name="lastName"
+                   maxlength="50" required>
+            <mat-hint align="end">{{lastName.value?.length || 0}}/50</mat-hint>
+            <mat-error *ngIf="editUserForm.controls['lastName'].hasError('required')">
+              Last Name <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field color="accent" class="example-full-width">
+            <input matInput #role class="form-control" placeholder="Role" formControlName="role"
+                   name="role"
+                   maxlength="50" required>
+            <mat-hint align="end">{{role.value?.length || 0}}/50</mat-hint>
+            <mat-error *ngIf="editUserForm.controls['role'].hasError('required')">
+              Role <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field color="accent" class="example-full-width">
+            <input type="password" matInput #password class="form-control" placeholder="Password" formControlName="password"
+                   name="password"
+                   maxlength="50" required>
+            <mat-hint align="end">{{password.value?.length || 0}}/50</mat-hint>
+            <mat-error *ngIf="editUserForm.controls['password'].hasError('required')">
+              Password <strong>required</strong>
+            </mat-error>
+          </mat-form-field>
+
+      </div>
+
+      <div mat-dialog-actions>
+        <button mat-raised-button color="primary"
+                type="submit"
+                [disabled]="!editUserForm.valid" [mat-dialog-close]="1">Update
+        </button>
+      </div>
+    </form>
+
+    <mat-divider></mat-divider>
+
+    <button mat-raised-button color="accent" (click)="closeClick()" tabindex="-1">Cancel</button>
+
+  </div>
+
+</div>
+

@@ -1,5 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { UsersService } from '../../users.service';
+import { PostsModel, UserModel } from '../../../../shared/models/user.model';
+import { Subject, Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { EditUsersComponent } from '../../dialogs/edit-users/edit-users.component';
 
 /**
  * @title Table with sticky header
@@ -9,26 +13,28 @@ import { UsersService } from '../../users.service';
   templateUrl: './users-table.component.html',
   styleUrls: ['./users-table.component.scss'],
 })
-export class UsersTableComponent implements OnInit {
+export class UsersTableComponent implements OnInit, OnDestroy {
+  reloadPage$ = new Subject<void>();
 
 
   constructor(
-    public usersService: UsersService
+    public usersService: UsersService,
+    public dialog: MatDialog
   ) {
   }
 
 
-  displayedColumns = ['position', 'name', 'weight', 'symbol'];
-  dataSource = ELEMENT_DATA;
+  displayedColumns = ['id', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'avatar', 'posts', 'actions'];
 
-  subUsers: any;
-  users: any;
+  // dataSource = ELEMENT_DATA;
+  dataSource: UserModel[] = [];
+
+  subUsers: Subscription;
 
 
   ngOnInit(): void {
 
     this.fetchData();
-
 
     //
     // this.segmentsService.segmentById(params.id).subscribe(data => {
@@ -40,16 +46,50 @@ export class UsersTableComponent implements OnInit {
   }
 
   fetchData() {
-
     this.subUsers = this.usersService
       .getAllUsers()
       .subscribe(resp => {
-        this.users = resp;
-        console.log(this.users)
+        this.dataSource = resp;
+        console.log(this.dataSource)
       });
+  }
+
+
+
+  addUser() {
 
   }
 
+  // editUser(_id: any) {
+  //
+  // }
+
+  editUser(id: UserModel) {
+    console.log('edit', id)
+    const dialogRef = this.dialog.open(EditUsersComponent, {
+      data: {id}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 1) {
+
+        // this.refreshTable();
+      }
+    });
+  }
+
+  deleteUser(_id: any) {
+
+  }
+
+  private refreshTable() {
+    // this.reloadPage$.next();
+  }
+
+
+
+  ngOnDestroy() {
+    this.subUsers.unsubscribe();
+  }
 
 }
 

@@ -32,6 +32,7 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
             firstName: true,
             lastName: true,
             email: true,
+            password: true,
             createdAt: true,
             updatedAt: true,
             role: true,

@@ -7,6 +7,21 @@ import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { UsersState } from './store-users/users.state';
 import { NgxsModule } from '@ngxs/store';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule } from '@angular/material/sort';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { EditUsersComponent } from './dialogs/edit-users/edit-users.component';
 
 const routes: Routes = [
   {
@@ -27,11 +42,29 @@ const routes: Routes = [
   declarations: [
     UsersComponent,
     UsersTableComponent,
+    EditUsersComponent,
   ],
   imports: [
     CommonModule,
     MatTableModule,
     MatCardModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    FormsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatIconModule,
+    MatSortModule,
+    MatTableModule,
+    MatToolbarModule,
+    MatPaginatorModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatDividerModule,
+    MatCardModule,
+    MatTooltipModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([UsersState])
   ]

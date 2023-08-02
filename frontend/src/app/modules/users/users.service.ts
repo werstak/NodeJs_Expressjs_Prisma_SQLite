@@ -25,6 +25,16 @@ export class UsersService {
       );
   }
 
+  getUser(id: number): Observable<any> {
+    return this.http.get(config.API_URL + `/users/`+ id)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
 
 
 }
