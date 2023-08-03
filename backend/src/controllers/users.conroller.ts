@@ -71,7 +71,7 @@ export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const {firstName, lastName, email, role, avatar} = user;
+    const {firstName, lastName, email, password, role, avatar} = user;
     return db.user.update({
         where: {
             id,
@@ -80,6 +80,7 @@ export const updateUserHandler = async (
             firstName,
             lastName,
             email,
+            password,
             role,
             avatar
         },
@@ -87,6 +88,7 @@ export const updateUserHandler = async (
             id: true,
             firstName: true,
             lastName: true,
+            password: true,
             role: true,
             avatar: true
         },

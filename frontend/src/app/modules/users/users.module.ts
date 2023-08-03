@@ -22,6 +22,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EditUsersComponent } from './dialogs/edit-users/edit-users.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const routes: Routes = [
   {
@@ -65,6 +66,7 @@ const routes: Routes = [
     MatDividerModule,
     MatCardModule,
     MatTooltipModule,
+    MatSnackBarModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([UsersState])
   ]

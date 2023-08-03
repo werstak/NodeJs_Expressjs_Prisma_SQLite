@@ -29,7 +29,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   // dataSource = ELEMENT_DATA;
   dataSource: UserModel[] = [];
 
-  subUsers: Subscription;
+  private subUsers: Subscription;
 
 
   ngOnInit(): void {

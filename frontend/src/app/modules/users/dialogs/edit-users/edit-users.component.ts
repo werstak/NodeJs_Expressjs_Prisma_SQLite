@@ -1,20 +1,24 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { PostsModel } from '../../../../shared/models/user.model';
+import { PostsModel, UserModel } from '../../../../shared/models/user.model';
 import { UsersService } from '../../users.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-edit-users',
   templateUrl: './edit-users.component.html',
   styleUrls: ['./edit-users.component.scss']
 })
-export class EditUsersComponent implements OnInit {
+export class EditUsersComponent implements OnInit, OnDestroy {
   // ostypes: OsTypeInterface[] = [
   //   {value: 'ios', viewValue: 'ios'},
   //   {value: 'android', viewValue: 'android'}
   // ];
   public editUserForm: FormGroup;
+  private subUser: Subscription;
+  hide = true;
+  currentUser: UserModel;
 
   constructor(public dialogRef: MatDialogRef<EditUsersComponent>,
               private fb: FormBuilder,
@@ -95,9 +99,10 @@ export class EditUsersComponent implements OnInit {
     const id: number = this.data.id;
     console.log('MODAL', id)
 
-    this.usersService.getUser(id).subscribe(data => {
+    this.subUser = this.usersService.getUser(id).subscribe(data => {
 
-      console.log('getUser()', data)
+      this.currentUser = data
+      console.log('getUser()', this.currentUser)
 
       this.editUserForm.setValue({
         email: data.email,
@@ -118,43 +123,51 @@ export class EditUsersComponent implements OnInit {
       return;
     }
     console.log(1, 'onSubmit()', this.editUserForm.value)
-    // const dataClients: ClientsItemInterface = {
-    //   _id: this.data._id,
-    //   externalId: this.editUserForm.value.externalId,
-    //   osType: this.editUserForm.value.osType,
-    //   osVersion: this.editUserForm.value.osVersion
-    // };
-    // this.clientsService.updateClients(dataClients).subscribe();
+
+    let {id} = this.currentUser
+
+    const editUser: UserModel = {
+      id: id,
+      email: this.editUserForm.value.email,
+      password: this.editUserForm.value.password,
+      firstName: this.editUserForm.value.firstName,
+      lastName: this.editUserForm.value.lastName,
+      // role: this.editUserForm.value.role,
+      role: Number(this.editUserForm.value.role),
+      avatar: this.editUserForm.value.avatar,
+    };
+
+    this.usersService.updateUser(this.currentUser.id, editUser).subscribe();
   }
 
 
 
-/*TODO*/
-  // onSubmit() {
-  //   this.submitted = true;
-  //
-  //   // reset alerts on submit
-  //   this.alertService.clear();
-  //
-  //   // stop here if form is invalid
-  //   if (this.form.invalid) {
-  //     return;
-  //   }
-  //
-  //   this.submitting = true;
-  //   this.accountService.update(this.account.id!, this.form.value)
-  //     .pipe(first())
-  //     .subscribe({
-  //       next: () => {
-  //         this.alertService.success('Update successful', { keepAfterRouteChange: true });
-  //         this.router.navigate(['../'], { relativeTo: this.route });
-  //       },
-  //       error: error => {
-  //         this.alertService.error(error);
-  //         this.submitting = false;
-  //       }
-  //     });
-  // }
+// /*TODO*/
+//   onSubmit() {
+//     this.submitted = true;
+//
+//     // reset alerts on submit
+//     this.alertService.clear();
+//
+//     // stop here if form is invalid
+//     if (this.form.invalid) {
+//       return;
+//     }
+//
+//     this.submitting = true;
+//     this.accountService.update(this.account.id!, this.form.value)
+//       .pipe(first())
+//       .subscribe({
+//         next: () => {
+//           this.alertService.success('Update successful', { keepAfterRouteChange: true });
+//           this.router.navigate(['../'], { relativeTo: this.route });
+//         },
+//         error: error => {
+//           this.alertService.error(error);
+//           this.submitting = false;
+//         }
+//       });
+//   }
 
 
   /*TODO*/
@@ -173,6 +186,10 @@ export class EditUsersComponent implements OnInit {
 
   closeClick(): void {
     this.dialogRef.close();
+  }
+
+  ngOnDestroy() {
+    this.subUser.unsubscribe();
   }
 
 
