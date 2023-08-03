@@ -11,12 +11,15 @@ import { MaterialSharedModule } from './shared/material-shared.module';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsModule } from '@ngxs/store';
 import { AppState } from './store/app.state';
+import { SnackBarMessageComponent } from './shared/components/snack-bar-message/snack-bar-message.component';
+import { NotificationService } from './shared/notification.service';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
+    SnackBarMessageComponent,
   ],
   imports: [
     BrowserModule,
@@ -28,7 +31,9 @@ import { AppState } from './store/app.state';
     NgxsModule.forRoot([AppState]),
     NgxsReduxDevtoolsPluginModule.forRoot(),
   ],
-  providers: [],
+  providers: [
+    NotificationService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

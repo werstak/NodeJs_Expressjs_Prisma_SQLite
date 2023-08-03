@@ -3,7 +3,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostsModel, UserModel } from '../../../../shared/models/user.model';
 import { UsersService } from '../../users.service';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription, takeUntil } from 'rxjs';
+import { NotificationService } from '../../../../shared/notification.service';
+import * as _ from "lodash";
+
 
 @Component({
   selector: 'app-edit-users',
@@ -19,11 +22,13 @@ export class EditUsersComponent implements OnInit, OnDestroy {
   private subUser: Subscription;
   hide = true;
   currentUser: UserModel;
+  private unsubscribe = new Subject<void>();
 
   constructor(public dialogRef: MatDialogRef<EditUsersComponent>,
               private fb: FormBuilder,
               @Inject(MAT_DIALOG_DATA) public data: any,
               public usersService: UsersService,
+              private notificationService: NotificationService,
               // public clientsService: ClientsService
   ) {
   }
@@ -126,7 +131,7 @@ export class EditUsersComponent implements OnInit, OnDestroy {
 
     let {id} = this.currentUser
 
-    const editUser: UserModel = {
+    const params: UserModel = {
       id: id,
       email: this.editUserForm.value.email,
       password: this.editUserForm.value.password,
@@ -137,7 +142,24 @@ export class EditUsersComponent implements OnInit, OnDestroy {
       avatar: this.editUserForm.value.avatar,
     };
 
-    this.usersService.updateUser(this.currentUser.id, editUser).subscribe();
+    // this.usersService.updateUser(this.currentUser.id, params).subscribe();
+
+
+    this.usersService.updateUser(this.currentUser.id, params)
+      .pipe(
+        // takeUntil(this.unsubscribe)
+      )
+      .subscribe(
+        (response) => {
+          this.notificationService.showSuccess("User updated successfully");
+        },
+        (error) => {
+          console.error(error);
+          const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
+          const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
+          this.notificationService.showError(secondErrorAttempt);
+        }
+      );
   }
 
 
@@ -188,10 +210,16 @@ export class EditUsersComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  ngOnDestroy() {
-    this.subUser.unsubscribe();
-  }
+  // ngOnDestroy() {
+  //   this.subUser.unsubscribe();
+  // }
 
+  ngOnDestroy(): void {
+    this.dialogRef.close();
+
+    // this.unsubscribe.next();
+    // this.unsubscribe.complete();
+  }
 
 
 }

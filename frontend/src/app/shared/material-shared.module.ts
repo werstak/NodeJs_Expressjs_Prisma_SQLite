@@ -24,6 +24,8 @@ const modules = [
 @NgModule({
   imports: [...modules],
   exports: [...modules],
+  declarations: [
+  ],
 })
 
 export class MaterialSharedModule {

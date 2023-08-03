@@ -43,16 +43,17 @@ export class UsersService {
   }
 
   updateUser(id: number, params: UserModel): Observable<any> {
-    return this.http.put(config.API_URL + `/users/`+ id, params)
+    return this.http.put(config.API_URL + `/users/`+ id, params);
       // .pipe(
       //   catchError(error => {
       //     console.log('Error: ', error.message);
       //     return throwError(error);
       //   })
       // );
-  .pipe(
-      catchError(this.handleError.bind(this))
-    );
+
+  // .pipe(
+  //     catchError(this.handleError.bind(this))
+  //   );
   }
 
   // updateMetadata(_id: string, metadata: any): Observable<any> {
