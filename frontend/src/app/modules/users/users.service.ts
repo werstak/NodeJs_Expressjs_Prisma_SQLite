@@ -44,38 +44,15 @@ export class UsersService {
 
   updateUser(id: number, params: UserModel): Observable<any> {
     return this.http.put(config.API_URL + `/users/`+ id, params);
-      // .pipe(
-      //   catchError(error => {
-      //     console.log('Error: ', error.message);
-      //     return throwError(error);
-      //   })
-      // );
-
-  // .pipe(
-  //     catchError(this.handleError.bind(this))
-  //   );
   }
 
-  // updateMetadata(_id: string, metadata: any): Observable<any> {
-  //   return this.httpClient.patch(`${environment.API_URL}client/updateMetadata`, {metadata, _id})
-  //     .pipe(
-  //       catchError(this.handleError.bind(this))
-  //     );
-  // }
+  addUser(params: UserModel): Observable<any> {
+    return this.http.post(config.API_URL + `/users/`, params);
+  }
 
-
-  // update(id: string, params: any) {
-  //   return this.http.put(`${baseUrl}/${id}`, params)
-  //     .pipe(map((account: any) => {
-  //       // update the current account if it was updated
-  //       if (account.id === this.accountValue?.id) {
-  //         // publish updated account to subscribers
-  //         account = { ...this.accountValue, ...account };
-  //         this.accountSubject.next(account);
-  //       }
-  //       return account;
-  //     }));
-  // }
+  removeUser(id: number): Observable<any> {
+    return this.http.delete(config.API_URL + `/users/` + id);
+  }
 
 
   private handleError(errorResponse: HttpErrorResponse | any) {

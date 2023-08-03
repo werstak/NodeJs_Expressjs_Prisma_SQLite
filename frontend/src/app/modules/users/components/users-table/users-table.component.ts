@@ -4,6 +4,8 @@ import { PostsModel, UserModel } from '../../../../shared/models/user.model';
 import { Subject, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { EditUsersComponent } from '../../dialogs/edit-users/edit-users.component';
+import * as _ from 'lodash';
+import { NotificationService } from '../../../../shared/notification.service';
 
 /**
  * @title Table with sticky header
@@ -19,6 +21,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   constructor(
     public usersService: UsersService,
+    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
   }
@@ -57,17 +60,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   addUser() {
-
-  }
-
-  // editUser(_id: any) {
-  //
-  // }
-
-  editUser(id: UserModel) {
-    console.log('edit', id)
     const dialogRef = this.dialog.open(EditUsersComponent, {
-      data: {id}
+      data: {newUser: true}
     });
     dialogRef.afterClosed().subscribe(result => {
       if (result === 1) {
@@ -77,10 +71,48 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  deleteUser(_id: any) {
+
+
+  editUser(id: UserModel) {
+    console.log('edit', id)
+    const dialogRef = this.dialog.open(EditUsersComponent, {
+      data: {id, newUser: false}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 1) {
+
+        // this.refreshTable();
+      }
+    });
+  }
+
+
+
+  deleteUser(id: string): void {
+    const userId = Number(id);
+
+    this.usersService.removeUser(userId)
+      .pipe(
+        // takeUntil(this.unsubscribe)
+      )
+      .subscribe(
+        (response) => {
+          this.notificationService.showSuccess("User delete successfully");
+        },
+        (error) => {
+          console.error(error);
+          const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
+          const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
+          this.notificationService.showError(secondErrorAttempt);
+        }
+      );
+
+    // this.refreshTable();
 
   }
 
+
+// TODO
   private refreshTable() {
     // this.reloadPage$.next();
   }

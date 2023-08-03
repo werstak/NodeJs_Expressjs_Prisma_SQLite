@@ -2,7 +2,7 @@
   padding: 25px;
 
   &__container {
-    height: 400px;
+    max-height: 800px;
     overflow: auto;
   }
 }

@@ -61,7 +61,7 @@
         <th mat-header-cell class="header-btn" *matHeaderCellDef>
           <button mat-icon-button
                   color="primary"
-                  matTooltip="Add client"
+                  matTooltip="Add new user"
                   (click)="addUser()">
             <mat-icon aria-label="Add">add</mat-icon>
           </button>
@@ -70,7 +70,7 @@
           <button mat-icon-button color="primary" (click)="editUser(element.id)">
             <mat-icon aria-label="Edit">edit</mat-icon>
           </button>
-          <button mat-icon-button color="primary" (click)="deleteUser(element._id)">
+          <button mat-icon-button color="primary" (click)="deleteUser(element.id)">
             <mat-icon aria-label="Delete">delete</mat-icon>
           </button>
         </td>

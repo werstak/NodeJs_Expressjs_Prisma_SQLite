@@ -51,7 +51,13 @@ export class EditUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.buildForm();
-    this.initFormValue();
+    console.log('this.data', this.data)
+
+    if (this.data.newUser == true) {
+      this.editUserForm.reset();
+    } else {
+      this.initFormValue();
+    }
   }
 
 
@@ -96,11 +102,12 @@ export class EditUsersComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
+      avatar: [null, Validators.compose([])
+      ],
     });
   }
 
   private initFormValue() {
-
     const id: number = this.data.id;
     console.log('MODAL', id)
 
@@ -115,14 +122,62 @@ export class EditUsersComponent implements OnInit, OnDestroy {
         lastName: data.lastName,
         role: data.role,
         password: data.password,
+        avatar: ''
       });
-
 
       // return this.data = data;
     });
   }
 
   onSubmit(): void {
+    if (this.data.newUser == true) {
+      this.addNewUser();
+    } else  {
+      this.updateUser();
+    }
+  }
+
+  private addNewUser(): void {
+    this.submitted = true;
+    if (this.editUserForm.invalid) {
+      return;
+    }
+    console.log(1, 'onSubmit()', this.editUserForm.value)
+
+
+    const params: any = {
+      email: this.editUserForm.value.email,
+      password: this.editUserForm.value.password,
+      firstName: this.editUserForm.value.firstName,
+      lastName: this.editUserForm.value.lastName,
+      // role: this.editUserForm.value.role,
+      role: Number(this.editUserForm.value.role),
+      avatar: this.editUserForm.value.avatar,
+    };
+
+    // this.usersService.updateUser(this.currentUser.id, params).subscribe();
+
+
+    this.usersService.addUser(params)
+      .pipe(
+        // takeUntil(this.unsubscribe)
+      )
+      .subscribe(
+        (response) => {
+          this.notificationService.showSuccess("User created successfully");
+        },
+        (error) => {
+          console.error(error);
+          const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
+          const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
+          this.notificationService.showError(secondErrorAttempt);
+        }
+      );
+
+  }
+
+  private updateUser(): void {
+
     this.submitted = true;
     if (this.editUserForm.invalid) {
       return;
