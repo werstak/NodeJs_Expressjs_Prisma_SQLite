@@ -1,11 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
-import { PostsModel, UserModel } from '../../../../shared/models/user.model';
+import { UserModel } from '../../../../shared/models/user.model';
 import { Subject, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { EditUsersComponent } from '../../dialogs/edit-users/edit-users.component';
 import * as _ from 'lodash';
 import { NotificationService } from '../../../../shared/notification.service';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
+import { MatTable } from '@angular/material/table';
 
 /**
  * @title Table with sticky header
@@ -16,9 +18,6 @@ import { NotificationService } from '../../../../shared/notification.service';
   styleUrls: ['./users-table.component.scss'],
 })
 export class UsersTableComponent implements OnInit, OnDestroy {
-  reloadPage$ = new Subject<void>();
-
-
   constructor(
     public usersService: UsersService,
     private notificationService: NotificationService,
@@ -26,37 +25,33 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   ) {
   }
 
-
   displayedColumns = ['id', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'avatar', 'posts', 'actions'];
 
-  // dataSource = ELEMENT_DATA;
-  dataSource: UserModel[] = [];
+  @ViewChild(MatTable) table: MatTable<UserModel>;
 
+  reloadPage$ = new Subject<void>();
+
+  // dataSource = ELEMENT_DATA;
+  // dataSource: UserModel[] = [];
+  // public users$ = new BehaviorSubject<UserModel[] | null>([]);
+  users$ = this.usersService.users$;
   private subUsers: Subscription;
 
 
   ngOnInit(): void {
-
     this.fetchData();
-
-    //
-    // this.segmentsService.segmentById(params.id).subscribe(data => {
-    //   this.selectedSegment = data;
-    //   this.segmentsService.selectedIdSegment(this.selectedSegment._id);
-    // });
-
-
   }
 
   fetchData() {
     this.subUsers = this.usersService
       .getAllUsers()
       .subscribe(resp => {
-        this.dataSource = resp;
-        console.log(this.dataSource)
+        this.usersService.users$.next(resp);
+        // this.dataSource = resp;
+        // this.users = resp;
+        // console.log('get USERS', this.dataSource)
       });
   }
-
 
 
   addUser() {
@@ -64,12 +59,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       data: {newUser: true}
     });
     dialogRef.afterClosed().subscribe(result => {
+      console.log('dialogRef result', result)
       if (result === 1) {
-
-        // this.refreshTable();
+        this.refreshTable();
+        this.table.renderRows();
       }
     });
   }
+
 
 
 
@@ -88,27 +85,62 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
 
+  // deleteUser(id: string): void {
+  //   const userId = Number(id);
+  //
+  //   this.usersService.removeUser(userId)
+  //     .pipe(
+  //       // takeUntil(this.unsubscribe)
+  //     )
+  //     .subscribe(
+  //       (response) => {
+  //         this.notificationService.showSuccess("User delete successfully");
+  //       },
+  //       (error) => {
+  //         console.error(error);
+  //         const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
+  //         const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
+  //         this.notificationService.showError(secondErrorAttempt);
+  //       }
+  //     );
+  //
+  //   // this.refreshTable();
+  //
+  // }
+
+
   deleteUser(id: string): void {
     const userId = Number(id);
 
-    this.usersService.removeUser(userId)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.notificationService.showSuccess("User delete successfully");
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
-          const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+    const dialogRef = this.dialog.open(DialogConfirmComponent, {
+      data: {
+        title: 'Delete user?',
+        okText: 'Delete'
+      }
+    });
 
-    // this.refreshTable();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
 
+        this.usersService.removeUser(userId)
+          .pipe(
+            // takeUntil(this.unsubscribe)
+          )
+          .subscribe(
+            (response) => {
+              console.log('response', response);
+              this.notificationService.showSuccess("User delete successfully");
+            },
+            (error) => {
+              console.error(error);
+              const firstErrorAttempt: string = _.get(error, "error.error.message", "An error occurred");
+              const secondErrorAttempt: string = _.get(error, "error.message", firstErrorAttempt);
+              this.notificationService.showError(secondErrorAttempt);
+            }
+          );
+
+      }
+    });
   }
 
 
@@ -124,24 +156,3 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
 }
-
-
-export interface PeriodicElement {
-  name: string;
-  position: number;
-  weight: number;
-  symbol: string;
-}
-
-const ELEMENT_DATA: PeriodicElement[] = [
-  {position: 1, name: 'Hydrogen', weight: 1.0079, symbol: 'H'},
-  {position: 2, name: 'Helium', weight: 4.0026, symbol: 'He'},
-  {position: 3, name: 'Lithium', weight: 6.941, symbol: 'Li'},
-  {position: 4, name: 'Beryllium', weight: 9.0122, symbol: 'Be'},
-  {position: 5, name: 'Boron', weight: 10.811, symbol: 'B'},
-  {position: 6, name: 'Carbon', weight: 12.0107, symbol: 'C'},
-  {position: 7, name: 'Nitrogen', weight: 14.0067, symbol: 'N'},
-  {position: 8, name: 'Oxygen', weight: 15.9994, symbol: 'O'},
-  {position: 9, name: 'Fluorine', weight: 18.9984, symbol: 'F'},
-  {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
-];

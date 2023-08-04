@@ -14,16 +14,6 @@ import * as _ from "lodash";
   styleUrls: ['./edit-users.component.scss']
 })
 export class EditUsersComponent implements OnInit, OnDestroy {
-  // ostypes: OsTypeInterface[] = [
-  //   {value: 'ios', viewValue: 'ios'},
-  //   {value: 'android', viewValue: 'android'}
-  // ];
-  public editUserForm: FormGroup;
-  private subUser: Subscription;
-  hide = true;
-  currentUser: UserModel;
-  private unsubscribe = new Subject<void>();
-
   constructor(public dialogRef: MatDialogRef<EditUsersComponent>,
               private fb: FormBuilder,
               @Inject(MAT_DIALOG_DATA) public data: any,
@@ -34,24 +24,21 @@ export class EditUsersComponent implements OnInit, OnDestroy {
   }
 
 
+  public editUserForm: FormGroup;
+  private subUser: Subscription;
+  hide = true;
+  currentUser: UserModel;
+  respNewUser: UserModel;
+  private unsubscribe = new Subject<void>();
+  private usersArr: UserModel[] = [];
   submitted = false;
-
-
-  // // id: number;
-  // email: string;
-  // // password?: string;
-  // firstName: string;
-  // lastName: string;
-  // // createdAt?: string
-  // // updatedAt?: string
-  // role: number
-  // avatar: string
-  // posts?: PostsModel[]
 
 
   ngOnInit() {
     this.buildForm();
-    console.log('this.data', this.data)
+    this.getUsers();
+
+    console.log('DIALOG  data', this.data)
 
     if (this.data.newUser == true) {
       this.editUserForm.reset();
@@ -60,21 +47,6 @@ export class EditUsersComponent implements OnInit, OnDestroy {
     }
   }
 
-
-  // initForm() {
-  //   const { fb } = this;
-  //   this.form = fb.group({
-  //     name: fb.control(null),
-  //     fields: fb.array([]),
-  //     status: fb.control(null)
-  //   });
-  //
-  //   this.form.valueChanges.pipe(
-  //     tap(() => this.topBarService.showNavActions()),
-  //     debounceTime(500),
-  //     takeUntil(this.componentDestroy$)
-  //   ).subscribe(val => console.log(new Date().getTime(), 'value change', val));
-  // }
 
   private buildForm() {
     this.editUserForm = this.fb.group({
@@ -125,7 +97,7 @@ export class EditUsersComponent implements OnInit, OnDestroy {
         avatar: ''
       });
 
-      // return this.data = data;
+      return this.data = data;
     });
   }
 
@@ -144,7 +116,6 @@ export class EditUsersComponent implements OnInit, OnDestroy {
     }
     console.log(1, 'onSubmit()', this.editUserForm.value)
 
-
     const params: any = {
       email: this.editUserForm.value.email,
       password: this.editUserForm.value.password,
@@ -155,15 +126,16 @@ export class EditUsersComponent implements OnInit, OnDestroy {
       avatar: this.editUserForm.value.avatar,
     };
 
-    // this.usersService.updateUser(this.currentUser.id, params).subscribe();
-
-
     this.usersService.addUser(params)
       .pipe(
         // takeUntil(this.unsubscribe)
       )
       .subscribe(
         (response) => {
+          this.respNewUser = response;
+          console.log('addNewUser response', response);
+          this.addNewUserInTable();
+
           this.notificationService.showSuccess("User created successfully");
         },
         (error) => {
@@ -175,6 +147,36 @@ export class EditUsersComponent implements OnInit, OnDestroy {
       );
 
   }
+
+ private getUsers(): void {
+   this.usersService.users$.subscribe((users) => {
+       this.usersArr = users;
+       console.log('usersArr', this.usersArr)
+   });
+  }
+
+
+  private addNewUserInTable() {
+    this.usersArr.push(this.respNewUser);
+    console.log('usersArr', this.usersArr)
+    this.usersService.users$.next(this.usersArr);
+    return 1;
+  }
+
+  // private addNewUserInTable(): void {
+  //   console.log('addNewUserInTable')
+  //   this.usersService.users$.subscribe((users) => {
+  //     if (users) {
+  //       const usersArr = users;
+  //       usersArr.push(this.respNewUser);
+  //       console.log('usersArr', usersArr)
+  //       this.usersService.users$.next(users);
+  //     } else {
+  //       return;
+  //     }
+  //   });
+  // }
+
 
   private updateUser(): void {
 
@@ -217,34 +219,6 @@ export class EditUsersComponent implements OnInit, OnDestroy {
       );
   }
 
-
-
-// /*TODO*/
-//   onSubmit() {
-//     this.submitted = true;
-//
-//     // reset alerts on submit
-//     this.alertService.clear();
-//
-//     // stop here if form is invalid
-//     if (this.form.invalid) {
-//       return;
-//     }
-//
-//     this.submitting = true;
-//     this.accountService.update(this.account.id!, this.form.value)
-//       .pipe(first())
-//       .subscribe({
-//         next: () => {
-//           this.alertService.success('Update successful', { keepAfterRouteChange: true });
-//           this.router.navigate(['../'], { relativeTo: this.route });
-//         },
-//         error: error => {
-//           this.alertService.error(error);
-//           this.submitting = false;
-//         }
-//       });
-//   }
 
 
   /*TODO*/

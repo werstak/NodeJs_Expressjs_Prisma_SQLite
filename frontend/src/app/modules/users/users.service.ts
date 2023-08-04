@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import * as config from "../../../app-config";
 import { UserModel } from '../../shared/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -16,6 +16,8 @@ export class UsersService {
     private http: HttpClient,
     private _snackBar: MatSnackBar
   ) { }
+
+  users$ = new BehaviorSubject<any>([]);
 
 
   getAllUsers(): Observable<any> {

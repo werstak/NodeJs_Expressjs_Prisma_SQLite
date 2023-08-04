@@ -13,6 +13,7 @@ import { NgxsModule } from '@ngxs/store';
 import { AppState } from './store/app.state';
 import { SnackBarMessageComponent } from './shared/components/snack-bar-message/snack-bar-message.component';
 import { NotificationService } from './shared/notification.service';
+import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialog-confirm.component';
 
 
 @NgModule({
@@ -20,6 +21,7 @@ import { NotificationService } from './shared/notification.service';
     AppComponent,
     ErrorPageComponent,
     SnackBarMessageComponent,
+    DialogConfirmComponent
   ],
   imports: [
     BrowserModule,

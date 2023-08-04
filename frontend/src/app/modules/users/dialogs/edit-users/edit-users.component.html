@@ -1,4 +1,4 @@
-<div class="container">
+<div class="dialog">
 
   <div>
     <h3 mat-dialog-title>{{this.currentUser ? this.currentUser.firstName : 'Add User'}}</h3>
@@ -63,19 +63,17 @@
 
       </div>
 
-      <div mat-dialog-actions>
+      <div mat-dialog-actions class="dialog__actions">
         <button mat-raised-button color="primary"
                 type="submit"
                 [disabled]="!editUserForm.valid"
-                [mat-dialog-close]="1">
+                [mat-dialog-close]="data">
           {{this.data.newUser ? 'Create' : 'Update'}}
         </button>
+        <button mat-raised-button color="accent" (click)="closeClick()" tabindex="-1">Cancel</button>
       </div>
     </form>
 
-    <mat-divider></mat-divider>
-
-    <button mat-raised-button color="accent" (click)="closeClick()" tabindex="-1">Cancel</button>
 
   </div>
 
