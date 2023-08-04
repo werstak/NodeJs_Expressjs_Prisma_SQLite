@@ -21,7 +21,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { EditUsersComponent } from './dialogs/edit-users/edit-users.component';
+import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 const routes: Routes = [
@@ -43,7 +43,7 @@ const routes: Routes = [
   declarations: [
     UsersComponent,
     UsersTableComponent,
-    EditUsersComponent,
+    DialogUsersComponent,
   ],
   imports: [
     CommonModule,

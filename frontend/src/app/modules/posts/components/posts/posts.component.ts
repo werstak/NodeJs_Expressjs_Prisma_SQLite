@@ -30,7 +30,6 @@ export class PostsComponent implements OnInit {
   public name$: any;
 
 
-
   ngOnInit(): void {
     this.fetchData();
     this.store.dispatch([new SetPostsName('LAZY1')]);
@@ -45,5 +44,9 @@ export class PostsComponent implements OnInit {
         console.log(this.posts)
       });
   }
+
+  // trackByFn(index, item) {
+  //   return item.id; // unique id corresponding to the item
+  // }
 }
 

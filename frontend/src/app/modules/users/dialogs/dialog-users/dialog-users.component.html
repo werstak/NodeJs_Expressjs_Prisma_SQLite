@@ -51,7 +51,7 @@
                  formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
                  name="password"
                  maxlength="50" required>
-          <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
                   [attr.aria-pressed]="hide">
             <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
@@ -70,10 +70,13 @@
                 [mat-dialog-close]="data">
           {{this.data.newUser ? 'Create' : 'Update'}}
         </button>
-        <button mat-raised-button color="accent" (click)="closeClick()" tabindex="-1">Cancel</button>
+        <button mat-raised-button color="accent"
+                type="button"
+                (click)="closeClick()"
+                tabindex="-1">Cancel
+        </button>
       </div>
     </form>
-
 
   </div>
 

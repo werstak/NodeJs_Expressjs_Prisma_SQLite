@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditUsersComponent } from './edit-users.component';
+import { DialogUsersComponent } from './dialog-users.component';
 
 describe('EditUsersComponent', () => {
-  let component: EditUsersComponent;
-  let fixture: ComponentFixture<EditUsersComponent>;
+  let component: DialogUsersComponent;
+  let fixture: ComponentFixture<DialogUsersComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [EditUsersComponent]
+      declarations: [DialogUsersComponent]
     });
-    fixture = TestBed.createComponent(EditUsersComponent);
+    fixture = TestBed.createComponent(DialogUsersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

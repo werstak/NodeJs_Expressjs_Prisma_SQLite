@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import * as config from "../../../app-config";
+import * as config from '../../../app-config';
 import { UserModel } from '../../shared/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -15,7 +15,8 @@ export class UsersService {
   constructor(
     private http: HttpClient,
     private _snackBar: MatSnackBar
-  ) { }
+  ) {
+  }
 
   users$ = new BehaviorSubject<any>([]);
 
@@ -28,14 +29,10 @@ export class UsersService {
           return throwError(error);
         })
       );
-
-  // .pipe(
-  //     catchError(this.handleError.bind(this))
-  //   );
   }
 
   getUser(id: number): Observable<any> {
-    return this.http.get(config.API_URL + `/users/`+ id)
+    return this.http.get(config.API_URL + `/users/` + id)
       .pipe(
         catchError(error => {
           console.log('Error: ', error.message);
@@ -45,7 +42,7 @@ export class UsersService {
   }
 
   updateUser(id: number, params: UserModel): Observable<any> {
-    return this.http.put(config.API_URL + `/users/`+ id, params);
+    return this.http.put(config.API_URL + `/users/` + id, params);
   }
 
   addUser(params: UserModel): Observable<any> {

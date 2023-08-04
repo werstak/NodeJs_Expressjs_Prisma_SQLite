@@ -38,4 +38,5 @@ import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialo
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
