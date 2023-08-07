@@ -25,11 +25,13 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   displayedColumns = ['id', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'avatar', 'posts', 'actions'];
 
-  @ViewChild(MatTable) table: MatTable<UserModel>;
+  @ViewChild(MatTable) table: MatTable<UserModel[]>;
 
   reloadPage$ = new Subject<void>();
   users$ = this.usersService.users$;
   private subUsers: Subscription;
+  private usersArr: UserModel[] = [];
+
 
   // dataSource = ELEMENT_DATA;
   // dataSource: UserModel[] = [];
@@ -44,10 +46,13 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.subUsers = this.usersService
       .getAllUsers()
       .subscribe(resp => {
+        this.usersArr = resp;
         this.usersService.users$.next(resp);
         // this.dataSource = resp;
         // this.users = resp;
-        // console.log('get USERS', this.dataSource)
+
+
+        console.log('get USERS', this.usersArr)
       });
   }
 
@@ -58,10 +63,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialogRef result', result)
-      if (result === 1) {
-        this.refreshTable();
+      setTimeout(() => {
         this.table.renderRows();
-      }
+      }, 1000)
+
+      // if (result === 1) {
+      //   // this.refreshTable();
+      //   this.table.renderRows();
+      // }
     });
   }
 
@@ -72,36 +81,43 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       data: {id, newUser: false}
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialogRef result', result)
+      console.log('EDIT dialogRef result', result)
 
-      if (result === 1) {
+      setTimeout(() => {
+        this.table.renderRows();
+      }, 1000)
 
-        // this.refreshTable();
-      }
+      // if (result === 1) {
+      //   // this.refreshTable();
+      //   this.table.renderRows();
+      // }
     });
   }
 
 
-  deleteUser(id: string): void {
-    const userId = Number(id);
+  deleteUser(user: UserModel): void {
+    let {id, firstName} = user;
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
-        title: 'Delete user?',
+        subtitle: firstName,
+        title: 'Delete user - ',
         okText: 'Delete'
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
+      console.log('deleteUser - afterClosed', result)
 
-        this.usersService.removeUser(userId)
+      if (result === true) {
+        this.usersService.removeUser(id)
           .pipe(
             // takeUntil(this.unsubscribe)
           )
           .subscribe(
             (response) => {
-              console.log('response', response);
+              console.log(' deleteUser - response', response);
+              this.deleteUserInTable(id);
               this.notificationService.showSuccess('User delete successfully');
             },
             (error) => {
@@ -112,8 +128,26 @@ export class UsersTableComponent implements OnInit, OnDestroy {
             }
           );
 
+        // this.refreshTable();
+
+
+      } else {
+        return
       }
+
+
     });
+  }
+
+  private deleteUserInTable(id: number) {
+
+    let newUsersArr =  this.usersArr.filter(n => n.id !== id);
+    // let newArray = myArray.filter(function(f) { return f !== 'two' });
+    // let newUsersArr = this.usersArr.filter((n) => {return n != id});
+
+
+    this.usersService.users$.next(newUsersArr);
+    this.table.renderRows();
   }
 
 
@@ -126,5 +160,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.subUsers.unsubscribe();
   }
+
 
 }

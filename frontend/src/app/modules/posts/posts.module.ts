@@ -10,6 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PostsState } from './store-posts/posts.state';
 import { NgxsModule } from '@ngxs/store';
+import { DialogPostsComponent } from './dialogs/dialog-posts/dialog-posts.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 
 const routes: Routes = [
@@ -30,12 +35,24 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     PostComponent,
-    PostsComponent
+    PostsComponent,
+    DialogPostsComponent
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([PostsState]),
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogModule,
     MatButtonModule,
     MatCardModule,
     MatButtonModule,

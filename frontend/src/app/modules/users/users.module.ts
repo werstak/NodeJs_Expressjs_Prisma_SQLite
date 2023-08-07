@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgIf } from '@angular/common';
 import { UsersComponent } from './components/users/users.component';
 import { UsersTableComponent } from './components/users-table/users-table.component';
 import { RouterModule, Routes } from '@angular/router';

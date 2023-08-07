@@ -31,6 +31,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   hide = true;
   currentUser: UserModel;
   respNewUser: UserModel;
+  respUpdateUser: UserModel;
 
 
   ngOnInit() {
@@ -180,9 +181,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         (response) => {
-          this.respNewUser = response;
+          this.respUpdateUser = response;
           console.log('RESPONSE Update User', response);
-          // this.updateUserInTable();
+          this.updateUserInTable(id);
           this.notificationService.showSuccess('User updated successfully');
         },
         (error) => {
@@ -195,18 +196,18 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  private updateUserInTable() {
-    console.log('usersArr', this.usersArr)
+  private updateUserInTable(id: number) {
+    console.log('updateUserInTable - usersArr', this.usersArr)
 
-    const newUsersArr = this.usersArr.map(item => {
-      if (item.id === this.respNewUser.id) {
-        item = this.respNewUser;
+    const updateUsersArr = this.usersArr.map(item => {
+      if (item.id === id) {
+        item = this.respUpdateUser;
         return item;
       }
       return item;
     });
-    console.log('newUsersArr', newUsersArr)
-    // this.usersService.users$.next(newUsersArr);
+    console.log('updateUsersArr', updateUsersArr)
+    this.usersService.users$.next(updateUsersArr);
   }
 
 

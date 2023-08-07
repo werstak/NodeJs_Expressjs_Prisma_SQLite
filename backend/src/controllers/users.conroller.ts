@@ -60,9 +60,11 @@ export const createUserHandler = async (
             firstName: true,
             lastName: true,
             email: true,
-            password: true,
+            createdAt: true,
+            updatedAt: true,
             role: true,
-            avatar: true
+            avatar: true,
+            posts: true
         },
     });
 };
@@ -88,9 +90,12 @@ export const updateUserHandler = async (
             id: true,
             firstName: true,
             lastName: true,
-            password: true,
+            email: true,
+            createdAt: true,
+            updatedAt: true,
             role: true,
-            avatar: true
+            avatar: true,
+            posts: true
         },
     });
 };

@@ -67,11 +67,12 @@
         <button mat-raised-button color="primary"
                 type="submit"
                 [disabled]="!editUserForm.valid"
-                [mat-dialog-close]="data">
+                [mat-dialog-close]="true">
           {{this.data.newUser ? 'Create' : 'Update'}}
         </button>
         <button mat-raised-button color="accent"
                 type="button"
+                [mat-dialog-close]="1"
                 (click)="closeClick()"
                 tabindex="-1">Cancel
         </button>
