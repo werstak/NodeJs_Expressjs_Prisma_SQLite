@@ -12,9 +12,10 @@ import { PostsState } from './store-posts/posts.state';
 import { NgxsModule } from '@ngxs/store';
 import { DialogPostsComponent } from './dialogs/dialog-posts/dialog-posts.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 const routes: Routes = [
@@ -42,23 +43,17 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([PostsState]),
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    MatButtonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogModule,
     MatButtonModule,
     MatCardModule,
-    MatButtonModule,
     MatDividerModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatCheckboxModule
   ]
 })
 export class PostsModule {

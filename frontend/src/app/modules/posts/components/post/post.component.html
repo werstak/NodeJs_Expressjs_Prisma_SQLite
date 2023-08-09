@@ -12,13 +12,14 @@
     <button mat-button>SHARE</button>
 
     <button mat-icon-button class="material-icons app-toolbar-menu save-button"
-            matTooltip="Edit" color="primary">
+            matTooltip="Edit" color="primary"
+            (click)="openDialogEditPost(post.id)">
       <mat-icon>edit</mat-icon>
     </button>
 
     <button mat-icon-button class="material-icons app-toolbar-menu delete-button"
             matTooltip="Delete" color="warn"
-            (click)="openDialog()">
+            (click)="openDialogDeletePost(post.id)">
       <mat-icon>delete</mat-icon>
     </button>
   </mat-card-actions>

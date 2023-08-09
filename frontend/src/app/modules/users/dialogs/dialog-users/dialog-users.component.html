@@ -3,7 +3,7 @@
   <div>
     <h3 mat-dialog-title>{{this.currentUser ? this.currentUser.firstName : 'Add User'}}</h3>
 
-    <form [formGroup]="editUserForm" novalidate (ngSubmit)="onSubmit()" class="example-form">
+    <form [formGroup]="editUserForm" novalidate (ngSubmit)="onSubmitUser()" class="example-form">
       <div mat-dialog-content>
 
         <mat-form-field color="accent" class="example-full-width">

@@ -1,16 +1,63 @@
-<h1 mat-dialog-title>Hi {{data.name}}</h1>
-<div mat-dialog-content>
-  <p>What's your favorite animal?</p>
-  <mat-form-field>
-    <mat-label>Favorite Animal</mat-label>
-    <input matInput [(ngModel)]="data.animal">
-  </mat-form-field>
+<div class="dialog-post">
+  <h1 mat-dialog-title>Hi {{data.name}}</h1>
+  <form [formGroup]="postForm" novalidate (ngSubmit)="onSubmitPost()" class="dialog-post__form">
+    <div mat-dialog-content>
+      <p>What's your favorite animal?</p>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Title</mat-label>
+        <input matInput class="form-control" placeholder="Title" formControlName="title">
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Description</mat-label>
+        <input matInput class="form-control" placeholder="Description" formControlName="description">
+      </mat-form-field>
+
+      <mat-form-field class="example-full-width">
+        <mat-label>Content</mat-label>
+        <textarea matInput class="form-control" placeholder="Content..." rows="5" formControlName="content"></textarea>
+      </mat-form-field>
+
+<!--      <mat-form-field class="example-full-width">-->
+<!--        <mat-label>Picture</mat-label>-->
+<!--        <input matInput class="form-control" placeholder="Picture" formControlName="picture">-->
+<!--      </mat-form-field>-->
+    </div>
+
+    <p><mat-checkbox formControlName="published">Published</mat-checkbox></p>
+
+
+    <div mat-dialog-actions class="dialog-post__actions">
+      <button mat-raised-button color="primary"
+              type="submit"
+              [disabled]="!postForm.valid"
+              [mat-dialog-close]="true">
+        {{this.data.newUser ? 'Create' : 'Update'}}
+      </button>
+      <button mat-raised-button color="accent"
+              type="button"
+              [mat-dialog-close]="1"
+              (click)="onNoClick()"
+              tabindex="-1">Cancel
+      </button>
+    </div>
+  </form>
+
 </div>
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-<!--  <button mat-button (click)="onNoClick1()">No Thanks</button>-->
-  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
-</div>
+
+<!--<div mat-dialog-content>-->
+<!--  <p>What's your favorite animal?</p>-->
+<!--  <mat-form-field>-->
+<!--    <mat-label>Favorite Animal</mat-label>-->
+<!--    <input matInput [(ngModel)]="data.animal">-->
+<!--  </mat-form-field>-->
+<!--</div>-->
+<!--<div mat-dialog-actions>-->
+<!--  <button mat-button (click)="onNoClick()">No Thanks</button>-->
+<!--&lt;!&ndash;  <button mat-button (click)="onNoClick1()">No Thanks</button>&ndash;&gt;-->
+<!--  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>-->
+<!--</div>-->
 
 
 <!-- Copyright 2023 Google LLC. All Rights Reserved.

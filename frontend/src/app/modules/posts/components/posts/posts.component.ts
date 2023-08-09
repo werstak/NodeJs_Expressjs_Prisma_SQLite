@@ -4,6 +4,8 @@ import { Select, Store } from '@ngxs/store';
 import { AppState } from '../../../../store/app.state';
 import { PostsState } from '../../store-posts/posts.state';
 import { SetPostsName } from '../../store-posts/posts.action';
+import { UserModel } from '../../../../shared/models/user.model';
+import { PostModel } from '../../../../shared/models/post.model';
 
 @Component({
   selector: 'app-posts',
@@ -19,8 +21,11 @@ export class PostsComponent implements OnInit {
   }
 
 
+  posts$ = this.postsService.posts$
+
   subPosts: any;
-  posts: any;
+  private postsArr: PostModel[] = [];
+
 
 
   @Select(AppState.getAppName)
@@ -40,13 +45,15 @@ export class PostsComponent implements OnInit {
     this.subPosts = this.postsService
       .getAllPosts()
       .subscribe(resp => {
-        this.posts = resp;
-        console.log(this.posts)
+        this.postsArr = resp;
+        this.postsService.posts$.next(resp);
+        console.log(this.postsArr)
       });
   }
 
   // trackByFn(index, item) {
   //   return item.id; // unique id corresponding to the item
   // }
+
 }
 

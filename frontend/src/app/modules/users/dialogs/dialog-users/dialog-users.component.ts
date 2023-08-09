@@ -104,7 +104,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSubmit(): void {
+  onSubmitUser(): void {
     if (this.data.newUser == true) {
       this.addNewUser();
     } else {
@@ -116,7 +116,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.editUserForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmit()', this.editUserForm.value)
+    console.log(1, 'onSubmitUser()', this.editUserForm.value)
 
     const params: any = {
       email: this.editUserForm.value.email,
@@ -160,7 +160,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.editUserForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmit()', this.editUserForm.value)
+    console.log(1, 'onSubmitUser()', this.editUserForm.value)
 
     let {id} = this.currentUser
 
