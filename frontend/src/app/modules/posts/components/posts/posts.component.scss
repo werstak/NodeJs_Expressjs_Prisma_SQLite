@@ -1,3 +1,10 @@
 .posts {
   padding: 25px;
+
+  &__panel {
+    margin-bottom: 25px;
+    mat-card {
+      background: #f0f8ff;
+    }
+  }
 }

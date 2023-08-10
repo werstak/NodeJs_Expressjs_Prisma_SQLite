@@ -128,9 +128,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
             }
           );
 
-        // this.refreshTable();
-
-
       } else {
         return
       }

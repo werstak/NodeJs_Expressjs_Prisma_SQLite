@@ -43,7 +43,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   public postForm: FormGroup;
   private subPost: Subscription;
   private unsubscribe = new Subject<void>();
-  private postsArr: UserModel[] = [];
+  private postsArr: PostModel[] = [];
 
   currentPost: PostModel;
   respNewPost: PostModel;
@@ -59,6 +59,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
 
     if (this.data.newPost == true) {
       this.postForm.reset();
+      this.postForm.patchValue({
+        published: true
+      });
     } else {
       this.initPostFormValue();
     }
@@ -77,7 +80,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.postForm = this.fb.group({
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      content: ['', [Validators.required]],
+      content: ['', []],
       published: ['', []],
       picture: ['', []]
     });
@@ -104,54 +107,56 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
 
   onSubmitPost(): void {
     if (this.data.newPost == true) {
-      // this.addNewUser();
+      this.addNewPost();
     } else {
       this.updatePost();
     }
   }
 
-  // private addNewUser(): void {
-  //   if (this.editUserForm.invalid) {
-  //     return;
-  //   }
-  //   console.log(1, 'onSubmit()', this.editUserForm.value)
-  //
-  //   const params: any = {
-  //     email: this.editUserForm.value.email,
-  //     password: this.editUserForm.value.password,
-  //     firstName: this.editUserForm.value.firstName,
-  //     lastName: this.editUserForm.value.lastName,
-  //     // role: this.editUserForm.value.role,
-  //     role: Number(this.editUserForm.value.role),
-  //     avatar: this.editUserForm.value.avatar,
-  //   };
-  //
-  //   this.usersService.addUser(params)
-  //     .pipe(
-  //       // takeUntil(this.unsubscribe)
-  //     )
-  //     .subscribe(
-  //       (response) => {
-  //         this.respNewUser = response;
-  //         console.log('addNewUser response', response);
-  //         this.addNewUserInTable();
-  //         this.notificationService.showSuccess('User created successfully');
-  //       },
-  //       (error) => {
-  //         console.error(error);
-  //         const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-  //         const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-  //         this.notificationService.showError(secondErrorAttempt);
-  //       }
-  //     );
-  // }
-  //
-  //
-  // private addNewUserInTable() {
-  //   this.usersArr.push(this.respNewUser);
-  //   console.log('usersArr', this.usersArr)
-  //   this.usersService.users$.next(this.usersArr);
-  // }
+  private addNewPost(): void {
+    if (this.postForm.invalid) {
+      return;
+    }
+    console.log(1, 'onSubmit()', this.postForm.value)
+
+    // let {id, userId} = this.currentPost
+
+    const params: any = {
+      // id: id,
+      title: this.postForm.value.title,
+      description: this.postForm.value.description,
+      content: this.postForm.value.content,
+      published: this.postForm.value.published,
+      picture: this.postForm.value.picture,
+      userId: 1
+    };
+
+    this.postsService.addPost(params)
+      .pipe(
+        // takeUntil(this.unsubscribe)
+      )
+      .subscribe(
+        (response) => {
+          this.respNewPost = response;
+          console.log('respNewPost response', response);
+          this.addNewPostInList();
+          this.notificationService.showSuccess('Post created successfully');
+        },
+        (error) => {
+          console.error(error);
+          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+          this.notificationService.showError(secondErrorAttempt);
+        }
+      );
+  }
+
+
+  private addNewPostInList() {
+    this.postsArr.push(this.respNewPost);
+    console.log('usersArr', this.postsArr)
+    this.postsService.posts$.next(this.postsArr);
+  }
 
 
   private updatePost(): void {
@@ -180,7 +185,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         (response) => {
           this.respUpdatePost = response;
           console.log('RESPONSE Update Post', response);
-          // this.updateUserInTable(id);
+          this.updateListPosts(id);
           this.notificationService.showSuccess('Post updated successfully');
         },
         (error) => {
@@ -192,6 +197,21 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       );
   }
 
+
+
+  private updateListPosts(id: number) {
+    console.log('updateListPosts - usersArr', this.postsArr)
+
+    const updatePostsArr = this.postsArr.map(item => {
+      if (item.id === id) {
+        item = this.respUpdatePost;
+        return item;
+      }
+      return item;
+    });
+    console.log('updateUsersArr', updatePostsArr)
+    this.postsService.posts$.next(updatePostsArr);
+  }
 
 
   onNoClick(): void {

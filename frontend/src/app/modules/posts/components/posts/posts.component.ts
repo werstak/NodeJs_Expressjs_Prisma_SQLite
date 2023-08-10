@@ -6,6 +6,9 @@ import { PostsState } from '../../store-posts/posts.state';
 import { SetPostsName } from '../../store-posts/posts.action';
 import { UserModel } from '../../../../shared/models/user.model';
 import { PostModel } from '../../../../shared/models/post.model';
+import { DialogUsersComponent } from '../../../users/dialogs/dialog-users/dialog-users.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 
 @Component({
   selector: 'app-posts',
@@ -16,6 +19,7 @@ export class PostsComponent implements OnInit {
 
   constructor(
     public postsService: PostsService,
+    public dialog: MatDialog,
     public store: Store
   ) {
   }
@@ -50,6 +54,25 @@ export class PostsComponent implements OnInit {
         console.log(this.postsArr)
       });
   }
+
+  addPost() {
+    const dialogRef = this.dialog.open(DialogPostsComponent, {
+      data: {newPost: true}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('dialogRef result', result)
+
+      // setTimeout(() => {
+      //   this.table.renderRows();
+      // }, 1000)
+
+      // if (result === 1) {
+      //   // this.refreshTable();
+      //   this.table.renderRows();
+      // }
+    });
+  }
+
 
   // trackByFn(index, item) {
   //   return item.id; // unique id corresponding to the item
