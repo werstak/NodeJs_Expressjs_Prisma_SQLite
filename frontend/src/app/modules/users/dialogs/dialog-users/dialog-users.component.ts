@@ -7,6 +7,8 @@ import { Subject, Subscription, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import * as _ from 'lodash';
 
+const customProfileImage = 'assets/images/avatar_1.jpg';
+
 
 @Component({
   selector: 'app-edit-users',
@@ -14,6 +16,9 @@ import * as _ from 'lodash';
   styleUrls: ['./dialog-users.component.scss']
 })
 export class DialogUsersComponent implements OnInit, OnDestroy {
+  private fileToUpload: Blob;
+  private url: string | ArrayBuffer | null;
+
   constructor(
     public dialogRef: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
@@ -33,15 +38,22 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   respNewUser: UserModel;
   respUpdateUser: UserModel;
 
+  avatarUrl: any;
+  avatarImage: '';
+  avatarImageDefault: any;
+
 
   ngOnInit() {
     this.getUsers();
     this.buildForm();
 
     console.log('DIALOG  data', this.data)
+    this.avatarImageDefault = customProfileImage;
 
     if (this.data.newUser == true) {
       this.editUserForm.reset();
+      this.test();
+
     } else {
       this.initFormValue();
     }
@@ -52,6 +64,17 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       this.usersArr = users;
       console.log('1 getUsers  = usersArr', this.usersArr)
     });
+  }
+
+  private test(): void {
+    // this.editUserForm.get('avatar').valueChanges.subscribe((v) => {
+    //   console.log(v)
+    // })
+
+    this.editUserForm.valueChanges.subscribe((v) => {
+      console.log(v)
+    })
+
   }
 
 
@@ -223,8 +246,41 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
 
     // this.unsubscribe.next();
-    // this.unsubscribe.complete();
+    // this.unssubscribe.complete();
   }
 
+
+  handleInputChange(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      const files = event.target.files;
+      let invalidFlag = false;
+      const pattern = /image-*/;
+      for (const file of files) {
+        if (!file.type.match(pattern)) {
+          invalidFlag = true;
+          alert('invalid format');
+        }
+      }
+      console.log(1111111111, files)
+
+      this.handleImageLoaded(files);
+    }
+
+  }
+
+
+  handleImageLoaded(files: any): void {
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      // console.log(444444444, event.target.result);
+      this.avatarUrl = event.target.result;
+    }
+    reader.readAsDataURL(files[0]);
+
+  }
+
+  public deleteAvatar() {
+    this.avatarUrl = null;
+  }
 
 }
