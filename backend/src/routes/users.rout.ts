@@ -2,7 +2,8 @@ import express from "express";
 import type { Request, Response } from "express";
 import { body, validationResult } from "express-validator";
 import * as UserHandler from "../controllers/users.conroller";
-
+import upload from '../middleware/upload';
+const path = require('path');
 
 export const usersRouter = express.Router();
 
@@ -71,20 +72,38 @@ usersRouter.put(
             return response.status(400).json({ errors: errors.array() });
         }
         const id: number = parseInt(request.params.id, 10);
+
         try {
 
-            console.log('111 Root PUT - Updating USER = ', request)
+            // console.log('111 Root PUT - Updating USER = ', request)
             console.log('222 Root PUT - Updating USER = ', request.body)
             console.log('3333 PUT - Updating USER request = ', request.params)
 
             // const test = JSON.stringify(request.body.UserParams);
 
             // console.log('44444 test', test);
-            // console.log(77777, JSON.stringify(request.body.user_params));
+            console.log(77777, JSON.parse(request.body.user_params));
 
 
 
-            const user = request.body;
+            // const user = request.body;
+            const user = JSON.parse(request.body.user_params);
+
+
+            const filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+            // const imagePath = path.join?.(__dirname, '/uploads/');
+
+            console.log(88888, 'filename = ', filename);
+            // console.log(999999, 'imagePath = ', imagePath);
+
+
+            console.warn('file name: ', upload.name);
+            user.avatar = filename;
+
+            // const file = request.files;
+            // const newFileName = encodeURI(id + "-" + file.name);
+            // await file.mv(`${__dirname}/uploads/${newFileName}`);
+
 
             // const path = request.file.path.replace(/\\/g, "/");
             // await User.findByIdAndUpdate(id, req.body = {ProfilePicture: "http://localhost:5000/" + path}, { new: true });
