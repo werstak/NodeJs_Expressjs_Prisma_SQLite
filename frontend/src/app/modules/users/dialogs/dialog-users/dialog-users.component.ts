@@ -39,7 +39,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   respUpdateUser: UserModel;
 
   avatarUrl: any;
-  avatarImage: '';
+  avatarImage: any = '';
   avatarImageDefault: any;
 
 
@@ -127,6 +127,38 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  /** Image upload */
+  handleImageLoaded(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      const files = event.target.files;
+      let invalidFlag = false;
+      const pattern = /image-*/;
+      for (const file of files) {
+        if (!file.type.match(pattern)) {
+          invalidFlag = true;
+          alert('invalid format');
+        }
+      }
+      console.log(1111111111, files)
+
+      this.handleImagePreview(files);
+    }
+  }
+
+  handleImagePreview(files: any): void {
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      // console.log(444444444, event.target.result);
+      this.avatarUrl = event.target.result;
+    }
+    this.avatarImage = files[0];
+    console.log(55555, this.avatarImage);
+    reader.readAsDataURL(files[0]);
+  }
+
+
+  /** Sending the Form*/
   onSubmitUser(): void {
     if (this.data.newUser == true) {
       this.addNewUser();
@@ -135,6 +167,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  /** Adding a new User*/
   private addNewUser(): void {
     if (this.editUserForm.invalid) {
       return;
@@ -171,7 +205,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
-
   private addNewUserInTable() {
     this.usersArr.push(this.respNewUser);
     console.log('usersArr', this.usersArr)
@@ -179,6 +212,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
+  /** Update a new User*/
   private updateUser(): void {
     if (this.editUserForm.invalid) {
       return;
@@ -186,6 +220,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     console.log(1, 'onSubmitUser()', this.editUserForm.value)
 
     let {id} = this.currentUser
+    const avatar = this.avatarImage;
 
     const params: UserModel = {
       id: id,
@@ -195,10 +230,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       lastName: this.editUserForm.value.lastName,
       // role: this.editUserForm.value.role,
       role: Number(this.editUserForm.value.role),
-      avatar: this.editUserForm.value.avatar,
+      avatar: '',
     };
 
-    this.usersService.updateUser(this.currentUser.id, params)
+    this.usersService.updateUser(this.currentUser.id, params, avatar)
       .pipe(
         // takeUntil(this.unsubscribe)
       )
@@ -218,10 +253,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
-
   private updateUserInTable(id: number) {
     console.log('updateUserInTable - usersArr', this.usersArr)
-
     const updateUsersArr = this.usersArr.map(item => {
       if (item.id === id) {
         item = this.respUpdateUser;
@@ -249,35 +282,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     // this.unssubscribe.complete();
   }
 
-
-  handleInputChange(event: any) {
-    if (event.target.files && event.target.files[0]) {
-      const files = event.target.files;
-      let invalidFlag = false;
-      const pattern = /image-*/;
-      for (const file of files) {
-        if (!file.type.match(pattern)) {
-          invalidFlag = true;
-          alert('invalid format');
-        }
-      }
-      console.log(1111111111, files)
-
-      this.handleImageLoaded(files);
-    }
-
-  }
-
-
-  handleImageLoaded(files: any): void {
-    const reader = new FileReader();
-    reader.onload = (event: any) => {
-      // console.log(444444444, event.target.result);
-      this.avatarUrl = event.target.result;
-    }
-    reader.readAsDataURL(files[0]);
-
-  }
 
   public deleteAvatar() {
     this.avatarUrl = null;

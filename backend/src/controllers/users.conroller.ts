@@ -74,6 +74,7 @@ export const updateUserHandler = async (
     id: number
 ): Promise<any> => {
     const {firstName, lastName, email, password, role, avatar} = user;
+
     return db.user.update({
         where: {
             id,

@@ -62,9 +62,9 @@ usersRouter.post(
 /** PUT: Updating an USER */
 usersRouter.put(
     "/:id",
-    body("firstName").isString(),
-    body("lastName").isString(),
-    body("email").isString(),
+    // body("firstName").isString(),
+    // body("lastName").isString(),
+    // body("email").isString(),
     async (request: Request, response: Response) => {
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
@@ -72,9 +72,24 @@ usersRouter.put(
         }
         const id: number = parseInt(request.params.id, 10);
         try {
-            console.log('Root PUT - Updating USER = ', request.body)
+
+            console.log('111 Root PUT - Updating USER = ', request)
+            console.log('222 Root PUT - Updating USER = ', request.body)
+            console.log('3333 PUT - Updating USER request = ', request.params)
+
+            // const test = JSON.stringify(request.body.UserParams);
+
+            // console.log('44444 test', test);
+            // console.log(77777, JSON.stringify(request.body.user_params));
+
+
 
             const user = request.body;
+
+            // const path = request.file.path.replace(/\\/g, "/");
+            // await User.findByIdAndUpdate(id, req.body = {ProfilePicture: "http://localhost:5000/" + path}, { new: true });
+            // res.json(updateAnUser);
+
             const updatedUser = await UserHandler.updateUserHandler(user, id);
             return response.status(200).json(updatedUser);
         } catch (error: any) {

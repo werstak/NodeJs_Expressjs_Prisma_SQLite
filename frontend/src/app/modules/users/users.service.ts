@@ -41,9 +41,32 @@ export class UsersService {
       );
   }
 
-  updateUser(id: number, params: UserModel): Observable<any> {
-    return this.http.put(config.API_URL + `/users/` + id, params);
+
+  updateUser(id: number, params: any, avatar: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", avatar);
+    uploadData.append("user_params", params);
+
+    console.log('params', params);
+    console.log('uploadData', uploadData);
+
+    return this.http.put(config.API_URL + `/users/` + id, uploadData);
   }
+
+  // uploadImages(files): Observable<any> {
+  //   const uploadData = new FormData();
+  //
+  //   let i = 0;
+  //   for (const file of files) {
+  //     uploadData.append("images" + ++i, file);
+  //   }
+  //
+  //   return this.http.post(
+  //     config.API_URL + "api/variationgroup/uploadfiles",
+  //     uploadData
+  //   );
+  //   // return of(['fgdgd'])
+  // }
 
   addUser(params: UserModel): Observable<any> {
     return this.http.post(config.API_URL + `/users/`, params);

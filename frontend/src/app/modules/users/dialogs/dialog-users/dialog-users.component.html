@@ -17,7 +17,7 @@
           id="fileInput"
           type='file'
           accept="image/*"
-          (change)="handleInputChange($event)">
+          (change)="handleImageLoaded($event)">
         <button *ngIf="avatarUrl" (click)="deleteAvatar()" >delete</button>
       </div>
 
