@@ -54,9 +54,21 @@ export class UsersService {
   }
 
 
-  addUser(params: UserModel): Observable<any> {
-    return this.http.post(config.API_URL + `/users/`, params);
+  addUser(params: UserModel, avatar: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", avatar);
+    uploadData.append("user_params", JSON.stringify(params));
+
+    console.log('ADD params', params);
+    console.log('ADD uploadData', uploadData);
+    return this.http.post(config.API_URL + `/users/`, uploadData);
   }
+
+
+  //
+  // addUser(params: UserModel): Observable<any> {
+  //   return this.http.post(config.API_URL + `/users/`, params);
+  // }
 
   removeUser(id: number): Observable<any> {
     return this.http.delete(config.API_URL + `/users/` + id);

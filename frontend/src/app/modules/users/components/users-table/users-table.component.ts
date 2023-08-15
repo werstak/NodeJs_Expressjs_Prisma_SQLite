@@ -23,7 +23,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  displayedColumns = ['id', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'avatar', 'posts', 'actions'];
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
 
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
 

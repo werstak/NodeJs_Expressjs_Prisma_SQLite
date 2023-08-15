@@ -2,8 +2,20 @@
   padding: 25px;
 
   &__container {
-    max-height: 600px;
+    max-height: 750px;
     overflow: auto;
+  }
+
+  &__avatar {
+    width: auto;
+    max-height: 100px;
+    overflow: hidden;
+    text-align: center;
+
+    img {
+      width: 100px;
+      height: auto;
+    }
   }
 }
 

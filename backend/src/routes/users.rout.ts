@@ -40,8 +40,8 @@ usersRouter.get("/:id", async (request: Request, response: Response) => {
 /** POST: Create a User */
 usersRouter.post(
     "/",
-    body("firstName").isString(),
-    body("lastName").isString(),
+    // body("firstName").isString(),
+    // body("lastName").isString(),
     async (request: Request, response: Response) => {
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
@@ -50,7 +50,27 @@ usersRouter.post(
         try {
             console.log('Root POST - create USER = ', request.body)
 
-            const user = request.body;
+
+            const user = JSON.parse(request.body.user_params);
+
+
+            // const imagePath = path.join?.(__dirname, '/uploads/');
+
+            // console.log(999999, 'imagePath = ', imagePath);
+            let filename = '';
+
+            if (request.file?.filename) {
+                filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+            } else {
+                filename = '';
+            }
+
+            // const filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+            // console.log(88888, 'filename = ', filename);
+
+            user.avatar = filename;
+
+
             const newUser = await UserHandler.createUserHandler(user);
             return response.status(201).json(newUser);
         } catch (error: any) {
@@ -58,6 +78,29 @@ usersRouter.post(
         }
     }
 );
+
+
+// /** POST: Create a User */
+// usersRouter.post(
+//     "/",
+//     body("firstName").isString(),
+//     body("lastName").isString(),
+//     async (request: Request, response: Response) => {
+//         const errors = validationResult(request);
+//         if (!errors.isEmpty()) {
+//             return response.status(400).json({ errors: errors.array() });
+//         }
+//         try {
+//             console.log('Root POST - create USER = ', request.body)
+//
+//             const user = request.body;
+//             const newUser = await UserHandler.createUserHandler(user);
+//             return response.status(201).json(newUser);
+//         } catch (error: any) {
+//             return response.status(500).json(error.message);
+//         }
+//     }
+// );
 
 
 /** PUT: Updating an USER */
@@ -76,13 +119,13 @@ usersRouter.put(
         try {
 
             // console.log('111 Root PUT - Updating USER = ', request)
-            console.log('222 Root PUT - Updating USER = ', request.body)
-            console.log('3333 PUT - Updating USER request = ', request.params)
+            // console.log('222 Root PUT - Updating USER = ', request.body)
+            // console.log('3333 PUT - Updating USER request = ', request.params)
 
             // const test = JSON.stringify(request.body.UserParams);
 
             // console.log('44444 test', test);
-            console.log(77777, JSON.parse(request.body.user_params));
+            // console.log(77777, JSON.parse(request.body.user_params));
 
 
 
@@ -90,14 +133,20 @@ usersRouter.put(
             const user = JSON.parse(request.body.user_params);
 
 
-            const filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
             // const imagePath = path.join?.(__dirname, '/uploads/');
 
-            console.log(88888, 'filename = ', filename);
             // console.log(999999, 'imagePath = ', imagePath);
+            let filename = '';
 
+            if (request.file?.filename) {
+                filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+            } else {
+                filename = '';
+            }
 
-            console.warn('file name: ', upload.name);
+            // const filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+            // console.log(88888, 'filename = ', filename);
+
             user.avatar = filename;
 
             // const file = request.files;

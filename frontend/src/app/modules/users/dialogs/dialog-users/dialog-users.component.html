@@ -5,7 +5,6 @@
       <div class="dialog__title">{{this.currentUser ? this.currentUser.firstName : 'Add User'}}</div>
 
       <div class="dialog__avatar">
-
         <label class="hoverable" for="fileInput">
           <img [src]="avatarUrl ? avatarUrl : avatarImageDefault">
           <div class="hover-text">Choose file</div>
@@ -18,31 +17,14 @@
           type='file'
           accept="image/*"
           (change)="handleImageLoaded($event)">
-        <button *ngIf="avatarUrl" (click)="deleteAvatar()" >delete</button>
       </div>
-
-
-
-
-<!--      <div class="dialog__avatar">-->
-<!--        <img *ngIf="avatarImage" [src]="avatarImage" alt="">-->
-<!--        <img [src]="avatarImage ? avatarImage : avatarImageDefault">-->
-<!--      </div>-->
-
+      <button *ngIf="avatarUrl" (click)="deleteAvatar()" class="dialog__iconCancel" mat-icon-button  tabindex="-2" matTooltip="Delete avatar" aria-label="Example icon button with a vertical three dot icon">
+        <mat-icon>close</mat-icon>
+      </button>
     </div>
 
     <form [formGroup]="editUserForm" novalidate (ngSubmit)="onSubmitUser()" class="example-form">
       <div mat-dialog-content>
-
-<!--        <mat-form-field color="accent" class="example-full-width">-->
-<!--          <input-->
-<!--            #email class="form-control"-->
-<!--            formControlName="avatar"-->
-<!--            type="file"-->
-<!--            name="avatar"-->
-<!--            accept="image/*"-->
-<!--          />-->
-<!--        </mat-form-field>-->
 
         <mat-form-field color="accent" class="example-full-width">
           <input matInput #email class="form-control" placeholder="Email" formControlName="email"
