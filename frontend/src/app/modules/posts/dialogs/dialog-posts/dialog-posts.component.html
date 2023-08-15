@@ -1,5 +1,31 @@
 <div class="dialog-post">
-  <h1 mat-dialog-title>Hi {{data.name}}</h1>
+<!--  <h1 mat-dialog-title>Hi {{data.name}}</h1>-->
+
+  <div class="dialog__header">
+    <div class="dialog__title">
+      {{data.name}}}
+    </div>
+
+    <div class="dialog__avatar">
+      <label class="hoverable" for="fileInput">
+        <img [src]="avatarUrl ? avatarUrl : avatarImageDefault">
+        <div class="hover-text">Choose file</div>
+        <div class="background"></div>
+      </label>
+      <br/>
+      <input
+        name="fileInput"
+        id="fileInput"
+        type='file'
+        accept="image/*"
+        (change)="handleImageLoaded($event)">
+    </div>
+    <button *ngIf="avatarUrl" (click)="deleteAvatar()" class="dialog__iconClose" mat-icon-button  tabindex="-2" matTooltip="Delete avatar" aria-label="Example icon button with a vertical three dot icon">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+
   <form [formGroup]="postForm" novalidate (ngSubmit)="onSubmitPost()" class="dialog-post__form">
     <div mat-dialog-content>
       <p>What's your favorite animal?</p>

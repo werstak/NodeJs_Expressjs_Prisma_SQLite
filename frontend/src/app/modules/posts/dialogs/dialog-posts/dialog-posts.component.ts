@@ -49,6 +49,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   respNewPost: PostModel;
   respUpdatePost: PostModel;
 
+  avatarUrl: any;
+  avatarImage = '';
+  avatarImageDefault: any;
 
 
   ngOnInit() {
@@ -102,6 +105,43 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         picture: '',
       });
     });
+  }
+
+
+
+  /** Picture upload */
+  handleImageLoaded(event: any) {
+    if (event.target.files && event.target.files[0]) {
+      const files = event.target.files;
+      let invalidFlag = false;
+      const pattern = /image-*/;
+      for (const file of files) {
+        if (!file.type.match(pattern)) {
+          invalidFlag = true;
+          alert('invalid format');
+        }
+      }
+      console.log(1111111111, files)
+
+      this.handleImagePreview(files);
+    }
+  }
+
+  handleImagePreview(files: any): void {
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      // console.log(444444444, event.target.result);
+      this.avatarUrl = event.target.result;
+    }
+    this.avatarImage = files[0];
+    // console.log(55555, this.avatarImage);
+    reader.readAsDataURL(files[0]);
+  }
+
+  /** Delete picture */
+  public deleteAvatar() {
+    this.avatarUrl = '';
+    this.avatarImage = '';
   }
 
 
@@ -225,8 +265,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     // this.unsubscribe.complete();
   }
 
-  onSubmit() {
-
-  }
+  // onSubmit() {
+  //
+  // }
 }
 

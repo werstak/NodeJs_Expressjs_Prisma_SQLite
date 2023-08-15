@@ -2,4 +2,23 @@
   //max-width: 400px;
   padding: 20px;
   margin: 0 0 20px;
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    //justify-content: space-between;
+  }
+
+  &__description {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+
+  }
+
+  &__subTitle {
+    color: grey;
+  }
 }

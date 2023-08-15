@@ -158,6 +158,12 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     reader.readAsDataURL(files[0]);
   }
 
+  /** Delete Avatar */
+  public deleteAvatar() {
+    this.avatarUrl = '';
+    this.avatarImage = '';
+  }
+
 
   /** Sending the Form*/
   onSubmitUser(): void {
@@ -286,9 +292,5 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  public deleteAvatar() {
-    this.avatarUrl = '';
-    this.avatarImage = '';
-  }
 
 }
