@@ -50,7 +50,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     console.log('DIALOG  data', this.data)
     this.avatarImageDefault = customProfileImage;
 
-    if (this.data.newUser == true) {
+    if (this.data.newUser) {
       this.editUserForm.reset();
       this.test();
 
@@ -167,7 +167,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   /** Sending the Form*/
   onSubmitUser(): void {
-    if (this.data.newUser == true) {
+    if (this.data.newUser) {
       this.addNewUser();
     } else {
       this.updateUser();
@@ -202,7 +202,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         (response) => {
           this.respNewUser = response;
           console.log('addNewUser response', response);
-          this.addNewUserInTable();
+          this.addNewUserToTable();
           this.notificationService.showSuccess('User created successfully');
         },
         (error) => {
@@ -214,7 +214,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
-  private addNewUserInTable() {
+  private addNewUserToTable() {
     this.usersArr.push(this.respNewUser);
     console.log('usersArr', this.usersArr)
     this.usersService.users$.next(this.usersArr);

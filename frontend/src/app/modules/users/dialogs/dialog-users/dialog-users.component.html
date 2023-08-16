@@ -18,7 +18,12 @@
           accept="image/*"
           (change)="handleImageLoaded($event)">
       </div>
-      <button *ngIf="avatarUrl" (click)="deleteAvatar()" class="dialog__iconClose" mat-icon-button  tabindex="-2" matTooltip="Delete avatar" aria-label="Example icon button with a vertical three dot icon">
+      <button *ngIf="avatarUrl"
+              mat-icon-button
+              (click)="deleteAvatar()"
+              class="dialog__iconClose"
+              tabindex="-2"
+              matTooltip="Delete avatar">
         <mat-icon>close</mat-icon>
       </button>
     </div>

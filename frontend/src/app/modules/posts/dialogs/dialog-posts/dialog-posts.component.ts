@@ -3,12 +3,11 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, Subscription } from 'rxjs';
-import { UserModel } from '../../../../shared/models/user.model';
-import { UsersService } from '../../../users/users.service';
 import { NotificationService } from '../../../../shared/notification.service';
 import { PostsService } from '../../posts.service';
 import * as _ from 'lodash';
-// import { DialogData } from '../../components/post/post.component';
+
+const pictureDefault = 'assets/images/image-placeholder.jpg';
 
 @Component({
   selector: 'app-dialogs-posts',
@@ -34,11 +33,11 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   constructor(
     public dialogRef: MatDialogRef<DialogPostsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
-
     private fb: FormBuilder,
     public postsService: PostsService,
     private notificationService: NotificationService,
-  ) {}
+  ) {
+  }
 
   public postForm: FormGroup;
   private subPost: Subscription;
@@ -49,18 +48,21 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   respNewPost: PostModel;
   respUpdatePost: PostModel;
 
-  avatarUrl: any;
-  avatarImage = '';
-  avatarImageDefault: any;
+  pictureUrl: any;
+  previousPictureUrl: '';
+  pictureFile: any;
+  pictureDefault: any;
 
 
   ngOnInit() {
     this.getPosts();
     this.buildForm();
 
-    console.log('DIALOG  data', this.data)
+    console.log('Open DIALOG data = ', this.data)
 
-    if (this.data.newPost == true) {
+    this.pictureDefault = pictureDefault;
+
+    if (this.data.newPost) {
       this.postForm.reset();
       this.postForm.patchValue({
         published: true
@@ -68,16 +70,14 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     } else {
       this.initPostFormValue();
     }
-
   }
 
   private getPosts(): void {
     this.postsService.posts$.subscribe((posts) => {
       this.postsArr = posts;
-      console.log('1 getUsers  = postsArr', this.postsArr)
+      // console.log('postsArr', this.postsArr)
     });
   }
-
 
   private buildForm() {
     this.postForm = this.fb.group({
@@ -85,28 +85,28 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: ['', [Validators.required]],
       content: ['', []],
       published: ['', []],
-      picture: ['', []]
+      // picture: ['', []]
     });
   }
-
 
   private initPostFormValue() {
     const id: number = this.data.id;
     this.subPost = this.postsService.getPost(id).subscribe(data => {
-
       this.currentPost = data
-      console.log('getUser()', this.currentPost)
+      this.previousPictureUrl = data.picture;
+      this.pictureUrl = data.picture;
+
+      console.log('currentPost', this.currentPost)
 
       this.postForm.setValue({
         title: data.title,
         description: data.description,
         content: data.content,
         published: data.published,
-        picture: '',
+        // picture: '',
       });
     });
   }
-
 
 
   /** Picture upload */
@@ -130,23 +130,23 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
-      // console.log(444444444, event.target.result);
-      this.avatarUrl = event.target.result;
+      // console.log('IMAGE', event.target.result);
+      this.pictureUrl = event.target.result;
     }
-    this.avatarImage = files[0];
-    // console.log(55555, this.avatarImage);
+    this.pictureFile = files[0];
+    // console.log(55555, this.pictureFile);
     reader.readAsDataURL(files[0]);
   }
 
   /** Delete picture */
-  public deleteAvatar() {
-    this.avatarUrl = '';
-    this.avatarImage = '';
+  public deletePicture() {
+    this.pictureUrl = '';
+    this.pictureFile = '';
   }
 
-
+  /** Creating or updating a post */
   onSubmitPost(): void {
-    if (this.data.newPost == true) {
+    if (this.data.newPost) {
       this.addNewPost();
     } else {
       this.updatePost();
@@ -157,21 +157,17 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     if (this.postForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmit()', this.postForm.value)
-
-    // let {id, userId} = this.currentPost
-
+    const picture = this.pictureFile;
     const params: any = {
-      // id: id,
       title: this.postForm.value.title,
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
-      picture: this.postForm.value.picture,
+      // picture: '',
       userId: 1
     };
 
-    this.postsService.addPost(params)
+    this.postsService.addPost(params, picture)
       .pipe(
         // takeUntil(this.unsubscribe)
       )
@@ -179,7 +175,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         (response) => {
           this.respNewPost = response;
           console.log('respNewPost response', response);
-          this.addNewPostInList();
+          this.addNewPostToList();
           this.notificationService.showSuccess('Post created successfully');
         },
         (error) => {
@@ -191,33 +187,28 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       );
   }
 
-
-  private addNewPostInList() {
+  private addNewPostToList() {
     this.postsArr.push(this.respNewPost);
-    console.log('usersArr', this.postsArr)
     this.postsService.posts$.next(this.postsArr);
   }
-
 
   private updatePost(): void {
     if (this.postForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmit()', this.postForm.value)
-
-    let {id, userId} = this.currentPost
-
+    let {id, userId} = this.currentPost;
+    const picture = this.pictureFile;
+    const previousPictureUrl = this.previousPictureUrl;
     const params: any = {
       id: id,
       title: this.postForm.value.title,
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
-      picture: this.postForm.value.picture,
       userId: userId
     };
 
-    this.postsService.updatePost(this.currentPost.id, params)
+    this.postsService.updatePost(this.currentPost.id, params, picture, previousPictureUrl)
       .pipe(
         // takeUntil(this.unsubscribe)
       )
@@ -238,10 +229,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
 
-
   private updateListPosts(id: number) {
-    console.log('updateListPosts - usersArr', this.postsArr)
-
     const updatePostsArr = this.postsArr.map(item => {
       if (item.id === id) {
         item = this.respUpdatePost;
@@ -249,7 +237,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       }
       return item;
     });
-    console.log('updateUsersArr', updatePostsArr)
     this.postsService.posts$.next(updatePostsArr);
   }
 
@@ -264,9 +251,5 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     // this.unsubscribe.next();
     // this.unsubscribe.complete();
   }
-
-  // onSubmit() {
-  //
-  // }
 }
 

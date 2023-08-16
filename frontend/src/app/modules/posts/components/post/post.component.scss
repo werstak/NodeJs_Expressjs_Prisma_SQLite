@@ -6,7 +6,7 @@
   &__header {
     display: flex;
     flex-direction: row;
-    //justify-content: space-between;
+    justify-content: space-between;
   }
 
   &__description {
@@ -21,4 +21,21 @@
   &__subTitle {
     color: grey;
   }
+
+  &__img {
+    max-height: 100px;
+    max-width: 200px;
+    text-align: right;
+    overflow: hidden;
+
+    img {
+      width: auto;
+      height: 100%;
+    }
+
+  }
+}
+
+::ng-deep .mat-mdc-card-header-text {
+  display: none !important;
 }

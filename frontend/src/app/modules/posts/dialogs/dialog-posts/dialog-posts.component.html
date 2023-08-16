@@ -1,14 +1,15 @@
 <div class="dialog-post">
-<!--  <h1 mat-dialog-title>Hi {{data.name}}</h1>-->
+  <!--  <h1 mat-dialog-title>Hi {{data.name}}</h1>-->
 
-  <div class="dialog__header">
-    <div class="dialog__title">
-      {{data.name}}}
+  <div class="dialog-post__header">
+    <div class="dialog-post__title">
+      <!--      {{this.currentPost.title}}-->
+      {{this.currentPost ? this.currentPost.title : 'Add Post'}}
     </div>
 
-    <div class="dialog__avatar">
+    <div class="dialog-post__avatar">
       <label class="hoverable" for="fileInput">
-        <img [src]="avatarUrl ? avatarUrl : avatarImageDefault">
+        <img [src]="pictureUrl ? pictureUrl : pictureDefault">
         <div class="hover-text">Choose file</div>
         <div class="background"></div>
       </label>
@@ -20,7 +21,12 @@
         accept="image/*"
         (change)="handleImageLoaded($event)">
     </div>
-    <button *ngIf="avatarUrl" (click)="deleteAvatar()" class="dialog__iconClose" mat-icon-button  tabindex="-2" matTooltip="Delete avatar" aria-label="Example icon button with a vertical three dot icon">
+    <button *ngIf="pictureUrl"
+            mat-icon-button
+            (click)="deletePicture()"
+            class="dialog-post__iconClose"
+            tabindex="-2"
+            matTooltip="Delete avatar">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -28,8 +34,6 @@
 
   <form [formGroup]="postForm" novalidate (ngSubmit)="onSubmitPost()" class="dialog-post__form">
     <div mat-dialog-content>
-      <p>What's your favorite animal?</p>
-
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input matInput class="form-control" placeholder="Title" formControlName="title">
@@ -45,13 +49,15 @@
         <textarea matInput class="form-control" placeholder="Content..." rows="5" formControlName="content"></textarea>
       </mat-form-field>
 
-<!--      <mat-form-field class="example-full-width">-->
-<!--        <mat-label>Picture</mat-label>-->
-<!--        <input matInput class="form-control" placeholder="Picture" formControlName="picture">-->
-<!--      </mat-form-field>-->
+      <!--      <mat-form-field class="example-full-width">-->
+      <!--        <mat-label>Picture</mat-label>-->
+      <!--        <input matInput class="form-control" placeholder="Picture" formControlName="picture">-->
+      <!--      </mat-form-field>-->
     </div>
 
-    <p><mat-checkbox formControlName="published">Published</mat-checkbox></p>
+    <p>
+      <mat-checkbox formControlName="published">Published</mat-checkbox>
+    </p>
 
 
     <div mat-dialog-actions class="dialog-post__actions">

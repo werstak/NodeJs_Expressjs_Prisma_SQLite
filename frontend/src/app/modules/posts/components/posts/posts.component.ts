@@ -51,7 +51,7 @@ export class PostsComponent implements OnInit {
       .subscribe(resp => {
         this.postsArr = resp;
         this.postsService.posts$.next(resp);
-        console.log(this.postsArr)
+        // console.log(this.postsArr)
       });
   }
 

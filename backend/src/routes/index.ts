@@ -10,7 +10,7 @@ console.log('index - ROUTS')
 
 export const router = express.Router();
 
-router.use('/posts', postsRouter);
+router.use('/posts', upload, postsRouter);
 router.use('/users', upload, usersRouter);
 router.use('/', rootRouter);
 

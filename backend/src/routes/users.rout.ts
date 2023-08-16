@@ -48,10 +48,9 @@ usersRouter.post(
             return response.status(400).json({ errors: errors.array() });
         }
         try {
-            console.log('Root POST - create USER = ', request.body)
-
-
+            console.log('request.body - create USER = ', request.body)
             const user = JSON.parse(request.body.user_params);
+            // console.log(' USER = ', user)
 
 
             // const imagePath = path.join?.(__dirname, '/uploads/');

@@ -4,10 +4,10 @@ export class UserModel {
   password?: string;
   firstName: string;
   lastName: string;
-  createdAt?: string
-  updatedAt?: string
-  role: number
-  avatar: string
+  createdAt?: string;
+  updatedAt?: string;
+  role: number;
+  avatar: string;
   posts?: PostsModel[]
 }
 

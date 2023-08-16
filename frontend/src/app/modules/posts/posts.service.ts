@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import * as config from '../../../app-config';
 import { PostModel } from '../../shared/models/post.model';
+import { UserModel } from '../../shared/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,13 +39,33 @@ export class PostsService {
       );
   }
 
-  updatePost(id: number, params: PostModel): Observable<any> {
-    return this.http.put(config.API_URL + `/posts/` + id, params);
+  updatePost(id: number, params: PostModel, picture: any, previousPictureUrl: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", picture);
+    uploadData.append("post_params", JSON.stringify(params));
+    uploadData.append("previousPictureUrl", JSON.stringify(previousPictureUrl));
+
+    // console.log('ADD params', params);
+    // console.log('ADD uploadData', uploadData);
+    return this.http.put(config.API_URL + `/posts/` + id, uploadData);
   }
 
-  addPost(params: PostModel): Observable<any> {
-    return this.http.post(config.API_URL + `/posts/`, params);
+  // updatePost(id: number, params: PostModel): Observable<any> {
+  //   return this.http.put(config.API_URL + `/posts/` + id, params);
+  // }
+
+  addPost(params: PostModel, avatar: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", avatar);
+    uploadData.append("post_params", JSON.stringify(params));
+    // console.log('ADD params', params);
+    // console.log('ADD uploadData', uploadData);
+    return this.http.post(config.API_URL + `/posts/`, uploadData);
   }
+
+  // addPost(params: PostModel): Observable<any> {
+  //   return this.http.post(config.API_URL + `/posts/`, params);
+  // }
 
   removePost(id: number): Observable<any> {
     return this.http.delete(config.API_URL + `/posts/` + id);
