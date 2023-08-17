@@ -39,10 +39,11 @@ export class PostsService {
       );
   }
 
-  updatePost(id: number, params: PostModel, picture: any, previousPictureUrl: any): Observable<any> {
+  updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append("ProfilePicture", picture);
     uploadData.append("post_params", JSON.stringify(params));
+    uploadData.append("pictureOrUrl", JSON.stringify(pictureOrUrl));
     uploadData.append("previousPictureUrl", JSON.stringify(previousPictureUrl));
 
     // console.log('ADD params', params);

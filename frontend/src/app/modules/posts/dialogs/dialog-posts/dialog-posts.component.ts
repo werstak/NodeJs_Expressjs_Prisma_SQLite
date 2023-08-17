@@ -121,7 +121,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
           alert('invalid format');
         }
       }
-      console.log(1111111111, files)
+      console.log('handleImageLoaded() files[0]', files)
 
       this.handleImagePreview(files);
     }
@@ -199,6 +199,17 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     let {id, userId} = this.currentPost;
     const picture = this.pictureFile;
     const previousPictureUrl = this.previousPictureUrl;
+    let pictureOrUrl = false;
+
+    // console.log('this.pictureUrl' ,this.pictureUrl)
+    pictureOrUrl = !!this.pictureUrl;
+    // if (this.pictureUrl) {
+    //   pictureOrUrl = true;
+    // } else {
+    //   pictureOrUrl = false;
+    // }
+
+
     const params: any = {
       id: id,
       title: this.postForm.value.title,
@@ -208,7 +219,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       userId: userId
     };
 
-    this.postsService.updatePost(this.currentPost.id, params, picture, previousPictureUrl)
+    this.postsService.updatePost(this.currentPost.id, params, picture, pictureOrUrl, previousPictureUrl)
       .pipe(
         // takeUntil(this.unsubscribe)
       )

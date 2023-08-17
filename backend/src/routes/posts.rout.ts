@@ -85,34 +85,101 @@ postsRouter.put(
             console.log('Update POST = ', request.body)
             const post = JSON.parse(request.body.post_params);
 
+            const pictureOrUrl = JSON.parse(request.body.pictureOrUrl);
+            const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
+            console.log(2222222, 'pictureOrUrl', pictureOrUrl)
+            console.log(33333333, 'request.file?.filename', request.file?.filename)
 
-            let filename = '';
+            const removePicture = previousPictureUrl.replace('http://localhost:5000/', '');
 
-            if (request.file?.filename) {
-                filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
-            } else {
-                filename = '';
-            }
-            post.picture = filename;
 
+            // console.log(111111,'ProfilePicture', request.body.ProfilePicture)
 
             /**deleted image*/
             // TODO
             /** add file existence check before deleting*/
 
-            // const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
-            //
-            // if (previousPictureUrl == '' || previousPictureUrl == null) {
-            //     console.log(33333333333)
-            //     return;
+
+                // if (previousPictureUrl == '' || previousPictureUrl == null) {
+                //     console.log(33333333333)
+                //     return;
+                // } else {
+                //     const removePicture = previousPictureUrl.replace('http://localhost:5000/', '');
+                //     console.log('removePicture', removePicture)
+                //     fs.unlink(removePicture, err => {
+                //         if(err) throw err;
+                //         console.log('1111111111111 File deleted successfully');
+                //     });
+                // }
+
+
+            let fileUrl = '';
+
+            if (!request.file?.filename) {
+                console.log('обновление  удаление')
+                if (pictureOrUrl) {
+                    console.log('обновление')
+                    fileUrl = previousPictureUrl;
+                } else {
+                    console.log('удаленеи')
+                    fileUrl = '';
+
+                    fs.stat(removePicture, (err, stats) => {
+                        console.log('stats', stats);//here we got all information of file in stats variable
+                        if (err) {
+                            return console.error(err);
+                        }
+
+                        fs.unlink(removePicture, err => {
+                            if (err) return console.log(err);
+                            console.log('file deleted successfully');
+                        });
+                    });
+                }
+            } else {
+                console.log('первая загрузка картинки или ее замена')
+                fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+
+                console.log('removePicture', removePicture)
+                fs.stat(removePicture, (err, stats) => {
+                    console.log(stats);//here we got all information of file in stats variable
+                    if (err) {
+                        return console.error(err);
+                    }
+
+                    fs.unlink(removePicture, err => {
+                        if (err) return console.log(err);
+                        console.log('file deleted successfully');
+                    });
+                });
+
+                // fs.unlink(removePicture, err => {
+                //     if(err) throw err;
+                //     console.log('УДАЛЕНИЕ File deleted successfully');
+                // });
+            }
+            post.picture = fileUrl;
+
+
+            // let fileUrl = '';
+            // if (!request.file?.filename) {
+            //     // обновление  удалеие
+            //     console.log('обновление  удаление')
+            //     if (pictureOrUrl) {
+            //         // обновление
+            //         console.log('обновление')
+            //         fileUrl = previousPictureUrl;
+            //     } else {
+            //         // удаленеи
+            //         console.log('удаленеи')
+            //         fileUrl = '';
+            //     }
             // } else {
-            //     const removePicture = previousPictureUrl.replace('http://localhost:5000/', '');
-            //     console.log('removePicture', removePicture)
-            //     fs.unlink(removePicture, err => {
-            //         if(err) throw err;
-            //         console.log('1111111111111 File deleted successfully');
-            //     });
+            //     // загрузка новой картинки
+            //     console.log('первая загрузка картинки или ее замена')
+            //     fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
             // }
+            // post.picture = fileUrl;
 
 
             const updatedPost = await PostHandler.updatePostHandler(post, id);
