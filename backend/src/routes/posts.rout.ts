@@ -82,108 +82,62 @@ postsRouter.put(
         }
         const id: number = parseInt(request.params.id, 10);
         try {
-            console.log('Update POST = ', request.body)
-            const post = JSON.parse(request.body.post_params);
 
+            console.log(11111, 'Update POST = ', request.body.post_params)
+
+            const post = JSON.parse(request.body.post_params);
             const pictureOrUrl = JSON.parse(request.body.pictureOrUrl);
             const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
-            console.log(2222222, 'pictureOrUrl', pictureOrUrl)
-            console.log(33333333, 'request.file?.filename', request.file?.filename)
 
-            const removePicture = previousPictureUrl.replace('http://localhost:5000/', '');
+            // console.log(2222222, 'pictureOrUrl', pictureOrUrl)
+            // console.log(33333333, 'request.file?.filename', request.file?.filename)
 
-
-            // console.log(111111,'ProfilePicture', request.body.ProfilePicture)
-
-            /**deleted image*/
-            // TODO
-            /** add file existence check before deleting*/
+            const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
 
 
-                // if (previousPictureUrl == '' || previousPictureUrl == null) {
-                //     console.log(33333333333)
-                //     return;
-                // } else {
-                //     const removePicture = previousPictureUrl.replace('http://localhost:5000/', '');
-                //     console.log('removePicture', removePicture)
-                //     fs.unlink(removePicture, err => {
-                //         if(err) throw err;
-                //         console.log('1111111111111 File deleted successfully');
-                //     });
-                // }
-
-
+            /**
+             adding, replacing and deleting photos in the database and folder (uploads)
+             */
             let fileUrl = '';
-
             if (!request.file?.filename) {
-                console.log('обновление  удаление')
+                console.log('updating a post without a picture and deleting a picture')
                 if (pictureOrUrl) {
-                    console.log('обновление')
                     fileUrl = previousPictureUrl;
+                    console.log('update a picture path in base')
                 } else {
-                    console.log('удаленеи')
                     fileUrl = '';
-
-                    fs.stat(removePicture, (err, stats) => {
-                        console.log('stats', stats);//here we got all information of file in stats variable
+                    console.log('deleting a picture path in base')
+                    fs.stat(pathRemovePicture, (err, stats) => {
+                        console.log('search for a deleted file in a folder (uploads)', stats);
                         if (err) {
                             return console.error(err);
                         }
-
-                        fs.unlink(removePicture, err => {
+                        fs.unlink(pathRemovePicture, err => {
                             if (err) return console.log(err);
                             console.log('file deleted successfully');
                         });
                     });
                 }
             } else {
-                console.log('первая загрузка картинки или ее замена')
+                console.log('first image upload or replacement')
                 fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
 
-                console.log('removePicture', removePicture)
-                fs.stat(removePicture, (err, stats) => {
-                    console.log(stats);//here we got all information of file in stats variable
+                console.log('deleting a picture path in base')
+                fs.stat(pathRemovePicture, (err, stats) => {
+                    console.log('search for a deleted file in a folder (uploads)', stats);
                     if (err) {
                         return console.error(err);
                     }
-
-                    fs.unlink(removePicture, err => {
+                    fs.unlink(pathRemovePicture, err => {
                         if (err) return console.log(err);
                         console.log('file deleted successfully');
                     });
                 });
 
-                // fs.unlink(removePicture, err => {
-                //     if(err) throw err;
-                //     console.log('УДАЛЕНИЕ File deleted successfully');
-                // });
             }
+
             post.picture = fileUrl;
-
-
-            // let fileUrl = '';
-            // if (!request.file?.filename) {
-            //     // обновление  удалеие
-            //     console.log('обновление  удаление')
-            //     if (pictureOrUrl) {
-            //         // обновление
-            //         console.log('обновление')
-            //         fileUrl = previousPictureUrl;
-            //     } else {
-            //         // удаленеи
-            //         console.log('удаленеи')
-            //         fileUrl = '';
-            //     }
-            // } else {
-            //     // загрузка новой картинки
-            //     console.log('первая загрузка картинки или ее замена')
-            //     fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
-            // }
-            // post.picture = fileUrl;
-
-
             const updatedPost = await PostHandler.updatePostHandler(post, id);
-
             return response.status(201).json(updatedPost);
         } catch (error: any) {
             return response.status(500).json(error.message);
@@ -196,6 +150,34 @@ postsRouter.put(
 postsRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
+
+        // const picture = request.body.picture;
+        // const id = JSON.parse(request.params.id);
+        // const picture = JSON.parse(request.params.picture);
+        const test = request.params.id;
+
+        console.log(7777, 'request.params', test)
+        // console.log(8888, 'request.params', JSON.parse(request.params.id))
+
+
+// TODO
+
+//         const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
+//         const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
+//
+//         /** deleting photos in the database and folder (uploads)*/
+//         console.log('deleting a picture path in base')
+//         fs.stat(pathRemovePicture, (err, stats) => {
+//             console.log('search for a deleted file in a folder (uploads)', stats);
+//             if (err) {
+//                 return console.error(err);
+//             }
+//             fs.unlink(pathRemovePicture, err => {
+//                 if (err) return console.log(err);
+//                 console.log('file deleted successfully');
+//             });
+//         });
+
         await PostHandler.deletePostHandler(id);
         return response.status(204).json('Post was successfully deleted');
     } catch (error: any) {

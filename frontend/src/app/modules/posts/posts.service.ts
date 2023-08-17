@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import * as config from '../../../app-config';
 import { PostModel } from '../../shared/models/post.model';
@@ -45,49 +45,23 @@ export class PostsService {
     uploadData.append("post_params", JSON.stringify(params));
     uploadData.append("pictureOrUrl", JSON.stringify(pictureOrUrl));
     uploadData.append("previousPictureUrl", JSON.stringify(previousPictureUrl));
-
-    // console.log('ADD params', params);
-    // console.log('ADD uploadData', uploadData);
     return this.http.put(config.API_URL + `/posts/` + id, uploadData);
   }
-
-  // updatePost(id: number, params: PostModel): Observable<any> {
-  //   return this.http.put(config.API_URL + `/posts/` + id, params);
-  // }
 
   addPost(params: PostModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append("ProfilePicture", avatar);
     uploadData.append("post_params", JSON.stringify(params));
-    // console.log('ADD params', params);
-    // console.log('ADD uploadData', uploadData);
     return this.http.post(config.API_URL + `/posts/`, uploadData);
   }
 
-  // addPost(params: PostModel): Observable<any> {
-  //   return this.http.post(config.API_URL + `/posts/`, params);
-  // }
-
-  removePost(id: number): Observable<any> {
+  removePost(id: number, picture: any): Observable<any> {
+    // const test = {
+    //   id,
+    //   picture
+    // }
     return this.http.delete(config.API_URL + `/posts/` + id);
   }
-
-
-  // uploadImages(files): Observable<any> {
-  //   const uploadData = new FormData();
-  //
-  //   let i = 0;
-  //   for (const file of files) {
-  //     uploadData.append("images" + ++i, file);
-  //   }
-  //
-  //   return this.http.post(
-  //     config.API_URL + "api/variationgroup/uploadfiles",
-  //     uploadData
-  //   );
-  //   // return of(['fgdgd'])
-  // }
-
 
 
 }
