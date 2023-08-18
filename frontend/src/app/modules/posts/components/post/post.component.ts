@@ -72,9 +72,9 @@ export class PostComponent implements OnInit, OnDestroy {
     this.getPosts();
 
     let {id, title, picture} = post;
-    // const params = {
-    //   picture
-    // }
+    const params = {
+      picture
+    }
 
     console.log('DIALOG dell post', post)
 
@@ -88,10 +88,10 @@ export class PostComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('deletePost - afterClosed', result)
-      console.log('pictures', picture)
+      console.log('pictures', params)
 
       if (result === true) {
-        this.postsService.removePost(id, picture)
+        this.postsService.removePost(id, params)
           .pipe(
             // takeUntil(this.unsubscribe)
           )

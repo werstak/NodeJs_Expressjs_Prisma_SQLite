@@ -96,7 +96,11 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   deleteUser(user: UserModel): void {
-    let {id, firstName} = user;
+    let {id, firstName, avatar} = user;
+    // let {id, title, picture} = post;
+    const params = {
+      avatar
+    }
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
@@ -110,7 +114,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       console.log('deleteUser - afterClosed', result)
 
       if (result === true) {
-        this.usersService.removeUser(id)
+        this.usersService.removeUser(id, params)
           .pipe(
             // takeUntil(this.unsubscribe)
           )

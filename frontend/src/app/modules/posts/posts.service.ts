@@ -41,26 +41,22 @@ export class PostsService {
 
   updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
     const uploadData = new FormData();
-    uploadData.append("ProfilePicture", picture);
-    uploadData.append("post_params", JSON.stringify(params));
-    uploadData.append("pictureOrUrl", JSON.stringify(pictureOrUrl));
-    uploadData.append("previousPictureUrl", JSON.stringify(previousPictureUrl));
+    uploadData.append('ProfilePicture', picture);
+    uploadData.append('post_params', JSON.stringify(params));
+    uploadData.append('pictureOrUrl', JSON.stringify(pictureOrUrl));
+    uploadData.append('previousPictureUrl', JSON.stringify(previousPictureUrl));
     return this.http.put(config.API_URL + `/posts/` + id, uploadData);
   }
 
   addPost(params: PostModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
-    uploadData.append("ProfilePicture", avatar);
-    uploadData.append("post_params", JSON.stringify(params));
+    uploadData.append('ProfilePicture', avatar);
+    uploadData.append('post_params', JSON.stringify(params));
     return this.http.post(config.API_URL + `/posts/`, uploadData);
   }
 
-  removePost(id: number, picture: any): Observable<any> {
-    // const test = {
-    //   id,
-    //   picture
-    // }
-    return this.http.delete(config.API_URL + `/posts/` + id);
+  removePost(id: number, params: any): Observable<any> {
+    return this.http.delete(config.API_URL + `/posts/` + id, {params});
   }
 
 

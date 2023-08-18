@@ -42,10 +42,12 @@ export class UsersService {
   }
 
 
-  updateUser(id: number, params: any, avatar: any): Observable<any> {
+  updateUser(id: number, params: any, avatar: any, imageOrUrl: any, previousImageUrl: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append("ProfilePicture", avatar);
     uploadData.append("user_params", JSON.stringify(params));
+    uploadData.append("imageOrUrl", JSON.stringify(imageOrUrl));
+    uploadData.append("previousImageUrl", JSON.stringify(previousImageUrl));
 
     console.log('params', params);
     console.log('uploadData', uploadData);
@@ -70,8 +72,8 @@ export class UsersService {
   //   return this.http.post(config.API_URL + `/users/`, params);
   // }
 
-  removeUser(id: number): Observable<any> {
-    return this.http.delete(config.API_URL + `/users/` + id);
+  removeUser(id: number, params: any): Observable<any> {
+    return this.http.delete(config.API_URL + `/users/` + id, {params});
   }
 
 

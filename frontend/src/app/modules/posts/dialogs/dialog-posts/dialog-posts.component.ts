@@ -164,7 +164,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       content: this.postForm.value.content,
       published: this.postForm.value.published,
       // picture: '',
-      userId: 1
+      userId: 3
     };
 
     this.postsService.addPost(params, picture)
@@ -199,16 +199,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     let {id, userId} = this.currentPost;
     const picture = this.pictureFile;
     const previousPictureUrl = this.previousPictureUrl;
-    let pictureOrUrl = false;
-
-    // console.log('this.pictureUrl' ,this.pictureUrl)
+    let pictureOrUrl: boolean;
     pictureOrUrl = !!this.pictureUrl;
-    // if (this.pictureUrl) {
-    //   pictureOrUrl = true;
-    // } else {
-    //   pictureOrUrl = false;
-    // }
-
 
     const params: any = {
       id: id,

@@ -150,33 +150,21 @@ postsRouter.put(
 postsRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
+        const previousPictureUrl = String(request.query.picture);
+        const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
 
-        // const picture = request.body.picture;
-        // const id = JSON.parse(request.params.id);
-        // const picture = JSON.parse(request.params.picture);
-        const test = request.params.id;
-
-        console.log(7777, 'request.params', test)
-        // console.log(8888, 'request.params', JSON.parse(request.params.id))
-
-
-// TODO
-
-//         const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
-//         const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
-//
-//         /** deleting photos in the database and folder (uploads)*/
-//         console.log('deleting a picture path in base')
-//         fs.stat(pathRemovePicture, (err, stats) => {
-//             console.log('search for a deleted file in a folder (uploads)', stats);
-//             if (err) {
-//                 return console.error(err);
-//             }
-//             fs.unlink(pathRemovePicture, err => {
-//                 if (err) return console.log(err);
-//                 console.log('file deleted successfully');
-//             });
-//         });
+        /** deleting photos in the database and folder (uploads)*/
+        console.log('deleting a picture path in base')
+        fs.stat(pathRemovePicture, (err, stats) => {
+            console.log('search for a deleted file in a folder (uploads)', stats);
+            if (err) {
+                return console.error(err);
+            }
+            fs.unlink(pathRemovePicture, err => {
+                if (err) return console.log(err);
+                console.log('file deleted successfully');
+            });
+        });
 
         await PostHandler.deletePostHandler(id);
         return response.status(204).json('Post was successfully deleted');
