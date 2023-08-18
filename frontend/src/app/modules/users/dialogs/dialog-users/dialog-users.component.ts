@@ -105,8 +105,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
-      // avatar: [null, Validators.compose([])
-      // ],
     });
   }
 
@@ -117,6 +115,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
+
       console.log('getUser()', this.currentUser)
 
       this.editUserForm.setValue({
@@ -125,7 +124,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         lastName: data.lastName,
         role: data.role,
         password: data.password,
-        // avatar: ''
       });
     });
   }
@@ -143,7 +141,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
           alert('invalid format');
         }
       }
-      console.log(1111111111, files)
 
       this.handleImagePreview(files);
     }
@@ -152,22 +149,23 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
-      // console.log(444444444, event.target.result);
       this.avatarUrl = event.target.result;
     }
     this.avatarFile = files[0];
-    // console.log(55555, this.avatarFile);
     reader.readAsDataURL(files[0]);
   }
 
-  /** Delete Avatar */
+  /**
+   Delete Avatar
+   */
   public deleteAvatar() {
     this.avatarUrl = '';
     this.avatarFile = '';
   }
 
-
-  /** Sending the Form*/
+  /**
+   Sending the Form
+   */
   onSubmitUser(): void {
     if (this.data.newUser) {
       this.addNewUser();
@@ -177,7 +175,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  /** Adding a new User*/
+  /**
+   Adding a new User
+   */
   private addNewUser(): void {
     if (this.editUserForm.invalid) {
       return;
@@ -185,7 +185,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     console.log(1, 'onSubmitUser()', this.editUserForm.value)
 
     const avatar = this.avatarFile;
-
     const params: any = {
       email: this.editUserForm.value.email,
       password: this.editUserForm.value.password,
@@ -216,6 +215,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
+/**
+  Adding a new User to the Table
+*/
   private addNewUserToTable() {
     this.usersArr.push(this.respNewUser);
     console.log('usersArr', this.usersArr)
@@ -223,7 +225,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  /** Update a new User*/
+  /**
+   Update User
+   */
   private updateUser(): void {
     if (this.editUserForm.invalid) {
       return;
@@ -235,7 +239,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const previousImageUrl = this.previousImageUrl;
     let imageOrUrl: boolean;
     imageOrUrl = !!this.avatarUrl;
-
     const params: UserModel = {
       id: id,
       email: this.editUserForm.value.email,
@@ -267,6 +270,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
+/**
+  Update a new User to the Table
+*/
   private updateUserInTable(id: number) {
     console.log('updateUserInTable - usersArr', this.usersArr)
     const updateUsersArr = this.usersArr.map(item => {
@@ -295,7 +301,4 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     // this.unsubscribe.next();
     // this.unssubscribe.complete();
   }
-
-
-
 }

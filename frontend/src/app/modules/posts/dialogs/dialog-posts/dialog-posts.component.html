@@ -3,7 +3,6 @@
 
   <div class="dialog-post__header">
     <div class="dialog-post__title">
-      <!--      {{this.currentPost.title}}-->
       {{this.currentPost ? this.currentPost.title : 'Add Post'}}
     </div>
 
@@ -48,11 +47,6 @@
         <mat-label>Content</mat-label>
         <textarea matInput class="form-control" placeholder="Content..." rows="5" formControlName="content"></textarea>
       </mat-form-field>
-
-      <!--      <mat-form-field class="example-full-width">-->
-      <!--        <mat-label>Picture</mat-label>-->
-      <!--        <input matInput class="form-control" placeholder="Picture" formControlName="picture">-->
-      <!--      </mat-form-field>-->
     </div>
 
     <p>

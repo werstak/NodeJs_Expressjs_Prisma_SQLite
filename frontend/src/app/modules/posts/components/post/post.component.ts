@@ -32,16 +32,8 @@ export class PostComponent implements OnInit, OnDestroy {
   name: string;
 
   postsArr: PostModel[] = [];
-  // private postsArr: PostModel[] = [];
-
-
-  // currentPost: PostModel;
-  // respNewPost: PostModel;
-  // respUpdatePost: PostModel;
   private subPosts: Subscription;
   private unsubscribe = new Subject<void>();
-
-
 
   constructor(
     public dialog: MatDialog,
@@ -77,7 +69,6 @@ export class PostComponent implements OnInit, OnDestroy {
     }
 
     console.log('DIALOG dell post', post)
-
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
         subtitle: title,

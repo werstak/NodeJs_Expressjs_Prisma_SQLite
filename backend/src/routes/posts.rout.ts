@@ -4,14 +4,15 @@ import * as PostHandler from '../controllers/posts.conroller';
 import { body, validationResult } from 'express-validator';
 import * as fs from 'fs';
 
-
 export const postsRouter = express.Router();
 
-/** GET: List of all POSTS */
+
+/**
+ GET: List of all POSTS
+ */
 postsRouter.get('/', async (request: Request, response: Response) => {
     try {
         console.log('Root GET - All POSTS')
-
         const posts = await PostHandler.getAllPostsHandler();
         return response.status(200).json(posts);
     } catch (error: any) {
@@ -19,13 +20,14 @@ postsRouter.get('/', async (request: Request, response: Response) => {
     }
 });
 
-/** GET: A single POST by ID */
+
+/**
+ GET: A single POST by ID
+ */
 postsRouter.get('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
-
     try {
         console.log('Root GET - single POST')
-
         const post = await PostHandler.getSinglePostHandler(id);
         if (post) {
             return response.status(200).json(post);
@@ -37,7 +39,9 @@ postsRouter.get('/:id', async (request: Request, response: Response) => {
 });
 
 
-/** POST: Create a Post */
+/**
+ POST: Create a Post
+ */
 postsRouter.post(
     '/',
     // body("title").isString(),
@@ -68,7 +72,9 @@ postsRouter.post(
 );
 
 
-/** PUT: Update POST */
+/**
+ PUT: Update POST
+ */
 postsRouter.put(
     '/:id',
     // body('title').isString(),
@@ -83,21 +89,14 @@ postsRouter.put(
         const id: number = parseInt(request.params.id, 10);
         try {
 
-            console.log(11111, 'Update POST = ', request.body.post_params)
+            console.log('Update POST = ', request.body.post_params)
 
             const post = JSON.parse(request.body.post_params);
             const pictureOrUrl = JSON.parse(request.body.pictureOrUrl);
             const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
-
-            // console.log(2222222, 'pictureOrUrl', pictureOrUrl)
-            // console.log(33333333, 'request.file?.filename', request.file?.filename)
-
             const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
 
-
-            /**
-             adding, replacing and deleting photos in the database and folder (uploads)
-             */
+            /** adding, replacing and deleting photos in the database and folder (uploads) */
             let fileUrl = '';
             if (!request.file?.filename) {
                 console.log('updating a post without a picture and deleting a picture')
@@ -119,9 +118,6 @@ postsRouter.put(
                     });
                 }
             } else {
-                console.log('first image upload or replacement')
-                fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
-
                 console.log('deleting a picture path in base')
                 fs.stat(pathRemovePicture, (err, stats) => {
                     console.log('search for a deleted file in a folder (uploads)', stats);
@@ -133,6 +129,9 @@ postsRouter.put(
                         console.log('file deleted successfully');
                     });
                 });
+
+                console.log('first image upload or replacement')
+                fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
 
             }
 
@@ -146,7 +145,9 @@ postsRouter.put(
 );
 
 
-/**DELETE: Delete an POST based on the ID*/
+/**
+ DELETE: Delete an POST based on the ID
+ */
 postsRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {

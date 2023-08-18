@@ -84,8 +84,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
       content: ['', []],
-      published: ['', []],
-      // picture: ['', []]
+      published: ['', []]
     });
   }
 
@@ -102,14 +101,15 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         title: data.title,
         description: data.description,
         content: data.content,
-        published: data.published,
-        // picture: '',
+        published: data.published
       });
     });
   }
 
 
-  /** Picture upload */
+  /**
+   Picture upload
+   */
   handleImageLoaded(event: any) {
     if (event.target.files && event.target.files[0]) {
       const files = event.target.files;
@@ -130,21 +130,23 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
-      // console.log('IMAGE', event.target.result);
       this.pictureUrl = event.target.result;
     }
     this.pictureFile = files[0];
-    // console.log(55555, this.pictureFile);
     reader.readAsDataURL(files[0]);
   }
 
-  /** Delete picture */
+  /**
+   Delete picture
+   */
   public deletePicture() {
     this.pictureUrl = '';
     this.pictureFile = '';
   }
 
-  /** Creating or updating a post */
+  /**
+   Sending the Form
+   */
   onSubmitPost(): void {
     if (this.data.newPost) {
       this.addNewPost();
@@ -153,6 +155,10 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
+
+  /**
+   Adding a new post
+   */
   private addNewPost(): void {
     if (this.postForm.invalid) {
       return;
@@ -163,7 +169,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
-      // picture: '',
       userId: 3
     };
 
@@ -187,11 +192,17 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   Adding a new post to the List
+   */
   private addNewPostToList() {
     this.postsArr.push(this.respNewPost);
     this.postsService.posts$.next(this.postsArr);
   }
 
+  /**
+   Update current post
+   */
   private updatePost(): void {
     if (this.postForm.invalid) {
       return;
