@@ -1,5 +1,6 @@
 import {Action, Selector, State, StateContext} from "@ngxs/store";
 import { SetPostsName } from './posts.action';
+import { Injectable } from '@angular/core';
 
 export interface PostsStateModel {
   name: string;
@@ -13,6 +14,7 @@ export interface PostsStateModel {
 // }
 
 @State<PostsStateModel>({name: 'PostsState'})
+@Injectable()
 export class PostsState {
   @Selector()
   static getLazy1Name(state: PostsStateModel): string {

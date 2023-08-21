@@ -31,6 +31,17 @@ export class UsersService {
       );
   }
 
+  // STATE
+  fetchUsers(): Observable<any> {
+    return this.http.get(config.API_URL + `/users`)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
 
   getUser(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/users/` + id)
@@ -40,6 +51,16 @@ export class UsersService {
           return throwError(error);
         })
       );
+  }
+
+  // STATE
+  updateUser1(id: number, params: any, avatar: any, imageOrUrl: any, previousImageUrl: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", avatar);
+    uploadData.append("user_params", JSON.stringify(params));
+    uploadData.append("imageOrUrl", JSON.stringify(imageOrUrl));
+    uploadData.append("previousImageUrl", JSON.stringify(previousImageUrl));
+    return this.http.put(config.API_URL + `/users/` + id, uploadData);
   }
 
 

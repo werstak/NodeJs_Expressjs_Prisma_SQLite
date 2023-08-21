@@ -1,13 +1,16 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../shared/models/user.model';
-import { Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
 import { NotificationService } from '../../../../shared/notification.service';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { MatTable } from '@angular/material/table';
 import * as _ from 'lodash';
+import { Select, Store } from '@ngxs/store';
+import { GetUsers } from '../../store-users/users.action';
+import { UsersState } from '../../store-users/users.state';
 
 
 @Component({
@@ -17,15 +20,18 @@ import * as _ from 'lodash';
 })
 export class UsersTableComponent implements OnInit, OnDestroy {
   constructor(
+    public store: Store,
     public usersService: UsersService,
     private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
   }
 
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
+  @Select(UsersState.getUsersList) users: Observable<UserModel[]>;
 
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
+
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
 
   reloadPage$ = new Subject<void>();
   users$ = this.usersService.users$;
@@ -43,17 +49,27 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
-    this.subUsers = this.usersService
-      .getAllUsers()
-      .subscribe(resp => {
-        this.usersArr = resp;
-        this.usersService.users$.next(resp);
-        // this.dataSource = resp;
-        // this.users = resp;
+    this.store.dispatch(new GetUsers());
+
+    this.subUsers = this.users.subscribe(resp => {
+      this.usersArr = resp;
+      this.usersService.users$.next(resp);
+      // console.log('get USERS', this.usersArr)
+    });
 
 
-        console.log('get USERS', this.usersArr)
-      });
+    // this.subUsers = this.usersService
+    //   .getAllUsers()
+    //   .subscribe(resp => {
+    //     this.usersArr = resp;
+    //     this.usersService.users$.next(resp);
+    //     // this.dataSource = resp;
+    //     // this.users = resp;
+    //
+    //     console.log('get USERS', this.usersArr)
+    //   });
+
+
   }
 
 
@@ -141,11 +157,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   private deleteUserInTable(id: number) {
-
-    let newUsersArr =  this.usersArr.filter(n => n.id !== id);
-    // let newArray = myArray.filter(function(f) { return f !== 'two' });
-    // let newUsersArr = this.usersArr.filter((n) => {return n != id});
-
+    let newUsersArr = this.usersArr.filter(n => n.id !== id);
 
     this.usersService.users$.next(newUsersArr);
     this.table.renderRows();

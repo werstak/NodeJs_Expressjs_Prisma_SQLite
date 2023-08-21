@@ -6,6 +6,8 @@ import { UsersService } from '../../users.service';
 import { Subject, Subscription, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import * as _ from 'lodash';
+import { Store } from '@ngxs/store';
+import { GetUsers, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -20,6 +22,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   private url: string | ArrayBuffer | null;
 
   constructor(
+    public store: Store,
     public dialogRef: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -111,6 +114,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   private initFormValue() {
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
+
+      this.store.dispatch(new SetSelectedUser(data));
+
 
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
@@ -215,9 +221,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       );
   }
 
-/**
-  Adding a new User to the Table
-*/
+  /**
+   Adding a new User to the Table
+   */
   private addNewUserToTable() {
     this.usersArr.push(this.respNewUser);
     console.log('usersArr', this.usersArr)
@@ -250,29 +256,35 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       avatar: '',
     };
 
-    this.usersService.updateUser(this.currentUser.id, params, avatar, imageOrUrl, previousImageUrl)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respUpdateUser = response;
-          console.log('RESPONSE Update User', response);
-          this.updateUserInTable(id);
-          this.notificationService.showSuccess('User updated successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+
+    this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
+
+    // this.usersService.updateUser(this.currentUser.id, params, avatar, imageOrUrl, previousImageUrl)
+    //   .pipe(
+    //     // takeUntil(this.unsubscribe)
+    //   )
+    //   .subscribe(
+    //     (response) => {
+    //       this.respUpdateUser = response;
+    //       console.log('RESPONSE Update User', response);
+    //       this.updateUserInTable(id);
+    //       this.notificationService.showSuccess('User updated successfully');
+    //     },
+    //     (error) => {
+    //       console.error(error);
+    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+    //       this.notificationService.showError(secondErrorAttempt);
+    //     }
+    //   );
+
+
+
   }
 
-/**
-  Update a new User to the Table
-*/
+  /**
+   Update a new User to the Table
+   */
   private updateUserInTable(id: number) {
     console.log('updateUserInTable - usersArr', this.usersArr)
     const updateUsersArr = this.usersArr.map(item => {
@@ -302,3 +314,4 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     // this.unssubscribe.complete();
   }
 }
+
