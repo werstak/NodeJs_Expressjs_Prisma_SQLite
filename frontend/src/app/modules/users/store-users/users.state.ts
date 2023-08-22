@@ -43,7 +43,7 @@ export class UsersState {
 
 
   @Action(GetUsers)
-  getTodos({getState, setState}: StateContext<UsersStateModel>) {
+  getUsers({getState, setState}: StateContext<UsersStateModel>) {
     return this.usersService.fetchUsers().pipe(tap((result) => {
       const state = getState();
       setState({
@@ -55,7 +55,7 @@ export class UsersState {
 
 
   @Action(SetSelectedUser)
-  setSelectedTodoId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
+  setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
     const state = getState();
     setState({
       ...state,
@@ -95,8 +95,8 @@ export class UsersState {
         this.notificationService.showSuccess('User updated successfully');
         const state = getState();
         const usersList = [...state.users];
-        const todoIndex = usersList.findIndex(item => item.id === id);
-        usersList[todoIndex] = result;
+        const userIndex = usersList.findIndex(item => item.id === id);
+        usersList[userIndex] = result;
         setState({
           ...state,
           users: usersList,
@@ -133,45 +133,6 @@ export class UsersState {
     ));
   }
 
-
-  //
-  // @Action(UpdateUser)
-  // updateTodo({getState, setState}: StateContext<UsersStateModel>, {id, params, avatar, imageOrUrl, previousImageUrl}: UpdateUser) {
-  //   return this.usersService.updateUser1(id, params, avatar, imageOrUrl, previousImageUrl).pipe(tap((result) => {
-  //     const state = getState();
-  //     const usersList = [...state.users];
-  //     const todoIndex = usersList.findIndex(item => item.id === id);
-  //     usersList[todoIndex] = result;
-  //     setState({
-  //       ...state,
-  //       users: usersList,
-  //     });
-  //   }));
-  // }
-  //
-
-
-  // @Selector()
-  // static getUsersName(state: UsersStateModel): string {
-  //   return state.name;
-  // }
-  //
-  // @Selector()
-  // static getAppName(state: UsersStateModel): string {
-  //   return state.appName;
-  // }
-
-  // @Selector()
-  // static getAppName2(state: AppStateModel): string {
-  //   return state.appName;
-  // }
-
-  // @Action(SetUsersName)
-  // setHost(ctx: StateContext<UsersStateModel>, action: SetUsersName) {
-  //   ctx.patchState({
-  //     name: action.name,
-  //   });
-  // }
 
 
 }

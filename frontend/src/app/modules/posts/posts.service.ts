@@ -16,8 +16,8 @@ export class PostsService {
 
   posts$ = new BehaviorSubject<any>([]);
 
-
-  getAllPosts(): Observable<any> {
+  // STATE
+  fetchPosts(): Observable<any> {
     return this.http.get(config.API_URL + `/posts`)
       .pipe(
         catchError(error => {
@@ -26,6 +26,17 @@ export class PostsService {
         })
       );
   }
+
+
+  // getAllPosts(): Observable<any> {
+  //   return this.http.get(config.API_URL + `/posts`)
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
 
 
   getPost(id: number): Observable<any> {
@@ -38,8 +49,8 @@ export class PostsService {
       );
   }
 
-
-  updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
+  // STATE
+  updatePost1(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', picture);
     uploadData.append('post_params', JSON.stringify(params));
@@ -47,6 +58,16 @@ export class PostsService {
     uploadData.append('previousPictureUrl', JSON.stringify(previousPictureUrl));
     return this.http.put(config.API_URL + `/posts/` + id, uploadData);
   }
+
+
+  // updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
+  //   const uploadData = new FormData();
+  //   uploadData.append('ProfilePicture', picture);
+  //   uploadData.append('post_params', JSON.stringify(params));
+  //   uploadData.append('pictureOrUrl', JSON.stringify(pictureOrUrl));
+  //   uploadData.append('previousPictureUrl', JSON.stringify(previousPictureUrl));
+  //   return this.http.put(config.API_URL + `/posts/` + id, uploadData);
+  // }
 
 
   addPost(params: PostModel, avatar: any): Observable<any> {

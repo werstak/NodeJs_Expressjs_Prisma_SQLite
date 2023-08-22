@@ -6,6 +6,8 @@ import { Subject, Subscription } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import { PostsService } from '../../posts.service';
 import * as _ from 'lodash';
+import { Store } from '@ngxs/store';
+import { SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -31,6 +33,7 @@ const pictureDefault = 'assets/images/image-placeholder.jpg';
 
 export class DialogPostsComponent implements OnInit, OnDestroy {
   constructor(
+    public store: Store,
     public dialogRef: MatDialogRef<DialogPostsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
@@ -91,6 +94,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   private initPostFormValue() {
     const id: number = this.data.id;
     this.subPost = this.postsService.getPost(id).subscribe(data => {
+
+      this.store.dispatch(new SetSelectedPost(data));
+
       this.currentPost = data
       this.previousPictureUrl = data.picture;
       this.pictureUrl = data.picture;
@@ -222,37 +228,43 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       userId: userId
     };
 
-    this.postsService.updatePost(this.currentPost.id, params, picture, pictureOrUrl, previousPictureUrl)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respUpdatePost = response;
-          console.log('RESPONSE Update Post', response);
-          this.updateListPosts(id);
-          this.notificationService.showSuccess('Post updated successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+
+    this.store.dispatch(new UpdatePost(id, params, picture, pictureOrUrl, previousPictureUrl));
+
+    // this.postsService.updatePost(this.currentPost.id, params, picture, pictureOrUrl, previousPictureUrl)
+    //   .pipe(
+    //     // takeUntil(this.unsubscribe)
+    //   )
+    //   .subscribe(
+    //     (response) => {
+    //       this.respUpdatePost = response;
+    //       console.log('RESPONSE Update Post', response);
+    //       this.updateListPosts(id);
+    //       this.notificationService.showSuccess('Post updated successfully');
+    //     },
+    //     (error) => {
+    //       console.error(error);
+    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+    //       this.notificationService.showError(secondErrorAttempt);
+    //     }
+    //   );
+
+
+
   }
 
 
-  private updateListPosts(id: number) {
-    const updatePostsArr = this.postsArr.map(item => {
-      if (item.id === id) {
-        item = this.respUpdatePost;
-        return item;
-      }
-      return item;
-    });
-    this.postsService.posts$.next(updatePostsArr);
-  }
+  // private updateListPosts(id: number) {
+  //   const updatePostsArr = this.postsArr.map(item => {
+  //     if (item.id === id) {
+  //       item = this.respUpdatePost;
+  //       return item;
+  //     }
+  //     return item;
+  //   });
+  //   this.postsService.posts$.next(updatePostsArr);
+  // }
 
 
   onNoClick(): void {

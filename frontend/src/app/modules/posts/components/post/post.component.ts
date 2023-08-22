@@ -15,10 +15,6 @@ import { Subject, Subscription, takeUntil } from 'rxjs';
   styleUrls: ['./post.component.scss']
 })
 
-// export interface DialogData {
-//   animal: string;
-//   name: string;
-// }
 
 export class PostComponent implements OnInit, OnDestroy {
 
@@ -26,10 +22,6 @@ export class PostComponent implements OnInit, OnDestroy {
   longText = `The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog
   from Japan. A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was
   originally bred for hunting.`;
-
-
-  animal: string;
-  name: string;
 
   postsArr: PostModel[] = [];
   private subPosts: Subscription;
@@ -50,12 +42,11 @@ export class PostComponent implements OnInit, OnDestroy {
     console.log('edit', id)
 
     const dialogRef = this.dialog.open(DialogPostsComponent, {
-      data: {id, newPost: false, name: this.name, animal: this.animal},
+      data: {id, newPost: false},
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       console.log('111 The dialog was closed', result);
-      this.animal = result;
     });
   }
 

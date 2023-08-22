@@ -28,7 +28,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   @Select(UsersState.getUsersList) users: Observable<UserModel[]>;
-
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
 
   displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
@@ -37,11 +36,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   users$ = this.usersService.users$;
   private subUsers: Subscription;
   private usersArr: UserModel[] = [];
-
-
-  // dataSource = ELEMENT_DATA;
-  // dataSource: UserModel[] = [];
-  // public users$ = new BehaviorSubject<UserModel[] | null>([]);
 
 
   ngOnInit(): void {
@@ -54,22 +48,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.subUsers = this.users.subscribe(resp => {
       this.usersArr = resp;
       this.usersService.users$.next(resp);
-      // console.log('get USERS', this.usersArr)
     });
-
-
-    // this.subUsers = this.usersService
-    //   .getAllUsers()
-    //   .subscribe(resp => {
-    //     this.usersArr = resp;
-    //     this.usersService.users$.next(resp);
-    //     // this.dataSource = resp;
-    //     // this.users = resp;
-    //
-    //     console.log('get USERS', this.usersArr)
-    //   });
-
-
   }
 
 
@@ -130,25 +109,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
       if (result === true) {
         this.store.dispatch(new DeleteUser(id, params));
-
-        // this.usersService.removeUser(id, params)
-        //   .pipe(
-        //     // takeUntil(this.unsubscribe)
-        //   )
-        //   .subscribe(
-        //     (response) => {
-        //       console.log(' deleteUser - response', response);
-        //       this.deleteUserInTable(id);
-        //       this.notificationService.showSuccess('User delete successfully');
-        //     },
-        //     (error) => {
-        //       console.error(error);
-        //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        //       this.notificationService.showError(secondErrorAttempt);
-        //     }
-        //   );
-
       } else {
         return
       }
@@ -156,15 +116,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
     });
   }
-
-
-
-  // private deleteUserInTable(id: number) {
-  //   let newUsersArr = this.usersArr.filter(n => n.id !== id);
-  //
-  //   this.usersService.users$.next(newUsersArr);
-  //   this.table.renderRows();
-  // }
 
 
 // TODO

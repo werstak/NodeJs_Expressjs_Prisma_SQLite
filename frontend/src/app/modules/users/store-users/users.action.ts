@@ -1,13 +1,14 @@
 import { UserModel } from '../../../shared/models/user.model';
 
-export class AddUser {
-  static readonly type = '[Users] Add';
-  constructor(public params: UserModel, public avatar: any) {
-  }
-}
-
 export class GetUsers {
   static readonly type = '[Users] Get';
+}
+
+export class AddUser {
+  static readonly type = '[Users] Add';
+
+  constructor(public params: UserModel, public avatar: any) {
+  }
 }
 
 export class UpdateUser {
@@ -24,25 +25,9 @@ export class DeleteUser {
   }
 }
 
-
-
 export class SetSelectedUser {
   static readonly type = '[Users] Set';
 
   constructor(public payload: UserModel) {
   }
 }
-
-// export class SetUsersName {
-//   static readonly type = '[App] Set Users Name';
-//
-//   constructor(public name: string) {
-//   }
-// }
-
-
-// export class CreateTodo {
-//   static readonly type = '[TODO] Create Todo';
-//
-//   constructor(public payload: string) {}
-// }

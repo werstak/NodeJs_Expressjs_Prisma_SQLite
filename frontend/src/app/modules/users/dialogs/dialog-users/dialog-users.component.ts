@@ -187,44 +187,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       role: Number(this.editUserForm.value.role),
       avatar: '',
     };
-
     this.store.dispatch(new AddUser(params, avatar));
-
-
-    // this.usersService.addUser(params, avatar)
-    //   .pipe(
-    //     // takeUntil(this.unsubscribe)
-    //   )
-    //   .subscribe(
-    //     (response) => {
-    //       this.respNewUser = response;
-    //       console.log('addNewUser response', response);
-    //       this.addNewUserToTable();
-    //       this.notificationService.showSuccess('User created successfully');
-    //     },
-    //     (error) => {
-    //       console.error(error);
-    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-    //       this.notificationService.showError(secondErrorAttempt);
-    //     }
-    //   );
-
-
   }
-
-
-
-
-  //
-  // /**
-  //  Adding a new User to the Table
-  //  */
-  // private addNewUserToTable() {
-  //   this.usersArr.push(this.respNewUser);
-  //   console.log('usersArr', this.usersArr)
-  //   this.usersService.users$.next(this.usersArr);
-  // }
 
 
   /**
@@ -251,64 +215,22 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       role: Number(this.editUserForm.value.role),
       avatar: '',
     };
-
-
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
-
-    // this.usersService.updateUser(this.currentUser.id, params, avatar, imageOrUrl, previousImageUrl)
-    //   .pipe(
-    //     // takeUntil(this.unsubscribe)
-    //   )
-    //   .subscribe(
-    //     (response) => {
-    //       this.respUpdateUser = response;
-    //       console.log('RESPONSE Update User', response);
-    //       this.updateUserInTable(id);
-    //       this.notificationService.showSuccess('User updated successfully');
-    //     },
-    //     (error) => {
-    //       console.error(error);
-    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-    //       this.notificationService.showError(secondErrorAttempt);
-    //     }
-    //   );
-
   }
-
-
-
-
-  // /**
-  //  Update a new User to the Table
-  //  */
-  // private updateUserInTable(id: number) {
-  //   console.log('updateUserInTable - usersArr', this.usersArr)
-  //   const updateUsersArr = this.usersArr.map(item => {
-  //     if (item.id === id) {
-  //       item = this.respUpdateUser;
-  //       return item;
-  //     }
-  //     return item;
-  //   });
-  //   console.log('updateUsersArr', updateUsersArr)
-  //   this.usersService.users$.next(updateUsersArr);
-  // }
 
 
   closeClick(): void {
     this.dialogRef.close();
   }
 
-  // ngOnDestroy() {
-  //   this.subUser.unsubscribe();
-  // }
 
   ngOnDestroy(): void {
     this.dialogRef.close();
 
     // this.unsubscribe.next();
     // this.unssubscribe.complete();
+    //   this.subUser.unsubscribe();
+
   }
 }
 

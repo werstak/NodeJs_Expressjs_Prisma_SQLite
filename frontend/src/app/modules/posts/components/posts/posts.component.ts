@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
-import { AppState } from '../../../../store/app.state';
 import { PostsState } from '../../store-posts/posts.state';
-import { SetPostsName } from '../../store-posts/posts.action';
-import { UserModel } from '../../../../shared/models/user.model';
 import { PostModel } from '../../../../shared/models/post.model';
-import { DialogUsersComponent } from '../../../users/dialogs/dialog-users/dialog-users.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
+import { Observable } from 'rxjs';
+import { GetPosts } from '../../store-posts/posts.action';
 
 @Component({
   selector: 'app-posts',
@@ -24,6 +22,7 @@ export class PostsComponent implements OnInit {
   ) {
   }
 
+  @Select(PostsState.getPostsList) posts: Observable<PostModel[]>;
 
   posts$ = this.postsService.posts$
 
@@ -32,27 +31,34 @@ export class PostsComponent implements OnInit {
 
 
 
-  @Select(AppState.getAppName)
-  public appName$: any;
-
-  @Select(PostsState.getLazy1Name)
-  public name$: any;
+  // @Select(PostsState.getLazy1Name)
+  // public name$: any;
 
 
   ngOnInit(): void {
     this.fetchData();
-    this.store.dispatch([new SetPostsName('LAZY1')]);
-
   }
 
   fetchData() {
-    this.subPosts = this.postsService
-      .getAllPosts()
-      .subscribe(resp => {
-        this.postsArr = resp;
-        this.postsService.posts$.next(resp);
-        // console.log(this.postsArr)
-      });
+    this.store.dispatch(new GetPosts());
+
+    this.subPosts = this.posts.subscribe(resp => {
+      this.postsArr = resp;
+      this.postsService.posts$.next(resp);
+      // console.log('get POSTS', this.postsArr)
+    });
+
+
+    // this.subPosts = this.postsService
+    //   .getAllPosts()
+    //   .subscribe(resp => {
+    //     this.postsArr = resp;
+    //     this.postsService.posts$.next(resp);
+    //     // console.log(this.postsArr)
+    //   });
+
+
+
   }
 
   addPost() {
