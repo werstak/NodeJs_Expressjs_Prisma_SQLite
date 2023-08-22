@@ -7,7 +7,7 @@ import { Subject, Subscription, takeUntil } from 'rxjs';
 import { NotificationService } from '../../../../shared/notification.service';
 import * as _ from 'lodash';
 import { Store } from '@ngxs/store';
-import { GetUsers, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
+import { AddUser, GetUsers, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -56,8 +56,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
     if (this.data.newUser) {
       this.editUserForm.reset();
-      // this.test();
-
     } else {
       this.initFormValue();
     }
@@ -69,17 +67,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       console.log('1 getUsers  = usersArr', this.usersArr)
     });
   }
-
-  // private test(): void {
-  //   // this.editUserForm.get('avatar').valueChanges.subscribe((v) => {
-  //   //   console.log(v)
-  //   // })
-  //
-  //   this.editUserForm.valueChanges.subscribe((v) => {
-  //     console.log(v)
-  //   })
-  //
-  // }
 
 
   private buildForm() {
@@ -201,34 +188,43 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       avatar: '',
     };
 
-    this.usersService.addUser(params, avatar)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respNewUser = response;
-          console.log('addNewUser response', response);
-          this.addNewUserToTable();
-          this.notificationService.showSuccess('User created successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+    this.store.dispatch(new AddUser(params, avatar));
+
+
+    // this.usersService.addUser(params, avatar)
+    //   .pipe(
+    //     // takeUntil(this.unsubscribe)
+    //   )
+    //   .subscribe(
+    //     (response) => {
+    //       this.respNewUser = response;
+    //       console.log('addNewUser response', response);
+    //       this.addNewUserToTable();
+    //       this.notificationService.showSuccess('User created successfully');
+    //     },
+    //     (error) => {
+    //       console.error(error);
+    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+    //       this.notificationService.showError(secondErrorAttempt);
+    //     }
+    //   );
+
+
   }
 
-  /**
-   Adding a new User to the Table
-   */
-  private addNewUserToTable() {
-    this.usersArr.push(this.respNewUser);
-    console.log('usersArr', this.usersArr)
-    this.usersService.users$.next(this.usersArr);
-  }
+
+
+
+  //
+  // /**
+  //  Adding a new User to the Table
+  //  */
+  // private addNewUserToTable() {
+  //   this.usersArr.push(this.respNewUser);
+  //   console.log('usersArr', this.usersArr)
+  //   this.usersService.users$.next(this.usersArr);
+  // }
 
 
   /**
@@ -278,25 +274,26 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     //     }
     //   );
 
-
-
   }
 
-  /**
-   Update a new User to the Table
-   */
-  private updateUserInTable(id: number) {
-    console.log('updateUserInTable - usersArr', this.usersArr)
-    const updateUsersArr = this.usersArr.map(item => {
-      if (item.id === id) {
-        item = this.respUpdateUser;
-        return item;
-      }
-      return item;
-    });
-    console.log('updateUsersArr', updateUsersArr)
-    this.usersService.users$.next(updateUsersArr);
-  }
+
+
+
+  // /**
+  //  Update a new User to the Table
+  //  */
+  // private updateUserInTable(id: number) {
+  //   console.log('updateUserInTable - usersArr', this.usersArr)
+  //   const updateUsersArr = this.usersArr.map(item => {
+  //     if (item.id === id) {
+  //       item = this.respUpdateUser;
+  //       return item;
+  //     }
+  //     return item;
+  //   });
+  //   console.log('updateUsersArr', updateUsersArr)
+  //   this.usersService.users$.next(updateUsersArr);
+  // }
 
 
   closeClick(): void {

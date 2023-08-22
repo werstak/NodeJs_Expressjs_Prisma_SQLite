@@ -2,8 +2,7 @@ import { UserModel } from '../../../shared/models/user.model';
 
 export class AddUser {
   static readonly type = '[Users] Add';
-
-  constructor(public payload: UserModel) {
+  constructor(public params: UserModel, public avatar: any) {
   }
 }
 
@@ -16,14 +15,12 @@ export class UpdateUser {
 
   constructor(public id: number, public params: any, public avatar: any, public imageOrUrl: any, public previousImageUrl: any) {
   }
-  // constructor(public payload: UserModel, public id: number) {
-  // }
 }
 
 export class DeleteUser {
   static readonly type = '[Users] Delete';
 
-  constructor(public id: number) {
+  constructor(public id: number, public params: any) {
   }
 }
 

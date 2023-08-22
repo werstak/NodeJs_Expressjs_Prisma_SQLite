@@ -73,6 +73,13 @@ export class UsersService {
     return this.http.put(config.API_URL + `/users/` + id, uploadData);
   }
 
+  // STATE
+  addUser1(params: UserModel, avatar: any): Observable<any> {
+    const uploadData = new FormData();
+    uploadData.append("ProfilePicture", avatar);
+    uploadData.append("user_params", JSON.stringify(params));
+    return this.http.post(config.API_URL + `/users/`, uploadData);
+  }
 
   addUser(params: UserModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
@@ -81,6 +88,10 @@ export class UsersService {
     return this.http.post(config.API_URL + `/users/`, uploadData);
   }
 
+  // STATE
+  removeUser1(id: number, params: any): Observable<any> {
+    return this.http.delete(config.API_URL + `/users/` + id, {params});
+  }
 
   removeUser(id: number, params: any): Observable<any> {
     return this.http.delete(config.API_URL + `/users/` + id, {params});

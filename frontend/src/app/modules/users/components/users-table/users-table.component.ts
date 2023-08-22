@@ -9,7 +9,7 @@ import { DialogConfirmComponent } from '../../../../shared/components/dialog-con
 import { MatTable } from '@angular/material/table';
 import * as _ from 'lodash';
 import { Select, Store } from '@ngxs/store';
-import { GetUsers } from '../../store-users/users.action';
+import { DeleteUser, GetUsers, UpdateUser } from '../../store-users/users.action';
 import { UsersState } from '../../store-users/users.state';
 
 
@@ -113,7 +113,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   deleteUser(user: UserModel): void {
     let {id, firstName, avatar} = user;
-    // let {id, title, picture} = post;
     const params = {
       avatar
     }
@@ -130,23 +129,25 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       console.log('deleteUser - afterClosed', result)
 
       if (result === true) {
-        this.usersService.removeUser(id, params)
-          .pipe(
-            // takeUntil(this.unsubscribe)
-          )
-          .subscribe(
-            (response) => {
-              console.log(' deleteUser - response', response);
-              this.deleteUserInTable(id);
-              this.notificationService.showSuccess('User delete successfully');
-            },
-            (error) => {
-              console.error(error);
-              const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-              const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-              this.notificationService.showError(secondErrorAttempt);
-            }
-          );
+        this.store.dispatch(new DeleteUser(id, params));
+
+        // this.usersService.removeUser(id, params)
+        //   .pipe(
+        //     // takeUntil(this.unsubscribe)
+        //   )
+        //   .subscribe(
+        //     (response) => {
+        //       console.log(' deleteUser - response', response);
+        //       this.deleteUserInTable(id);
+        //       this.notificationService.showSuccess('User delete successfully');
+        //     },
+        //     (error) => {
+        //       console.error(error);
+        //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        //       this.notificationService.showError(secondErrorAttempt);
+        //     }
+        //   );
 
       } else {
         return
@@ -156,12 +157,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deleteUserInTable(id: number) {
-    let newUsersArr = this.usersArr.filter(n => n.id !== id);
 
-    this.usersService.users$.next(newUsersArr);
-    this.table.renderRows();
-  }
+
+  // private deleteUserInTable(id: number) {
+  //   let newUsersArr = this.usersArr.filter(n => n.id !== id);
+  //
+  //   this.usersService.users$.next(newUsersArr);
+  //   this.table.renderRows();
+  // }
 
 
 // TODO
