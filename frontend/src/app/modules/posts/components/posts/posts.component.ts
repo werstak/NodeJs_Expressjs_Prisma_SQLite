@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
-// import { PostsState } from '../../store-posts/posts.state';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
@@ -23,18 +22,7 @@ export class PostsComponent implements OnInit {
   ) {
   }
 
-  @Select(PostsSelectors.getPostsList) posts: Observable<PostModel[]>;
-  // @Select(PostsState.getPostsList) posts: Observable<PostModel[]>;
-
-  posts$ = this.postsService.posts$
-
-  subPosts: any;
-  private postsArr: PostModel[] = [];
-
-
-
-  // @Select(PostsState.getLazy1Name)
-  // public name$: any;
+  @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
 
 
   ngOnInit(): void {
@@ -43,24 +31,6 @@ export class PostsComponent implements OnInit {
 
   fetchData() {
     this.store.dispatch(new GetPosts());
-
-    this.subPosts = this.posts.subscribe(resp => {
-      this.postsArr = resp;
-      this.postsService.posts$.next(resp);
-      // console.log('get POSTS', this.postsArr)
-    });
-
-
-    // this.subPosts = this.postsService
-    //   .getAllPosts()
-    //   .subscribe(resp => {
-    //     this.postsArr = resp;
-    //     this.postsService.posts$.next(resp);
-    //     // console.log(this.postsArr)
-    //   });
-
-
-
   }
 
   addPost() {
@@ -69,15 +39,6 @@ export class PostsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialogRef result', result)
-
-      // setTimeout(() => {
-      //   this.table.renderRows();
-      // }, 1000)
-
-      // if (result === 1) {
-      //   // this.refreshTable();
-      //   this.table.renderRows();
-      // }
     });
   }
 

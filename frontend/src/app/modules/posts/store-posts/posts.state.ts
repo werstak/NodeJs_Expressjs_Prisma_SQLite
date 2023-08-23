@@ -24,17 +24,12 @@ export class PostsStateModel {
 
 @Injectable()
 export class PostsState {
+
   constructor(
     private postsService: PostsService,
     private notificationService: NotificationService,
   ) {
   }
-
-  // @Selector()
-  // static getPostsList(state: PostsStateModel) {
-  //   return state.posts;
-  // }
-
 
   @Action(GetPosts)
   getAllPosts({getState, setState}: StateContext<PostsStateModel>) {
@@ -56,10 +51,9 @@ export class PostsState {
     });
   }
 
-
   @Action(AddPost)
-  addPost({getState, patchState}: StateContext<PostsStateModel>, {params, avatar}: AddPost) {
-    return this.postsService.addPost1(params, avatar).pipe(tap((result) => {
+  addNewPost({getState, patchState}: StateContext<PostsStateModel>, {params, avatar}: AddPost) {
+    return this.postsService.addPost(params, avatar).pipe(tap((result) => {
         this.notificationService.showSuccess('Post created successfully');
         const state = getState();
         patchState({
@@ -75,12 +69,11 @@ export class PostsState {
     ));
   }
 
-
   @Action(UpdatePost)
-  updatePost({getState, setState}: StateContext<PostsStateModel>, {
+  updateCurrentPost({getState, setState}: StateContext<PostsStateModel>, {
     id, params, picture, pictureOrUrl, previousPictureUrl
   }: UpdatePost) {
-    return this.postsService.updatePost1(id, params, picture, pictureOrUrl, previousPictureUrl).pipe(tap((result) => {
+    return this.postsService.updatePost(id, params, picture, pictureOrUrl, previousPictureUrl).pipe(tap((result) => {
         this.notificationService.showSuccess('Post updated successfully');
         const state = getState();
         const postsList = [...state.posts];
@@ -100,10 +93,9 @@ export class PostsState {
     ));
   }
 
-
   @Action(DeletePost)
   deletePost({getState, setState}: StateContext<PostsStateModel>, {id, params}: DeletePost) {
-    return this.postsService.removePost1(id, params).pipe(tap(() => {
+    return this.postsService.removePost(id, params).pipe(tap(() => {
         this.notificationService.showSuccess('Post delete successfully');
 
         const state = getState();

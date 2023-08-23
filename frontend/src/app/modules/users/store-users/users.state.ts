@@ -1,16 +1,11 @@
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { AppStateModel } from '../../../store/app.state';
+import { Action, State, StateContext } from '@ngxs/store';
 import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser } from './users.action';
 import { UserModel } from '../../../shared/models/user.model';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
 import { NotificationService } from '../../../shared/notification.service';
-
-// export interface UsersStateModel extends AppStateModel {
-//   name: string;
-// }
+import * as _ from 'lodash';
 
 
 export class UsersStateModel {
@@ -29,21 +24,15 @@ export class UsersStateModel {
 
 @Injectable()
 export class UsersState {
+
   constructor(
     private usersService: UsersService,
     private notificationService: NotificationService,
   ) {
   }
 
-
-  // @Selector()
-  // static getUsersList(state: UsersStateModel) {
-  //   return state.users;
-  // }
-
-
   @Action(GetUsers)
-  getUsers({getState, setState}: StateContext<UsersStateModel>) {
+  getAllUsers({getState, setState}: StateContext<UsersStateModel>) {
     return this.usersService.fetchUsers().pipe(tap((result) => {
       const state = getState();
       setState({
@@ -52,7 +41,6 @@ export class UsersState {
       });
     }));
   }
-
 
   @Action(SetSelectedUser)
   setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
@@ -63,10 +51,9 @@ export class UsersState {
     });
   }
 
-
   @Action(AddUser)
-  addUser({getState, patchState}: StateContext<UsersStateModel>, {params, avatar}: AddUser) {
-    return this.usersService.addUser1(params, avatar).pipe(tap((result) => {
+  addNewUser({getState, patchState}: StateContext<UsersStateModel>, {params, avatar}: AddUser) {
+    return this.usersService.addUser(params, avatar).pipe(tap((result) => {
         this.notificationService.showSuccess('User created successfully');
         const state = getState();
         patchState({
@@ -82,16 +69,15 @@ export class UsersState {
     ));
   }
 
-
   @Action(UpdateUser)
-  updateUser({getState, setState}: StateContext<UsersStateModel>, {
+  updateCurrentsUser({getState, setState}: StateContext<UsersStateModel>, {
     id,
     params,
     avatar,
     imageOrUrl,
     previousImageUrl
   }: UpdateUser) {
-    return this.usersService.updateUser1(id, params, avatar, imageOrUrl, previousImageUrl).pipe(tap((result) => {
+    return this.usersService.updateUser(id, params, avatar, imageOrUrl, previousImageUrl).pipe(tap((result) => {
         this.notificationService.showSuccess('User updated successfully');
         const state = getState();
         const usersList = [...state.users];
@@ -111,10 +97,9 @@ export class UsersState {
     ));
   }
 
-
   @Action(DeleteUser)
   deleteUser({getState, setState}: StateContext<UsersStateModel>, {id, params}: DeleteUser) {
-    return this.usersService.removeUser1(id, params).pipe(tap(() => {
+    return this.usersService.removeUser(id, params).pipe(tap(() => {
         this.notificationService.showSuccess('User delete successfully');
 
         const state = getState();
@@ -132,7 +117,4 @@ export class UsersState {
       }
     ));
   }
-
-
-
 }

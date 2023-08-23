@@ -3,11 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../shared/models/user.model';
 import { UsersService } from '../../users.service';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { NotificationService } from '../../../../shared/notification.service';
-import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, GetUsers, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
+import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -18,24 +16,19 @@ const customProfileImage = 'assets/images/avatar_1.jpg';
   styleUrls: ['./dialog-users.component.scss']
 })
 export class DialogUsersComponent implements OnInit, OnDestroy {
-  private fileToUpload: Blob;
-  private url: string | ArrayBuffer | null;
 
   constructor(
     public store: Store,
     public dialogRef: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public usersService: UsersService,
-    private notificationService: NotificationService,
+    public usersService: UsersService
   ) {
   }
 
 
   public editUserForm: FormGroup;
   private subUser: Subscription;
-  private unsubscribe = new Subject<void>();
-  private usersArr: UserModel[] = [];
   hide = true;
   currentUser: UserModel;
   respNewUser: UserModel;
@@ -48,26 +41,15 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.getUsers();
     this.buildForm();
-
     console.log('DIALOG  data', this.data)
     this.avatarImageDefault = customProfileImage;
-
     if (this.data.newUser) {
       this.editUserForm.reset();
     } else {
       this.initFormValue();
     }
   }
-
-  private getUsers(): void {
-    this.usersService.users$.subscribe((users) => {
-      this.usersArr = users;
-      console.log('1 getUsers  = usersArr', this.usersArr)
-    });
-  }
-
 
   private buildForm() {
     this.editUserForm = this.fb.group({
@@ -101,10 +83,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   private initFormValue() {
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
-
-      this.store.dispatch(new SetSelectedUser(data));
-
-
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
@@ -118,6 +96,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         role: data.role,
         password: data.password,
       });
+      this.store.dispatch(new SetSelectedUser(data));
     });
   }
 
@@ -134,7 +113,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
           alert('invalid format');
         }
       }
-
       this.handleImagePreview(files);
     }
   }
@@ -225,12 +203,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy(): void {
+    this.subUser?.unsubscribe();
     this.dialogRef.close();
-
-    // this.unsubscribe.next();
-    // this.unssubscribe.complete();
-    //   this.subUser.unsubscribe();
-
   }
 }
 
