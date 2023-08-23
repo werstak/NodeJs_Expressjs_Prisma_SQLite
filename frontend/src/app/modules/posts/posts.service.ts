@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import * as config from '../../../app-config';
 import { PostModel } from '../../shared/models/post.model';
+import * as config from '../../../app-config';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +14,8 @@ export class PostsService {
   ) {
   }
 
-  posts$ = new BehaviorSubject<any>([]);
 
-
-  getAllPosts(): Observable<any> {
+  fetchPosts(): Observable<any> {
     return this.http.get(config.API_URL + `/posts`)
       .pipe(
         catchError(error => {
@@ -26,7 +24,6 @@ export class PostsService {
         })
       );
   }
-
 
   getPost(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/posts/` + id)
@@ -38,7 +35,6 @@ export class PostsService {
       );
   }
 
-
   updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', picture);
@@ -48,7 +44,6 @@ export class PostsService {
     return this.http.put(config.API_URL + `/posts/` + id, uploadData);
   }
 
-
   addPost(params: PostModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', avatar);
@@ -56,10 +51,8 @@ export class PostsService {
     return this.http.post(config.API_URL + `/posts/`, uploadData);
   }
 
-
   removePost(id: number, params: any): Observable<any> {
     return this.http.delete(config.API_URL + `/posts/` + id, {params});
   }
-
 
 }

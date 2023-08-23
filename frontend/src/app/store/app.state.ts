@@ -1,4 +1,5 @@
 import {Action, Selector, State, StateContext} from "@ngxs/store";
+import { Injectable } from '@angular/core';
 
 export interface AppStateModel {
   appName: string;
@@ -12,6 +13,8 @@ export class SetAppName {
 }
 
 @State<AppStateModel>({name: 'AppState'})
+
+@Injectable()
 export class AppState {
   @Selector()
   static getAppName(state: AppStateModel): string {

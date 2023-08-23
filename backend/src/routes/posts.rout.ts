@@ -94,7 +94,14 @@ postsRouter.put(
             const post = JSON.parse(request.body.post_params);
             const pictureOrUrl = JSON.parse(request.body.pictureOrUrl);
             const previousPictureUrl = JSON.parse(request.body.previousPictureUrl);
-            const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
+
+            let pathRemovePicture ='';
+            if (previousPictureUrl !== null) {
+                pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
+            } else {
+                pathRemovePicture ='';
+            }
+            // const pathRemovePicture = previousPictureUrl.replace('http://localhost:5000/', '');
 
             /** adding, replacing and deleting photos in the database and folder (uploads) */
             let fileUrl = '';

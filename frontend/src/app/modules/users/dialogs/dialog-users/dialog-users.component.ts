@@ -3,9 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../shared/models/user.model';
 import { UsersService } from '../../users.service';
-import { Subject, Subscription, takeUntil } from 'rxjs';
-import { NotificationService } from '../../../../shared/notification.service';
-import * as _ from 'lodash';
+import { Subscription } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -16,23 +16,19 @@ const customProfileImage = 'assets/images/avatar_1.jpg';
   styleUrls: ['./dialog-users.component.scss']
 })
 export class DialogUsersComponent implements OnInit, OnDestroy {
-  private fileToUpload: Blob;
-  private url: string | ArrayBuffer | null;
 
   constructor(
+    public store: Store,
     public dialogRef: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public usersService: UsersService,
-    private notificationService: NotificationService,
+    public usersService: UsersService
   ) {
   }
 
 
   public editUserForm: FormGroup;
   private subUser: Subscription;
-  private unsubscribe = new Subject<void>();
-  private usersArr: UserModel[] = [];
   hide = true;
   currentUser: UserModel;
   respNewUser: UserModel;
@@ -45,39 +41,15 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.getUsers();
     this.buildForm();
-
     console.log('DIALOG  data', this.data)
     this.avatarImageDefault = customProfileImage;
-
     if (this.data.newUser) {
       this.editUserForm.reset();
-      // this.test();
-
     } else {
       this.initFormValue();
     }
   }
-
-  private getUsers(): void {
-    this.usersService.users$.subscribe((users) => {
-      this.usersArr = users;
-      console.log('1 getUsers  = usersArr', this.usersArr)
-    });
-  }
-
-  // private test(): void {
-  //   // this.editUserForm.get('avatar').valueChanges.subscribe((v) => {
-  //   //   console.log(v)
-  //   // })
-  //
-  //   this.editUserForm.valueChanges.subscribe((v) => {
-  //     console.log(v)
-  //   })
-  //
-  // }
-
 
   private buildForm() {
     this.editUserForm = this.fb.group({
@@ -111,7 +83,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   private initFormValue() {
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
-
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
@@ -125,6 +96,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         role: data.role,
         password: data.password,
       });
+      this.store.dispatch(new SetSelectedUser(data));
     });
   }
 
@@ -141,7 +113,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
           alert('invalid format');
         }
       }
-
       this.handleImagePreview(files);
     }
   }
@@ -194,34 +165,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       role: Number(this.editUserForm.value.role),
       avatar: '',
     };
-
-    this.usersService.addUser(params, avatar)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respNewUser = response;
-          console.log('addNewUser response', response);
-          this.addNewUserToTable();
-          this.notificationService.showSuccess('User created successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
-  }
-
-/**
-  Adding a new User to the Table
-*/
-  private addNewUserToTable() {
-    this.usersArr.push(this.respNewUser);
-    console.log('usersArr', this.usersArr)
-    this.usersService.users$.next(this.usersArr);
+    this.store.dispatch(new AddUser(params, avatar));
   }
 
 
@@ -249,41 +193,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       role: Number(this.editUserForm.value.role),
       avatar: '',
     };
-
-    this.usersService.updateUser(this.currentUser.id, params, avatar, imageOrUrl, previousImageUrl)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respUpdateUser = response;
-          console.log('RESPONSE Update User', response);
-          this.updateUserInTable(id);
-          this.notificationService.showSuccess('User updated successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
-  }
-
-/**
-  Update a new User to the Table
-*/
-  private updateUserInTable(id: number) {
-    console.log('updateUserInTable - usersArr', this.usersArr)
-    const updateUsersArr = this.usersArr.map(item => {
-      if (item.id === id) {
-        item = this.respUpdateUser;
-        return item;
-      }
-      return item;
-    });
-    console.log('updateUsersArr', updateUsersArr)
-    this.usersService.users$.next(updateUsersArr);
+    this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
 
@@ -291,14 +201,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 
-  // ngOnDestroy() {
-  //   this.subUser.unsubscribe();
-  // }
 
   ngOnDestroy(): void {
+    this.subUser?.unsubscribe();
     this.dialogRef.close();
-
-    // this.unsubscribe.next();
-    // this.unssubscribe.complete();
   }
 }
+

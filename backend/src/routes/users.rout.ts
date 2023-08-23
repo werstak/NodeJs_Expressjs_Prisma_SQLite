@@ -98,7 +98,14 @@ usersRouter.put(
             const user = JSON.parse(request.body.user_params);
             const imageOrUrl = JSON.parse(request.body.imageOrUrl);
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
-            const pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
+
+            let pathRemoveImage ='';
+            if (previousImageUrl !== null) {
+                pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
+            } else {
+                pathRemoveImage ='';
+            }
+            // const pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
 
             /** Adding, replacing and deleting photos in the database and folder (uploads) */
             let fileUrl = '';
