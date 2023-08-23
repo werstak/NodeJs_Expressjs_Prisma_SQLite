@@ -1,39 +1,120 @@
-import { Action, Selector, State, StateContext } from '@ngxs/store';
-import { AppStateModel } from '../../../store/app.state';
-import { SetUsersName } from './users.action';
+import { Action, State, StateContext } from '@ngxs/store';
+import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser } from './users.action';
+import { UserModel } from '../../../shared/models/user.model';
+import { UsersService } from '../users.service';
+import { tap } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { NotificationService } from '../../../shared/notification.service';
+import * as _ from 'lodash';
 
-export interface UsersStateModel extends AppStateModel {
-  name: string;
+
+export class UsersStateModel {
+  users: UserModel[];
+  selectedUser?: any;
 }
 
-// export class SetUsersName {
-//   static readonly type = '[App] SetUsersName';
-//
-//   constructor(public name: string) {
-//   }
-// }
+@State<UsersStateModel>({
+  name: 'UsersState',
+  defaults: {
+    users: [],
+    selectedUser: null
+  }
+})
 
-@State<UsersStateModel>({name: 'UsersState'})
+
+@Injectable()
 export class UsersState {
-  @Selector()
-  static getUsersName(state: UsersStateModel): string {
-    return state.name;
+
+  constructor(
+    private usersService: UsersService,
+    private notificationService: NotificationService,
+  ) {
   }
 
-  @Selector()
-  static getAppName(state: UsersStateModel): string {
-    return state.appName;
+  @Action(GetUsers)
+  getAllUsers({getState, setState}: StateContext<UsersStateModel>) {
+    return this.usersService.fetchUsers().pipe(tap((result) => {
+      const state = getState();
+      setState({
+        ...state,
+        users: result,
+      });
+    }));
   }
 
-  @Selector()
-  static getAppName2(state: AppStateModel): string {
-    return state.appName;
-  }
-
-  @Action(SetUsersName)
-  setHost(ctx: StateContext<UsersStateModel>, action: SetUsersName) {
-    ctx.patchState({
-      name: action.name,
+  @Action(SetSelectedUser)
+  setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
+    const state = getState();
+    setState({
+      ...state,
+      selectedUser: payload
     });
+  }
+
+  @Action(AddUser)
+  addNewUser({getState, patchState}: StateContext<UsersStateModel>, {params, avatar}: AddUser) {
+    return this.usersService.addUser(params, avatar).pipe(tap((result) => {
+        this.notificationService.showSuccess('User created successfully');
+        const state = getState();
+        patchState({
+          users: [...state.users, result]
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
+
+  @Action(UpdateUser)
+  updateCurrentsUser({getState, setState}: StateContext<UsersStateModel>, {
+    id,
+    params,
+    avatar,
+    imageOrUrl,
+    previousImageUrl
+  }: UpdateUser) {
+    return this.usersService.updateUser(id, params, avatar, imageOrUrl, previousImageUrl).pipe(tap((result) => {
+        this.notificationService.showSuccess('User updated successfully');
+        const state = getState();
+        const usersList = [...state.users];
+        const userIndex = usersList.findIndex(item => item.id === id);
+        usersList[userIndex] = result;
+        setState({
+          ...state,
+          users: usersList,
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
+
+  @Action(DeleteUser)
+  deleteUser({getState, setState}: StateContext<UsersStateModel>, {id, params}: DeleteUser) {
+    return this.usersService.removeUser(id, params).pipe(tap(() => {
+        this.notificationService.showSuccess('User delete successfully');
+
+        const state = getState();
+        const filteredArray = state.users.filter(item => item.id !== id);
+        setState({
+          ...state,
+          users: filteredArray,
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
   }
 }

@@ -2,10 +2,10 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subject, Subscription } from 'rxjs';
-import { NotificationService } from '../../../../shared/notification.service';
+import { Subscription } from 'rxjs';
 import { PostsService } from '../../posts.service';
-import * as _ from 'lodash';
+import { Store } from '@ngxs/store';
+import { AddPost, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -15,34 +15,20 @@ const pictureDefault = 'assets/images/image-placeholder.jpg';
   styleUrls: ['./dialog-posts.component.scss']
 })
 
-// export class DialogPostsComponent {
-//
-//   constructor(
-//     public dialogRef: MatDialogRef<DialogPostsComponent>,
-//     @Inject(MAT_DIALOG_DATA) public data: DialogData
-//   ) {
-//   }
-//
-//   // onNoClick(): void {
-//   //   this.dialogRef.close();
-//   // }
-// }
-
 
 export class DialogPostsComponent implements OnInit, OnDestroy {
+
   constructor(
+    public store: Store,
     public dialogRef: MatDialogRef<DialogPostsComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     public postsService: PostsService,
-    private notificationService: NotificationService,
   ) {
   }
 
   public postForm: FormGroup;
   private subPost: Subscription;
-  private unsubscribe = new Subject<void>();
-  private postsArr: PostModel[] = [];
 
   currentPost: PostModel;
   respNewPost: PostModel;
@@ -55,11 +41,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.getPosts();
     this.buildForm();
-
     console.log('Open DIALOG data = ', this.data)
-
     this.pictureDefault = pictureDefault;
 
     if (this.data.newPost) {
@@ -70,13 +53,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     } else {
       this.initPostFormValue();
     }
-  }
-
-  private getPosts(): void {
-    this.postsService.posts$.subscribe((posts) => {
-      this.postsArr = posts;
-      // console.log('postsArr', this.postsArr)
-    });
   }
 
   private buildForm() {
@@ -94,15 +70,13 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       this.currentPost = data
       this.previousPictureUrl = data.picture;
       this.pictureUrl = data.picture;
-
-      console.log('currentPost', this.currentPost)
-
       this.postForm.setValue({
         title: data.title,
         description: data.description,
         content: data.content,
         published: data.published
       });
+      this.store.dispatch(new SetSelectedPost(data));
     });
   }
 
@@ -122,7 +96,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         }
       }
       console.log('handleImageLoaded() files[0]', files)
-
       this.handleImagePreview(files);
     }
   }
@@ -149,7 +122,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
    */
   onSubmitPost(): void {
     if (this.data.newPost) {
-      this.addNewPost();
+      this.addPost();
     } else {
       this.updatePost();
     }
@@ -159,7 +132,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   /**
    Adding a new post
    */
-  private addNewPost(): void {
+  private addPost(): void {
     if (this.postForm.invalid) {
       return;
     }
@@ -169,36 +142,11 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
-      userId: 3
+      userId: 1
     };
-
-    this.postsService.addPost(params, picture)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respNewPost = response;
-          console.log('respNewPost response', response);
-          this.addNewPostToList();
-          this.notificationService.showSuccess('Post created successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+    this.store.dispatch(new AddPost(params, picture));
   }
 
-  /**
-   Adding a new post to the List
-   */
-  private addNewPostToList() {
-    this.postsArr.push(this.respNewPost);
-    this.postsService.posts$.next(this.postsArr);
-  }
 
   /**
    Update current post
@@ -221,49 +169,16 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       published: this.postForm.value.published,
       userId: userId
     };
-
-    this.postsService.updatePost(this.currentPost.id, params, picture, pictureOrUrl, previousPictureUrl)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respUpdatePost = response;
-          console.log('RESPONSE Update Post', response);
-          this.updateListPosts(id);
-          this.notificationService.showSuccess('Post updated successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+    this.store.dispatch(new UpdatePost(id, params, picture, pictureOrUrl, previousPictureUrl));
   }
-
-
-  private updateListPosts(id: number) {
-    const updatePostsArr = this.postsArr.map(item => {
-      if (item.id === id) {
-        item = this.respUpdatePost;
-        return item;
-      }
-      return item;
-    });
-    this.postsService.posts$.next(updatePostsArr);
-  }
-
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
   ngOnDestroy(): void {
+    this.subPost?.unsubscribe();
     this.dialogRef.close();
-
-    // this.unsubscribe.next();
-    // this.unsubscribe.complete();
   }
 }
 

@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../shared/models/user.model';
-import { Subject, Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
-import { NotificationService } from '../../../../shared/notification.service';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { MatTable } from '@angular/material/table';
-import * as _ from 'lodash';
+import { Select, Store } from '@ngxs/store';
+import { DeleteUser, GetUsers } from '../../store-users/users.action';
+import { UsersSelectors } from '../../store-users/users.selectors';
 
 
 @Component({
@@ -16,26 +17,20 @@ import * as _ from 'lodash';
   styleUrls: ['./users-table.component.scss'],
 })
 export class UsersTableComponent implements OnInit, OnDestroy {
+
   constructor(
+    public store: Store,
     public usersService: UsersService,
-    private notificationService: NotificationService,
     public dialog: MatDialog
   ) {
   }
 
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
-
+  @Select(UsersSelectors.getUsersList) users: Observable<UserModel[]>;
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
 
-  reloadPage$ = new Subject<void>();
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
   users$ = this.usersService.users$;
   private subUsers: Subscription;
-  private usersArr: UserModel[] = [];
-
-
-  // dataSource = ELEMENT_DATA;
-  // dataSource: UserModel[] = [];
-  // public users$ = new BehaviorSubject<UserModel[] | null>([]);
 
 
   ngOnInit(): void {
@@ -43,17 +38,10 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
-    this.subUsers = this.usersService
-      .getAllUsers()
-      .subscribe(resp => {
-        this.usersArr = resp;
-        this.usersService.users$.next(resp);
-        // this.dataSource = resp;
-        // this.users = resp;
-
-
-        console.log('get USERS', this.usersArr)
-      });
+    this.store.dispatch(new GetUsers());
+    this.subUsers = this.users.subscribe(resp => {
+      this.usersService.users$.next(resp);
+    });
   }
 
 
@@ -68,7 +56,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       }, 1000)
 
       // if (result === 1) {
-      //   // this.refreshTable();
       //   this.table.renderRows();
       // }
     });
@@ -88,7 +75,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       }, 1000)
 
       // if (result === 1) {
-      //   // this.refreshTable();
       //   this.table.renderRows();
       // }
     });
@@ -97,7 +83,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   deleteUser(user: UserModel): void {
     let {id, firstName, avatar} = user;
-    // let {id, title, picture} = post;
     const params = {
       avatar
     }
@@ -112,49 +97,12 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('deleteUser - afterClosed', result)
-
       if (result === true) {
-        this.usersService.removeUser(id, params)
-          .pipe(
-            // takeUntil(this.unsubscribe)
-          )
-          .subscribe(
-            (response) => {
-              console.log(' deleteUser - response', response);
-              this.deleteUserInTable(id);
-              this.notificationService.showSuccess('User delete successfully');
-            },
-            (error) => {
-              console.error(error);
-              const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-              const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-              this.notificationService.showError(secondErrorAttempt);
-            }
-          );
-
+        this.store.dispatch(new DeleteUser(id, params));
       } else {
         return
       }
-
-
     });
-  }
-
-  private deleteUserInTable(id: number) {
-
-    let newUsersArr =  this.usersArr.filter(n => n.id !== id);
-    // let newArray = myArray.filter(function(f) { return f !== 'two' });
-    // let newUsersArr = this.usersArr.filter((n) => {return n != id});
-
-
-    this.usersService.users$.next(newUsersArr);
-    this.table.renderRows();
-  }
-
-
-// TODO
-  private refreshTable() {
-    // this.reloadPage$.next();
   }
 
 

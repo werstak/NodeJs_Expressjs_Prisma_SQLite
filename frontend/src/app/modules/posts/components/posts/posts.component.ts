@@ -1,14 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
-import { AppState } from '../../../../store/app.state';
-import { PostsState } from '../../store-posts/posts.state';
-import { SetPostsName } from '../../store-posts/posts.action';
-import { UserModel } from '../../../../shared/models/user.model';
 import { PostModel } from '../../../../shared/models/post.model';
-import { DialogUsersComponent } from '../../../users/dialogs/dialog-users/dialog-users.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
+import { Observable } from 'rxjs';
+import { GetPosts } from '../../store-posts/posts.action';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
 
 @Component({
   selector: 'app-posts',
@@ -24,35 +22,15 @@ export class PostsComponent implements OnInit {
   ) {
   }
 
-
-  posts$ = this.postsService.posts$
-
-  subPosts: any;
-  private postsArr: PostModel[] = [];
-
-
-
-  @Select(AppState.getAppName)
-  public appName$: any;
-
-  @Select(PostsState.getLazy1Name)
-  public name$: any;
+  @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
 
 
   ngOnInit(): void {
     this.fetchData();
-    this.store.dispatch([new SetPostsName('LAZY1')]);
-
   }
 
   fetchData() {
-    this.subPosts = this.postsService
-      .getAllPosts()
-      .subscribe(resp => {
-        this.postsArr = resp;
-        this.postsService.posts$.next(resp);
-        // console.log(this.postsArr)
-      });
+    this.store.dispatch(new GetPosts());
   }
 
   addPost() {
@@ -61,15 +39,6 @@ export class PostsComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe(result => {
       console.log('dialogRef result', result)
-
-      // setTimeout(() => {
-      //   this.table.renderRows();
-      // }, 1000)
-
-      // if (result === 1) {
-      //   // this.refreshTable();
-      //   this.table.renderRows();
-      // }
     });
   }
 
