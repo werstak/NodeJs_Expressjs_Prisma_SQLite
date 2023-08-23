@@ -7,7 +7,8 @@ import { NotificationService } from '../../../../shared/notification.service';
 import { PostsService } from '../../posts.service';
 import * as _ from 'lodash';
 import { Store } from '@ngxs/store';
-import { SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { AddPost, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { AddUser } from '../../../users/store-users/users.action';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -175,36 +176,41 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
-      userId: 3
+      userId: 1
     };
+    this.store.dispatch(new AddPost(params, picture));
 
-    this.postsService.addPost(params, picture)
-      .pipe(
-        // takeUntil(this.unsubscribe)
-      )
-      .subscribe(
-        (response) => {
-          this.respNewPost = response;
-          console.log('respNewPost response', response);
-          this.addNewPostToList();
-          this.notificationService.showSuccess('Post created successfully');
-        },
-        (error) => {
-          console.error(error);
-          const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-          const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-          this.notificationService.showError(secondErrorAttempt);
-        }
-      );
+    // this.postsService.addPost(params, picture)
+    //   .pipe(
+    //     // takeUntil(this.unsubscribe)
+    //   )
+    //   .subscribe(
+    //     (response) => {
+    //       this.respNewPost = response;
+    //       console.log('respNewPost response', response);
+    //       this.addNewPostToList();
+    //       this.notificationService.showSuccess('Post created successfully');
+    //     },
+    //     (error) => {
+    //       console.error(error);
+    //       const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+    //       const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+    //       this.notificationService.showError(secondErrorAttempt);
+    //     }
+    //   )
+
+
   }
 
-  /**
-   Adding a new post to the List
-   */
-  private addNewPostToList() {
-    this.postsArr.push(this.respNewPost);
-    this.postsService.posts$.next(this.postsArr);
-  }
+
+
+  // /**
+  //  Adding a new post to the List
+  //  */
+  // private addNewPostToList() {
+  //   this.postsArr.push(this.respNewPost);
+  //   this.postsService.posts$.next(this.postsArr);
+  // }
 
   /**
    Update current post

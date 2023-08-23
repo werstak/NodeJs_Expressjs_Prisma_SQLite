@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import { Select, Store } from '@ngxs/store';
 import { DeleteUser, GetUsers, UpdateUser } from '../../store-users/users.action';
 import { UsersState } from '../../store-users/users.state';
+import { UsersSelectors } from '../../store-users/users.selectors';
 
 
 @Component({
@@ -27,7 +28,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  @Select(UsersState.getUsersList) users: Observable<UserModel[]>;
+  @Select(UsersSelectors.getUsersList) users: Observable<UserModel[]>;
+  // @Select(UsersState.getUsersList) users: Observable<UserModel[]>;
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
 
   displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];

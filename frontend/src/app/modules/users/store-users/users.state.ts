@@ -36,10 +36,10 @@ export class UsersState {
   }
 
 
-  @Selector()
-  static getUsersList(state: UsersStateModel) {
-    return state.users;
-  }
+  // @Selector()
+  // static getUsersList(state: UsersStateModel) {
+  //   return state.users;
+  // }
 
 
   @Action(GetUsers)

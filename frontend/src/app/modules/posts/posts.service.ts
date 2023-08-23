@@ -28,17 +28,6 @@ export class PostsService {
   }
 
 
-  // getAllPosts(): Observable<any> {
-  //   return this.http.get(config.API_URL + `/posts`)
-  //     .pipe(
-  //       catchError(error => {
-  //         console.log('Error: ', error.message);
-  //         return throwError(error);
-  //       })
-  //     );
-  // }
-
-
   getPost(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/posts/` + id)
       .pipe(
@@ -70,17 +59,28 @@ export class PostsService {
   // }
 
 
-  addPost(params: PostModel, avatar: any): Observable<any> {
+  addPost1(params: PostModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', avatar);
     uploadData.append('post_params', JSON.stringify(params));
     return this.http.post(config.API_URL + `/posts/`, uploadData);
   }
 
+  // addPost(params: PostModel, avatar: any): Observable<any> {
+  //   const uploadData = new FormData();
+  //   uploadData.append('ProfilePicture', avatar);
+  //   uploadData.append('post_params', JSON.stringify(params));
+  //   return this.http.post(config.API_URL + `/posts/`, uploadData);
+  // }
 
-  removePost(id: number, params: any): Observable<any> {
+
+  removePost1(id: number, params: any): Observable<any> {
     return this.http.delete(config.API_URL + `/posts/` + id, {params});
   }
+
+  // removePost(id: number, params: any): Observable<any> {
+  //   return this.http.delete(config.API_URL + `/posts/` + id, {params});
+  // }
 
 
 }

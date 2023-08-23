@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
-import { PostsState } from '../../store-posts/posts.state';
+// import { PostsState } from '../../store-posts/posts.state';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { Observable } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
 
 @Component({
   selector: 'app-posts',
@@ -22,7 +23,8 @@ export class PostsComponent implements OnInit {
   ) {
   }
 
-  @Select(PostsState.getPostsList) posts: Observable<PostModel[]>;
+  @Select(PostsSelectors.getPostsList) posts: Observable<PostModel[]>;
+  // @Select(PostsState.getPostsList) posts: Observable<PostModel[]>;
 
   posts$ = this.postsService.posts$
 

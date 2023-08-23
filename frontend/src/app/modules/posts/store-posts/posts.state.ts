@@ -4,10 +4,8 @@ import { PostModel } from '../../../shared/models/post.model';
 import { NotificationService } from '../../../shared/notification.service';
 import { PostsService } from '../posts.service';
 import { tap } from 'rxjs';
-import { GetPosts, SetSelectedPost, UpdatePost } from './posts.action';
-import { AddUser, SetSelectedUser, UpdateUser } from '../../users/store-users/users.action';
+import { AddPost, DeletePost, GetPosts, SetSelectedPost, UpdatePost } from './posts.action';
 import * as _ from 'lodash';
-import { UsersStateModel } from '../../users/store-users/users.state';
 
 
 export class PostsStateModel {
@@ -32,14 +30,14 @@ export class PostsState {
   ) {
   }
 
-  @Selector()
-  static getPostsList(state: PostsStateModel) {
-    return state.posts;
-  }
+  // @Selector()
+  // static getPostsList(state: PostsStateModel) {
+  //   return state.posts;
+  // }
 
 
   @Action(GetPosts)
-  getTodos({getState, setState}: StateContext<PostsStateModel>) {
+  getAllPosts({getState, setState}: StateContext<PostsStateModel>) {
     return this.postsService.fetchPosts().pipe(tap((result) => {
       const state = getState();
       setState({
@@ -49,7 +47,6 @@ export class PostsState {
     }));
   }
 
-  // id, params, picture, pictureOrUrl, previousPictureUrl
   @Action(SetSelectedPost)
   setSelectedPostId({getState, setState}: StateContext<PostsStateModel>, {payload}: SetSelectedPost) {
     const state = getState();
@@ -57,6 +54,25 @@ export class PostsState {
       ...state,
       selectedPost: payload
     });
+  }
+
+
+  @Action(AddPost)
+  addPost({getState, patchState}: StateContext<PostsStateModel>, {params, avatar}: AddPost) {
+    return this.postsService.addPost1(params, avatar).pipe(tap((result) => {
+        this.notificationService.showSuccess('Post created successfully');
+        const state = getState();
+        patchState({
+          posts: [...state.posts, result]
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
   }
 
 
@@ -85,4 +101,24 @@ export class PostsState {
   }
 
 
+  @Action(DeletePost)
+  deletePost({getState, setState}: StateContext<PostsStateModel>, {id, params}: DeletePost) {
+    return this.postsService.removePost1(id, params).pipe(tap(() => {
+        this.notificationService.showSuccess('Post delete successfully');
+
+        const state = getState();
+        const filteredArray = state.posts.filter(item => item.id !== id);
+        setState({
+          ...state,
+          posts: filteredArray,
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
 }

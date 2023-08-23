@@ -8,6 +8,9 @@ import * as _ from 'lodash';
 import { PostsService } from '../../posts.service';
 import { NotificationService } from '../../../../shared/notification.service';
 import { Subject, Subscription, takeUntil } from 'rxjs';
+import { DeleteUser } from '../../../users/store-users/users.action';
+import { Store } from '@ngxs/store';
+import { DeletePost } from '../../store-posts/posts.action';
 
 @Component({
   selector: 'app-post',
@@ -28,6 +31,7 @@ export class PostComponent implements OnInit, OnDestroy {
   private unsubscribe = new Subject<void>();
 
   constructor(
+    public store: Store,
     public dialog: MatDialog,
     public postsService: PostsService,
     private notificationService: NotificationService,
@@ -73,27 +77,33 @@ export class PostComponent implements OnInit, OnDestroy {
       console.log('pictures', params)
 
       if (result === true) {
-        this.postsService.removePost(id, params)
-          .pipe(
-            // takeUntil(this.unsubscribe)
-          )
-          .subscribe(
-            (response) => {
-              console.log(' deletePost - response', response);
-              this.deletePostInList(id);
-              this.notificationService.showSuccess('Post delete successfully');
-            },
-            (error) => {
-              console.error(error);
-              const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-              const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-              this.notificationService.showError(secondErrorAttempt);
-            }
-          );
-
+        this.store.dispatch(new DeletePost(id, params));
       } else {
         return
       }
+
+      // if (result === true) {
+      //   this.postsService.removePost(id, params)
+      //     .pipe(
+      //       // takeUntil(this.unsubscribe)
+      //     )
+      //     .subscribe(
+      //       (response) => {
+      //         console.log(' deletePost - response', response);
+      //         this.deletePostInList(id);
+      //         this.notificationService.showSuccess('Post delete successfully');
+      //       },
+      //       (error) => {
+      //         console.error(error);
+      //         const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+      //         const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+      //         this.notificationService.showError(secondErrorAttempt);
+      //       }
+      //     );
+      //
+      // } else {
+      //   return
+      // }
 
 
     });
@@ -106,10 +116,10 @@ export class PostComponent implements OnInit, OnDestroy {
     });
   }
 
-  private deletePostInList(id: number) {
-    let newPosArr = this.postsArr.filter(n => n.id !== id);
-    this.postsService.posts$.next(newPosArr);
-  }
+  // private deletePostInList(id: number) {
+  //   let newPosArr = this.postsArr.filter(n => n.id !== id);
+  //   this.postsService.posts$.next(newPosArr);
+  // }
 
   ngOnDestroy(): void {
     // this.unsubscribe.next();
