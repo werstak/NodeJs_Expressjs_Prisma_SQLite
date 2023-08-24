@@ -6,8 +6,18 @@ import db from '../utils/db';
  * */
 
 
-export const getAllUsersHandler = async (): Promise<any[]> => {
+export const getAllUsersHandler = async (params: any): Promise<any[]> => {
+    const {previousPageIndex, pageIndex, pageSize, length} = params;
+    let skip = 0;
+    if (pageIndex == 0) {
+        skip = 0;
+    } else {
+        skip = (pageIndex - 1) * pageSize;
+    }
+
     return db.user.findMany({
+        take: parseInt(pageSize),
+        skip: skip,
         select: {
             id: true,
             firstName: true,

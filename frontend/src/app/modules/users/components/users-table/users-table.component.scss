@@ -1,5 +1,6 @@
 .users-table {
   padding: 25px;
+  position: relative;
 
   &__container {
     max-height: 750px;
@@ -21,4 +22,10 @@
 
 table {
   width: 100%;
+}
+
+.data-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
 }

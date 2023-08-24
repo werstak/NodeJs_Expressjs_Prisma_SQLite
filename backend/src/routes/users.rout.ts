@@ -16,8 +16,13 @@ export const usersRouter = express.Router();
 usersRouter.get('/', async (request: Request, response: Response) => {
 
     console.log('Root GET - All USERS')
+    const params = (request.query);
+    console.log('USERS', 'paginator', params)
+    // const paginator = String(request.query);
+
+
     try {
-        const users = await UserHandler.getAllUsersHandler();
+        const users = await UserHandler.getAllUsersHandler(params);
         return response.status(200).json(users);
     } catch (error: any) {
         return response.status(500).json(error.message);
@@ -162,6 +167,8 @@ usersRouter.put(
 usersRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
+        console.log('DELETE', 'request.query', request.query)
+
         const previousAvatarUrl = String(request.query.avatar);
         const pathRemovePicture = previousAvatarUrl.replace('http://localhost:5000/', '');
 

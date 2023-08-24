@@ -23,6 +23,7 @@ export class PostsComponent implements OnInit {
   }
 
   @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
+  dataLoading: boolean = false;
 
 
   ngOnInit(): void {
@@ -30,7 +31,9 @@ export class PostsComponent implements OnInit {
   }
 
   fetchData() {
+    this.dataLoading = true;
     this.store.dispatch(new GetPosts());
+    this.dataLoading = false;
   }
 
   addPost() {

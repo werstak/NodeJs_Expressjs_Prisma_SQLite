@@ -32,8 +32,8 @@ export class UsersState {
   }
 
   @Action(GetUsers)
-  getAllUsers({getState, setState}: StateContext<UsersStateModel>) {
-    return this.usersService.fetchUsers().pipe(tap((result) => {
+  getAllUsers({getState, setState}: StateContext<UsersStateModel>, {params}: GetUsers) {
+    return this.usersService.fetchUsers(params).pipe(tap((result) => {
       const state = getState();
       setState({
         ...state,
@@ -41,6 +41,17 @@ export class UsersState {
       });
     }));
   }
+
+  // @Action(GetUsers)
+  // getAllUsers({getState, setState}: StateContext<UsersStateModel>) {
+  //   return this.usersService.fetchUsers().pipe(tap((result) => {
+  //     const state = getState();
+  //     setState({
+  //       ...state,
+  //       users: result,
+  //     });
+  //   }));
+  // }
 
   @Action(SetSelectedUser)
   setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {

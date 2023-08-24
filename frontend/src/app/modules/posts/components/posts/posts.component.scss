@@ -1,5 +1,6 @@
 .posts {
   padding: 25px;
+  position: relative;
 
   &__panel {
     margin-bottom: 25px;
@@ -7,4 +8,10 @@
       background: #f0f8ff;
     }
   }
+}
+
+.data-spinner {
+  position: absolute;
+  left: 50%;
+  top: 10%;
 }

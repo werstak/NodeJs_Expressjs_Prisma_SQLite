@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { UserModel } from '../../shared/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,8 +20,18 @@ export class UsersService {
 
   users$ = new BehaviorSubject<any>([]);
 
-  fetchUsers(): Observable<any> {
-    return this.http.get(config.API_URL + `/users`)
+
+
+  fetchUsers(params: any): Observable<any> {
+    return this.http.get(config.API_URL + `/users`, {
+      params: new HttpParams()
+        .set('previousPageIndex', params.previousPageIndex)
+        .set('pageIndex', params.pageIndex)
+        .set('pageSize', params.pageSize)
+        .set('length', params.length)
+        // .set('pageNumber', String(15))
+      // .set('sort', sort)
+    })
       .pipe(
         catchError(error => {
           console.log('Error: ', error.message);
@@ -29,6 +39,34 @@ export class UsersService {
         })
       );
   }
+
+
+  // fetchUsers(): Observable<any> {
+  //   return this.http.get(config.API_URL + `/users`, {
+  //     params: new HttpParams()
+  //       .set('limit', '10')
+  //       .set('pageNumber', String(15))
+  //     // .set('sort', sort)
+  //   })
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
+
+
+
+  // fetchUsers(): Observable<any> {
+  //   return this.http.get(config.API_URL + `/users`)
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
 
   getUser(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/users/` + id)

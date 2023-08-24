@@ -28,7 +28,7 @@
       </button>
     </div>
 
-    <form [formGroup]="editUserForm" novalidate (ngSubmit)="onSubmitUser()" class="example-form">
+    <form [formGroup]="userForm" novalidate (ngSubmit)="onSubmitUser()" class="example-form">
       <div mat-dialog-content>
 
         <mat-form-field color="accent" class="example-full-width">
@@ -36,7 +36,7 @@
                  name="email"
                  maxlength="50" required>
           <mat-hint align="end">{{email.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="editUserForm.controls['email'].hasError('required')">
+          <mat-error *ngIf="userForm.controls['email'].hasError('required')">
             Email <strong>required</strong>
           </mat-error>
         </mat-form-field>
@@ -46,7 +46,7 @@
                  name="firstName"
                  maxlength="50" required>
           <mat-hint align="end">{{firstName.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="editUserForm.controls['firstName'].hasError('required')">
+          <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
             First Name <strong>required</strong>
           </mat-error>
         </mat-form-field>
@@ -56,7 +56,7 @@
                  name="lastName"
                  maxlength="50" required>
           <mat-hint align="end">{{lastName.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="editUserForm.controls['lastName'].hasError('required')">
+          <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
             Last Name <strong>required</strong>
           </mat-error>
         </mat-form-field>
@@ -66,7 +66,7 @@
                  name="role"
                  maxlength="50" required>
           <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="editUserForm.controls['role'].hasError('required')">
+          <mat-error *ngIf="userForm.controls['role'].hasError('required')">
             Role <strong>required</strong>
           </mat-error>
         </mat-form-field>
@@ -81,7 +81,7 @@
             <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
           <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="editUserForm.controls['password'].hasError('required')">
+          <mat-error *ngIf="userForm.controls['password'].hasError('required')">
             Password <strong>required</strong>
           </mat-error>
         </mat-form-field>
@@ -91,7 +91,7 @@
       <div mat-dialog-actions class="dialog__actions">
         <button mat-raised-button color="primary"
                 type="submit"
-                [disabled]="!editUserForm.valid"
+                [disabled]="!userForm.valid"
                 [mat-dialog-close]="true">
           {{this.data.newUser ? 'Create' : 'Update'}}
         </button>

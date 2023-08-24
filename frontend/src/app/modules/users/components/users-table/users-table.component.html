@@ -83,7 +83,37 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    <mat-paginator #paginator
+                   class="demo-paginator"
+                   (page)="handlePageEvent($event)"
+                   [length]="length"
+                   [pageSize]="pageSize"
+                   [disabled]="disabled"
+                   [showFirstLastButtons]="showFirstLastButtons"
+                   [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []"
+                   [hidePageSize]="hidePageSize"
+                   [pageIndex]="pageIndex"
+                   aria-label="Select page">
+    </mat-paginator>
+
+<!--    <mat-paginator-->
+<!--      #paginator-->
+<!--      [pageSize]="5"-->
+<!--      [pageSizeOptions]="[5, 10, 15, 20, 50]"-->
+<!--      [length]="50"-->
+<!--      [showFirstLastButtons]="true"-->
+<!--    ></mat-paginator>-->
+
   </section>
+
+  <mat-progress-spinner
+    color="primary"
+    diameter="70"
+    mode="indeterminate"
+    *ngIf="dataLoading"
+    class="data-spinner"
+  >
+  </mat-progress-spinner>
 
 
   <div>

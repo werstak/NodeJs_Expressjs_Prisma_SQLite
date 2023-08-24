@@ -2,7 +2,14 @@ import { UserModel } from '../../../shared/models/user.model';
 
 export class GetUsers {
   static readonly type = '[Users] Get';
+
+  constructor(public params: any) {
+  }
 }
+
+// export class GetUsers {
+//   static readonly type = '[Users] Get';
+// }
 
 export class AddUser {
   static readonly type = '[Users] Add';

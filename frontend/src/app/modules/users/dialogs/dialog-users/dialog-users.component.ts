@@ -27,7 +27,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  public editUserForm: FormGroup;
+  public userForm: FormGroup;
   private subUser: Subscription;
   hide = true;
   currentUser: UserModel;
@@ -45,14 +45,14 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     console.log('DIALOG  data', this.data)
     this.avatarImageDefault = customProfileImage;
     if (this.data.newUser) {
-      this.editUserForm.reset();
+      this.userForm.reset();
     } else {
       this.initFormValue();
     }
   }
 
   private buildForm() {
-    this.editUserForm = this.fb.group({
+    this.userForm = this.fb.group({
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
@@ -89,7 +89,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
       console.log('getUser()', this.currentUser)
 
-      this.editUserForm.setValue({
+      this.userForm.setValue({
         email: data.email,
         firstName: data.firstName,
         lastName: data.lastName,
@@ -150,19 +150,19 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
    Adding a new User
    */
   private addNewUser(): void {
-    if (this.editUserForm.invalid) {
+    if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmitUser()', this.editUserForm.value)
+    console.log(1, 'onSubmitUser()', this.userForm.value)
 
     const avatar = this.avatarFile;
     const params: any = {
-      email: this.editUserForm.value.email,
-      password: this.editUserForm.value.password,
-      firstName: this.editUserForm.value.firstName,
-      lastName: this.editUserForm.value.lastName,
-      // role: this.editUserForm.value.role,
-      role: Number(this.editUserForm.value.role),
+      email: this.userForm.value.email,
+      password: this.userForm.value.password,
+      firstName: this.userForm.value.firstName,
+      lastName: this.userForm.value.lastName,
+      // role: this.userForm.value.role,
+      role: Number(this.userForm.value.role),
       avatar: '',
     };
     this.store.dispatch(new AddUser(params, avatar));
@@ -173,10 +173,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
    Update User
    */
   private updateUser(): void {
-    if (this.editUserForm.invalid) {
+    if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmitUser()', this.editUserForm.value)
+    console.log(1, 'onSubmitUser()', this.userForm.value)
 
     let {id} = this.currentUser
     const avatar = this.avatarFile;
@@ -185,12 +185,12 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     imageOrUrl = !!this.avatarUrl;
     const params: UserModel = {
       id: id,
-      email: this.editUserForm.value.email,
-      password: this.editUserForm.value.password,
-      firstName: this.editUserForm.value.firstName,
-      lastName: this.editUserForm.value.lastName,
-      // role: this.editUserForm.value.role,
-      role: Number(this.editUserForm.value.role),
+      email: this.userForm.value.email,
+      password: this.userForm.value.password,
+      firstName: this.userForm.value.firstName,
+      lastName: this.userForm.value.lastName,
+      // role: this.userForm.value.role,
+      role: Number(this.userForm.value.role),
       avatar: '',
     };
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
