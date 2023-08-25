@@ -4,6 +4,7 @@ import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
 // import upload from '../middleware/upload';
 import fs from 'fs';
+import db from '../utils/db';
 
 const path = require('path');
 
@@ -19,7 +20,6 @@ usersRouter.get('/', async (request: Request, response: Response) => {
     const params = (request.query);
     console.log('USERS', 'paginator', params)
     // const paginator = String(request.query);
-
 
     try {
         const users = await UserHandler.getAllUsersHandler(params);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { PostModel } from '../../shared/models/post.model';
 import * as config from '../../../app-config';
@@ -15,8 +15,16 @@ export class PostsService {
   }
 
 
-  fetchPosts(): Observable<any> {
-    return this.http.get(config.API_URL + `/posts`)
+  fetchPosts(params: any): Observable<any> {
+    return this.http.get(config.API_URL + `/posts`, {
+      params: new HttpParams()
+        .set('previousPageIndex', params.previousPageIndex)
+        .set('pageIndex', params.pageIndex)
+        .set('pageSize', params.pageSize)
+        .set('length', params.length)
+      // .set('pageNumber', String(15))
+      // .set('sort', sort)
+    })
       .pipe(
         catchError(error => {
           console.log('Error: ', error.message);
@@ -24,6 +32,16 @@ export class PostsService {
         })
       );
   }
+
+  // fetchPosts(params: any): Observable<any> {
+  //   return this.http.get(config.API_URL + `/posts`)
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
 
   getPost(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/posts/` + id)

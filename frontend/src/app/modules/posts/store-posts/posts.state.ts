@@ -32,8 +32,8 @@ export class PostsState {
   }
 
   @Action(GetPosts)
-  getAllPosts({getState, setState}: StateContext<PostsStateModel>) {
-    return this.postsService.fetchPosts().pipe(tap((result) => {
+  getAllPosts({getState, setState}: StateContext<PostsStateModel>, {params}: GetPosts) {
+    return this.postsService.fetchPosts(params).pipe(tap((result) => {
       const state = getState();
       setState({
         ...state,

@@ -37,7 +37,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   pagination variables
 */
   length = 50;
-  pageSize = 3;
+  pageSize = 5;
   pageIndex = 0;
   pageSizeOptions = [3, 5, 10, 15, 20, 25];
   previousPageIndex = 0;
@@ -73,7 +73,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
-
     const params = {
       previousPageIndex: this.previousPageIndex,
       pageIndex: this.pageIndex,

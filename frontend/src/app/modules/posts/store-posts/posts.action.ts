@@ -2,6 +2,10 @@ import { PostModel } from '../../../shared/models/post.model';
 
 export class GetPosts {
   static readonly type = '[Posts] Get';
+
+  constructor(public params: any) {
+  }
+
 }
 
 export class AddPost {

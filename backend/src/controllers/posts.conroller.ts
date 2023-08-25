@@ -5,8 +5,27 @@ import db from '../utils/db';
  * will be realized through the prism
  * */
 
-export const getAllPostsHandler = async (): Promise<any[]> => {
+export const getAllPostsHandler = async (params: any): Promise<any[]> => {
+    const {previousPageIndex, pageIndex, pageSize, length} = params;
+
+    const totalCount = await db.post.count();
+    console.log(2222222, 'totalCount POSTS', totalCount)
+
+    let skip;
+    if (pageIndex == 0) {
+        skip = 0;
+        console.log(77777, skip)
+
+    } else if (pageIndex == 1) {
+        skip = 1 + (pageIndex - 1) * pageSize;
+        console.log(8888, skip)
+    } else if (pageIndex > 1) {
+        skip = (pageIndex - 1) * pageSize;
+        console.log(9999, skip)
+    }
     return db.post.findMany({
+        take: parseInt(pageSize),
+        skip: skip,
         select: {
             id: true,
             title: true,

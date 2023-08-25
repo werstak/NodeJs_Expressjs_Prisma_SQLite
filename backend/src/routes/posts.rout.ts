@@ -13,7 +13,10 @@ export const postsRouter = express.Router();
 postsRouter.get('/', async (request: Request, response: Response) => {
     try {
         console.log('Root GET - All POSTS')
-        const posts = await PostHandler.getAllPostsHandler();
+        const params = (request.query);
+        console.log('USERS', 'paginator', params)
+
+        const posts = await PostHandler.getAllPostsHandler(params);
         return response.status(200).json(posts);
     } catch (error: any) {
         return response.status(500).json(error.message);

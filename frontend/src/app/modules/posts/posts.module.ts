@@ -17,6 +17,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 
 const routes: Routes = [
@@ -55,6 +56,7 @@ const routes: Routes = [
     MatIconModule,
     MatTooltipModule,
     MatCheckboxModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule
   ]
 })

@@ -8,11 +8,21 @@ import db from '../utils/db';
 
 export const getAllUsersHandler = async (params: any): Promise<any[]> => {
     const {previousPageIndex, pageIndex, pageSize, length} = params;
-    let skip = 0;
+
+    const totalCount = await db.user.count();
+    console.log(111111, 'totalCount USERS', totalCount)
+
+    let skip;
     if (pageIndex == 0) {
         skip = 0;
-    } else {
+        console.log(77777, skip)
+
+    } else if (pageIndex == 1) {
+        skip = 1 + (pageIndex - 1) * pageSize;
+        console.log(8888, skip)
+    } else if (pageIndex > 1) {
         skip = (pageIndex - 1) * pageSize;
+        console.log(9999, skip)
     }
 
     return db.user.findMany({
