@@ -1,15 +1,15 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../shared/models/user.model';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
+import { MatTable } from '@angular/material/table';
 import { Select, Store } from '@ngxs/store';
 import { DeleteUser, GetUsers } from '../../store-users/users.action';
 import { UsersSelectors } from '../../store-users/users.selectors';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 
 
 @Component({
@@ -27,16 +27,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   @Select(UsersSelectors.getUsersList) users: Observable<UserModel[]>;
+  @Select(UsersSelectors.getUsersCounter) usersCounter: Observable<any>;
+
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
 
-  // @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
-
-
-/**
-  pagination variables
-*/
-  length = 50;
+  /**
+   pagination variables
+   */
+  length = 0;
   pageSize = 5;
   pageIndex = 0;
   pageSizeOptions = [3, 5, 10, 15, 20, 25];
@@ -51,46 +49,40 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
   users$ = this.usersService.users$;
-  private subUsers: Subscription;
   dataLoading: boolean = false;
-
-  // dataSource: MatTableDataSource<any>;
-
-
-  // private ELEMENT_DATA = this.users$ | [];
-  //
-  // dataSource = new MatTableDataSource<UserModel>(this.ELEMENT_DATA);
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
 
   ngOnInit(): void {
     this.fetchData();
   }
 
-  ngAfterViewInit() {
-    // this.dataSource.paginator = this.paginator;
-    // this.dataSource = new MatTableDataSource(this.users$);
-    console.log('this.paginator.pageIndex', this.paginator)
-  }
 
   fetchData() {
     const params = {
-      previousPageIndex: this.previousPageIndex,
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      length: this.length
+      pageSize: this.pageSize
     }
 
     this.dataLoading = true;
     this.store.dispatch(new GetUsers(params));
-    this.subUsers = this.users.subscribe(resp => {
-      this.usersService.users$.next(resp);
-      this.dataLoading = false;
-    });
+
+    this.users.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.usersService.users$.next(resp);
+        this.dataLoading = false;
+      });
+
+    this.usersCounter.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.length = resp;
+      });
   }
 
 
   handlePageEvent(e: PageEvent) {
-    console.log('handlePageEvent', e)
     this.pageEvent = e;
     this.length = e.length;
     this.pageSize = e.pageSize;
@@ -162,7 +154,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
-    this.subUsers.unsubscribe();
+    this.destroy.next(null);
+    this.destroy.complete();
   }
 
 

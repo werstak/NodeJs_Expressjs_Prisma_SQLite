@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 
 export class UsersStateModel {
   users: UserModel[];
+  usersCounter?: any;
   selectedUser?: any;
 }
 
@@ -17,6 +18,7 @@ export class UsersStateModel {
   name: 'UsersState',
   defaults: {
     users: [],
+    usersCounter: null,
     selectedUser: null
   }
 })
@@ -37,21 +39,11 @@ export class UsersState {
       const state = getState();
       setState({
         ...state,
-        users: result,
+        users: result.users,
+        usersCounter: result.totalCount,
       });
     }));
   }
-
-  // @Action(GetUsers)
-  // getAllUsers({getState, setState}: StateContext<UsersStateModel>) {
-  //   return this.usersService.fetchUsers().pipe(tap((result) => {
-  //     const state = getState();
-  //     setState({
-  //       ...state,
-  //       users: result,
-  //     });
-  //   }));
-  // }
 
   @Action(SetSelectedUser)
   setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
@@ -68,7 +60,8 @@ export class UsersState {
         this.notificationService.showSuccess('User created successfully');
         const state = getState();
         patchState({
-          users: [...state.users, result]
+          users: [...state.users, result.newUser],
+          usersCounter: result.totalCount,
         });
       },
       (error) => {
@@ -110,14 +103,14 @@ export class UsersState {
 
   @Action(DeleteUser)
   deleteUser({getState, setState}: StateContext<UsersStateModel>, {id, params}: DeleteUser) {
-    return this.usersService.removeUser(id, params).pipe(tap(() => {
+    return this.usersService.removeUser(id, params).pipe(tap((result) => {
         this.notificationService.showSuccess('User delete successfully');
-
         const state = getState();
         const filteredArray = state.users.filter(item => item.id !== id);
         setState({
           ...state,
           users: filteredArray,
+          usersCounter: state.usersCounter -1
         });
       },
       (error) => {

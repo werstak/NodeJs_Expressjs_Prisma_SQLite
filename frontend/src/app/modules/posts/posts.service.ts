@@ -18,12 +18,8 @@ export class PostsService {
   fetchPosts(params: any): Observable<any> {
     return this.http.get(config.API_URL + `/posts`, {
       params: new HttpParams()
-        .set('previousPageIndex', params.previousPageIndex)
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
-        .set('length', params.length)
-      // .set('pageNumber', String(15))
-      // .set('sort', sort)
     })
       .pipe(
         catchError(error => {
@@ -32,16 +28,6 @@ export class PostsService {
         })
       );
   }
-
-  // fetchPosts(params: any): Observable<any> {
-  //   return this.http.get(config.API_URL + `/posts`)
-  //     .pipe(
-  //       catchError(error => {
-  //         console.log('Error: ', error.message);
-  //         return throwError(error);
-  //       })
-  //     );
-  // }
 
   getPost(id: number): Observable<any> {
     return this.http.get(config.API_URL + `/posts/` + id)

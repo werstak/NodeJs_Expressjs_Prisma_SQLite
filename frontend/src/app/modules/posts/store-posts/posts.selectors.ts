@@ -7,4 +7,9 @@ export class PostsSelectors {
     return state.posts;
   }
 
+  @Selector([PostsState])
+  static getPostsCounter(state: PostsStateModel) {
+    return state.postsCounter;
+  }
+
 }

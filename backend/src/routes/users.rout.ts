@@ -19,7 +19,6 @@ usersRouter.get('/', async (request: Request, response: Response) => {
     console.log('Root GET - All USERS')
     const params = (request.query);
     console.log('USERS', 'paginator', params)
-    // const paginator = String(request.query);
 
     try {
         const users = await UserHandler.getAllUsersHandler(params);

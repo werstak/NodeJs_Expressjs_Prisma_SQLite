@@ -7,4 +7,8 @@ export class UsersSelectors {
     return state.users;
   }
 
+  @Selector([UsersState])
+  static getUsersCounter(state: UsersStateModel) {
+    return state.usersCounter;
+  }
 }

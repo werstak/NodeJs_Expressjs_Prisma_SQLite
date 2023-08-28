@@ -5,25 +5,13 @@ import db from '../utils/db';
  * will be realized through the prism
  * */
 
-export const getAllPostsHandler = async (params: any): Promise<any[]> => {
-    const {previousPageIndex, pageIndex, pageSize, length} = params;
+export const getAllPostsHandler = async (params: any): Promise<any> => {
+    const {pageIndex, pageSize} = params;
 
     const totalCount = await db.post.count();
-    console.log(2222222, 'totalCount POSTS', totalCount)
+    const skip = pageIndex * pageSize;
 
-    let skip;
-    if (pageIndex == 0) {
-        skip = 0;
-        console.log(77777, skip)
-
-    } else if (pageIndex == 1) {
-        skip = 1 + (pageIndex - 1) * pageSize;
-        console.log(8888, skip)
-    } else if (pageIndex > 1) {
-        skip = (pageIndex - 1) * pageSize;
-        console.log(9999, skip)
-    }
-    return db.post.findMany({
+    const posts = await db.post.findMany({
         take: parseInt(pageSize),
         skip: skip,
         select: {
@@ -45,6 +33,7 @@ export const getAllPostsHandler = async (params: any): Promise<any[]> => {
             },
         },
     });
+     return {posts, totalCount}
 };
 
 
@@ -77,7 +66,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 
 export const createPostHandler = async (post: any): Promise<any> => {
     const {title, description, content, picture, published, userId} = post;
-    return db.post.create({
+    const newPost = await db.post.create({
         data: {
             title,
             description,
@@ -105,6 +94,8 @@ export const createPostHandler = async (post: any): Promise<any> => {
             },
         },
     });
+    const totalCount = await db.post.count();
+    return {totalCount, newPost}
 };
 
 

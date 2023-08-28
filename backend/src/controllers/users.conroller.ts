@@ -1,31 +1,16 @@
 import db from '../utils/db';
-// import { User } from '../models/user.model';
 
 /**
  * will be realized through the prisma
  * */
 
 
-export const getAllUsersHandler = async (params: any): Promise<any[]> => {
-    const {previousPageIndex, pageIndex, pageSize, length} = params;
+export const getAllUsersHandler = async (params: any): Promise<any> => {
+    const {pageIndex, pageSize} = params;
 
     const totalCount = await db.user.count();
-    console.log(111111, 'totalCount USERS', totalCount)
-
-    let skip;
-    if (pageIndex == 0) {
-        skip = 0;
-        console.log(77777, skip)
-
-    } else if (pageIndex == 1) {
-        skip = 1 + (pageIndex - 1) * pageSize;
-        console.log(8888, skip)
-    } else if (pageIndex > 1) {
-        skip = (pageIndex - 1) * pageSize;
-        console.log(9999, skip)
-    }
-
-    return db.user.findMany({
+    const skip = pageIndex * pageSize;
+    const users = await db.user.findMany({
         take: parseInt(pageSize),
         skip: skip,
         select: {
@@ -40,6 +25,7 @@ export const getAllUsersHandler = async (params: any): Promise<any[]> => {
             posts: true
         },
     });
+    return {totalCount, users}
 };
 
 export const getUserHandler = async (id: number): Promise<any | null> => {
@@ -62,11 +48,10 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
     });
 };
 
-export const createUserHandler = async (
-    user: Omit<any, 'id'>
-): Promise<any> => {
+export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
     const {firstName, lastName, email, password, role, avatar} = user;
-    return db.user.create({
+
+    const newUser = await db.user.create({
         data: {
             firstName,
             lastName,
@@ -87,6 +72,8 @@ export const createUserHandler = async (
             posts: true
         },
     });
+    const totalCount = await db.user.count();
+    return {totalCount, newUser}
 };
 
 export const updateUserHandler = async (
@@ -120,7 +107,6 @@ export const updateUserHandler = async (
         },
     });
 };
-
 
 export const deleteUserHandler = async (id: number): Promise<void> => {
     await db.user.delete({

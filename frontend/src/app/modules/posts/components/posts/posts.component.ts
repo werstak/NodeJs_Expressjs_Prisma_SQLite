@@ -1,20 +1,20 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { PageEvent } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-posts',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss']
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent implements OnInit, OnDestroy {
 
   constructor(
     public postsService: PostsService,
@@ -24,14 +24,14 @@ export class PostsComponent implements OnInit {
   }
 
   @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
-  @ViewChild(MatPaginator, {static: false}) paginator: MatPaginator;
+  @Select(PostsSelectors.getPostsCounter) postsCounter: Observable<any>;
 
   dataLoading: boolean = false;
 
   /**
    pagination variables
    */
-  length = 50;
+  length = 0;
   pageSize = 2;
   pageIndex = 0;
   pageSizeOptions = [2, 3, 5, 10, 15, 20, 25];
@@ -42,6 +42,7 @@ export class PostsComponent implements OnInit {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent;
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
 
   ngOnInit(): void {
@@ -50,20 +51,22 @@ export class PostsComponent implements OnInit {
 
   fetchData() {
     const params = {
-      previousPageIndex: this.previousPageIndex,
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
-      length: this.length
+      pageSize: this.pageSize
     }
 
     this.dataLoading = true;
     this.store.dispatch(new GetPosts(params));
+    this.postsCounter.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.length = resp;
+      });
     this.dataLoading = false;
   }
 
 
   handlePageEvent(e: PageEvent) {
-    console.log('handlePageEvent', e)
     this.pageEvent = e;
     this.length = e.length;
     this.pageSize = e.pageSize;
@@ -85,6 +88,11 @@ export class PostsComponent implements OnInit {
   // trackByFn(index, item) {
   //   return item.id; // unique id corresponding to the item
   // }
+
+  ngOnDestroy() {
+    this.destroy.next(null);
+    this.destroy.complete();
+  }
 
 }
 

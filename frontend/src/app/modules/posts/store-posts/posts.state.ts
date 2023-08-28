@@ -1,4 +1,4 @@
-import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Action, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 import { PostModel } from '../../../shared/models/post.model';
 import { NotificationService } from '../../../shared/notification.service';
@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 
 export class PostsStateModel {
   posts: PostModel[];
+  postsCounter?: any;
   selectedPost?: any;
 }
 
@@ -17,6 +18,7 @@ export class PostsStateModel {
   name: 'PostsState',
   defaults: {
     posts: [],
+    postsCounter: null,
     selectedPost: null
   }
 })
@@ -37,7 +39,8 @@ export class PostsState {
       const state = getState();
       setState({
         ...state,
-        posts: result,
+        posts: result.posts,
+        postsCounter: result.totalCount
       });
     }));
   }
@@ -57,7 +60,8 @@ export class PostsState {
         this.notificationService.showSuccess('Post created successfully');
         const state = getState();
         patchState({
-          posts: [...state.posts, result]
+          posts: [...state.posts, result.newPost],
+          postsCounter: result.totalCount
         });
       },
       (error) => {
@@ -103,6 +107,7 @@ export class PostsState {
         setState({
           ...state,
           posts: filteredArray,
+          postsCounter: state.postsCounter -1
         });
       },
       (error) => {

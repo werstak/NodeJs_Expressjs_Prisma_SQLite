@@ -7,10 +7,6 @@ export class GetUsers {
   }
 }
 
-// export class GetUsers {
-//   static readonly type = '[Users] Get';
-// }
-
 export class AddUser {
   static readonly type = '[Users] Add';
 
