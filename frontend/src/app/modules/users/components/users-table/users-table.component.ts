@@ -10,6 +10,7 @@ import { Select, Store } from '@ngxs/store';
 import { DeleteUser, GetUsers } from '../../store-users/users.action';
 import { UsersSelectors } from '../../store-users/users.selectors';
 import { PageEvent } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 
 
 @Component({
@@ -30,6 +31,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   @Select(UsersSelectors.getUsersCounter) usersCounter: Observable<any>;
 
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
+  @ViewChild(MatSort) sort: MatSort;
+
+
 
   /**
    pagination variables
@@ -52,6 +56,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
+  /** Sorting the table */
+  orderByColumn = 'id';
+  orderByDirection = 'asc';
 
   ngOnInit(): void {
     this.fetchData();
@@ -60,6 +67,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   fetchData() {
     const params = {
+      orderByColumn: this.orderByColumn,
+      orderByDirection: this.orderByDirection,
       pageIndex: this.pageIndex,
       pageSize: this.pageSize
     }
@@ -79,6 +88,17 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       .subscribe(resp => {
         this.length = resp;
       });
+  }
+
+
+
+  sortData($event: any) {
+    console.log(88888888, $event)
+    this.orderByColumn = $event.active;
+    this.orderByDirection = $event.direction;
+    this.fetchData();
+    // console.log('this.orderByColumn = ', this.orderByColumn)
+
   }
 
 
@@ -157,6 +177,5 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.destroy.next(null);
     this.destroy.complete();
   }
-
 
 }

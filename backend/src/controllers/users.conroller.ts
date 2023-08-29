@@ -6,13 +6,24 @@ import db from '../utils/db';
 
 
 export const getAllUsersHandler = async (params: any): Promise<any> => {
-    const {pageIndex, pageSize} = params;
+    const {orderByColumn, orderByDirection, pageIndex, pageSize} = params;
+
+    console.log(33333333, orderByColumn)
+
+    let sortCol = {email: 'asc'};
+
+    // sortCol[orderByColumn] = "red";
+
 
     const totalCount = await db.user.count();
     const skip = pageIndex * pageSize;
+
     const users = await db.user.findMany({
         take: parseInt(pageSize),
         skip: skip,
+        orderBy: {
+            [orderByColumn]: orderByDirection,
+        },
         select: {
             id: true,
             firstName: true,

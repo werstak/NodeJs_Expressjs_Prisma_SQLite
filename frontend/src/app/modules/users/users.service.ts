@@ -24,6 +24,8 @@ export class UsersService {
   fetchUsers(params: any): Observable<any> {
     return this.http.get(config.API_URL + `/users`, {
       params: new HttpParams()
+        .set('orderByColumn', params.orderByColumn)
+        .set('orderByDirection', params.orderByDirection)
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
     })
