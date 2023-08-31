@@ -19,6 +19,7 @@ export class UsersService {
   }
 
   users$ = new BehaviorSubject<any>([]);
+  usersFilters$ = new BehaviorSubject<any>({});
 
 
   fetchUsers(params: any): Observable<any> {
@@ -28,6 +29,9 @@ export class UsersService {
         .set('orderByDirection', params.orderByDirection)
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
+        .set('firstName', params.firstName)
+        .set('lastName', params.lastName)
+        .set('email', params.email)
     })
       .pipe(
         catchError(error => {

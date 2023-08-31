@@ -10,7 +10,8 @@ import { Select, Store } from '@ngxs/store';
 import { DeleteUser, GetUsers } from '../../store-users/users.action';
 import { UsersSelectors } from '../../store-users/users.selectors';
 import { PageEvent } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
+import { MatSort, SortDirection } from '@angular/material/sort';
+import { UserFilterModel } from '../../../../shared/models/user-filter.model';
 
 
 @Component({
@@ -57,11 +58,23 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   /** Sorting the table */
-  orderByColumn = 'id';
-  orderByDirection = 'asc';
+  orderByColumn = 'id' as SortDirection;
+  orderByDirection = 'asc' as SortDirection;
+
+  /** Filters */
+  // private usersFilters: UserFilterModel;
+
+
+  private usersFilters: UserFilterModel = {
+    email: '',
+    firstName: '',
+    lastName: ''
+  };
+
 
   ngOnInit(): void {
     this.fetchData();
+    this.getUsersFilter();
   }
 
 
@@ -69,8 +82,13 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
+
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+
+      firstName: this.usersFilters.firstName,
+      lastName: this.usersFilters.lastName,
+      email: this.usersFilters.email
     }
 
     this.dataLoading = true;
@@ -91,14 +109,25 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
 
-
   sortData($event: any) {
-    console.log(88888888, $event)
     this.orderByColumn = $event.active;
     this.orderByDirection = $event.direction;
     this.fetchData();
-    // console.log('this.orderByColumn = ', this.orderByColumn)
+  }
 
+  // this.usersFilters.firstName == '' && this.usersFilters.lastName == ''&& this.usersFilters.email == ''
+
+  private getUsersFilter() {
+    this.usersService.usersFilters$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.usersFilters = resp;
+        if (!Object.keys(this.usersFilters).length) {
+          return;
+        } else {
+          this.fetchData();
+        }
+      });
   }
 
 
@@ -107,7 +136,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.length = e.length;
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
-
     this.fetchData();
   }
 

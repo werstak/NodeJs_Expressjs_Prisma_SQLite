@@ -5,12 +5,8 @@
       matSort
       [dataSource]="users$ | async"
       (matSortChange)="sortData($event)"
-      matSortActive="id" matSortDirection="asc"
+      [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection"
     >
-
-<!--      [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection"-->
-
-
 
       <!-- ID Column -->
       <ng-container matColumnDef="id">

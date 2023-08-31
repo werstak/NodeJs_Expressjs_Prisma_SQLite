@@ -23,6 +23,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { FilterPanelComponent } from './components/filter-panel/filter-panel.component';
 
 const routes: Routes = [
   {
@@ -44,6 +45,7 @@ const routes: Routes = [
     UsersComponent,
     UsersTableComponent,
     DialogUsersComponent,
+    FilterPanelComponent,
   ],
   imports: [
     CommonModule,
