@@ -6,13 +6,16 @@ import db from '../utils/db';
 
 
 export const getAllUsersHandler = async (params: any): Promise<any> => {
-    const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email} = params;
+    const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles} = params;
 
-    console.log(111111, 'getAllUsersHandler', params)
-
-    let sortCol = {email: 'asc'};
-
-    // sortCol[orderByColumn] = "red";
+    const parseRoles = JSON.parse(roles);
+    console.log('ROLES', parseRoles)
+    let rolesArr;
+    if (parseRoles.length) {
+        rolesArr = parseRoles;
+    } else {
+        rolesArr = [1, 2 ,3, 4];
+    }
 
 
     const totalCount = await db.user.count();
@@ -20,6 +23,8 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
 
     const users = await db.user.findMany({
         where: {
+            role: { in: rolesArr },
+            // role: { in: [1, 3] },
             firstName: {
                 startsWith: firstName,
             },
@@ -50,40 +55,6 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     return {totalCount, users}
 };
 
-
-// export const getAllUsersHandler = async (params: any): Promise<any> => {
-//     const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email} = params;
-//
-//     console.log(111111, 'getAllUsersHandler', params)
-//
-//     let sortCol = {email: 'asc'};
-//
-//     // sortCol[orderByColumn] = "red";
-//
-//
-//     const totalCount = await db.user.count();
-//     const skip = pageIndex * pageSize;
-//
-//     const users = await db.user.findMany({
-//         take: parseInt(pageSize),
-//         skip: skip,
-//         orderBy: {
-//             [orderByColumn]: orderByDirection,
-//         },
-//         select: {
-//             id: true,
-//             firstName: true,
-//             lastName: true,
-//             email: true,
-//             createdAt: true,
-//             updatedAt: true,
-//             role: true,
-//             avatar: true,
-//             posts: true
-//         },
-//     });
-//     return {totalCount, users}
-// };
 
 export const getUserHandler = async (id: number): Promise<any | null> => {
     return db.user.findUnique({

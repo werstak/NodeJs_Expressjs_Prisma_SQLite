@@ -32,6 +32,7 @@ export class UsersService {
         .set('firstName', params.firstName)
         .set('lastName', params.lastName)
         .set('email', params.email)
+        .set('roles', JSON.stringify(params.roles))
     })
       .pipe(
         catchError(error => {

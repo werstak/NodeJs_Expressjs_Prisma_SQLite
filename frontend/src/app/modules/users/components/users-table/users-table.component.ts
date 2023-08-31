@@ -63,13 +63,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   /** Filters */
   // private usersFilters: UserFilterModel;
+  private defaultUsersFilters: UserFilterModel = {email: '', firstName: '', lastName: '', roles: []};
+  private usersFilters: UserFilterModel = this.defaultUsersFilters;
 
-
-  private usersFilters: UserFilterModel = {
-    email: '',
-    firstName: '',
-    lastName: ''
-  };
+  // private usersFilters: UserFilterModel = {
+  //   email: '',
+  //   firstName: '',
+  //   lastName: ''
+  // };
 
 
   ngOnInit(): void {
@@ -79,6 +80,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   fetchData() {
+    console.log(1111, this.usersFilters)
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
@@ -88,7 +90,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
       firstName: this.usersFilters.firstName,
       lastName: this.usersFilters.lastName,
-      email: this.usersFilters.email
+      email: this.usersFilters.email,
+      roles: this.usersFilters.roles
     }
 
     this.dataLoading = true;
@@ -121,14 +124,30 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.usersService.usersFilters$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
-        this.usersFilters = resp;
-        if (!Object.keys(this.usersFilters).length) {
-          return;
+        if (!Object.keys(resp).length) {
+          this.usersFilters = this.defaultUsersFilters;
         } else {
+          this.usersFilters = resp
           this.fetchData();
         }
       });
   }
+
+  // private getUsersFilter() {
+  //   this.usersService.usersFilters$.pipe(
+  //     takeUntil(this.destroy))
+  //     .subscribe(resp => {
+  //       console.log(1111, resp)
+  //       this.usersFilters = resp;
+  //       if (!Object.keys(this.usersFilters).length) {
+  //         console.log(22222)
+  //         return;
+  //       } else {
+  //         this.fetchData();
+  //         console.log(33333)
+  //       }
+  //     });
+  // }
 
 
   handlePageEvent(e: PageEvent) {
