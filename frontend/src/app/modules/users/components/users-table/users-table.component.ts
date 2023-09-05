@@ -52,7 +52,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
 
 
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
   users$ = this.usersService.users$;
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);

@@ -25,6 +25,7 @@ import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.compon
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FilterPanelComponent } from './components/filter-panel/filter-panel.component';
 import { SharedModule } from '../../shared/shared.module';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 const routes: Routes = [
   {
@@ -60,6 +61,7 @@ const routes: Routes = [
     MatInputModule,
     MatIconModule,
     MatSortModule,
+    MatCheckboxModule,
     MatToolbarModule,
     MatPaginatorModule,
     ReactiveFormsModule,

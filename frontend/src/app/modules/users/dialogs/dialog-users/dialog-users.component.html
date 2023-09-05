@@ -97,6 +97,18 @@
         </mat-form-field>
 
 
+        <mat-form-field color="accent" class="example-full-width">
+
+          <mat-label>Country</mat-label>
+          <mat-select formControlName="location">
+            <mat-option *ngFor="let country of countriesList" [value]="country.name">
+              {{country.name}}
+            </mat-option>
+          </mat-select>
+
+        </mat-form-field>
+
+
 
 
 
@@ -114,6 +126,10 @@
             Password <strong>required</strong>
           </mat-error>
         </mat-form-field>
+
+        <p>
+          <mat-checkbox formControlName="status">Status - {{ userForm.value.status == true ? 'Active' : 'Deactivated' }}</mat-checkbox>
+        </p>
 
       </div>
 

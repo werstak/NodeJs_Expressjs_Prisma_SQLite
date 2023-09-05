@@ -7,6 +7,7 @@ import { Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';
+import { COUNTRIES } from '../../../../shared/constants/countries';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -28,6 +29,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   rolesList = ROLES;
+  countriesList = COUNTRIES;
   public userForm: FormGroup;
   private subUser: Subscription;
   hide = true;
@@ -47,6 +49,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.avatarImageDefault = customProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
+      this. userForm.patchValue({
+        status: true
+      });
     } else {
       this.initFormValue();
     }
@@ -73,6 +78,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(50)])
       ],
+      location: '',
+      status: '',
       password: [null, Validators.compose([
         Validators.required,
         Validators.minLength(3),
@@ -98,6 +105,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         firstName: data.firstName,
         lastName: data.lastName,
         role: data.role,
+        location: data.location,
+        status: data.status,
         password: data.password,
       });
       this.store.dispatch(new SetSelectedUser(data));
@@ -187,14 +196,16 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const previousImageUrl = this.previousImageUrl;
     let imageOrUrl: boolean;
     imageOrUrl = !!this.avatarUrl;
-    const params: UserModel = {
+    const params: any = {
       id: id,
       email: this.userForm.value.email,
       password: this.userForm.value.password,
       firstName: this.userForm.value.firstName,
       lastName: this.userForm.value.lastName,
-      // role: this.userForm.value.role,
       role: Number(this.userForm.value.role),
+      location: this.userForm.value.location,
+      status: this.userForm.value.status,
+      birthAt: this.currentUser.birthAt,
       avatar: '',
     };
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));

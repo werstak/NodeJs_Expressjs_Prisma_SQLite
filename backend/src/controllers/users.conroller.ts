@@ -14,7 +14,7 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     if (parseRoles.length) {
         rolesArr = parseRoles;
     } else {
-        rolesArr = [1, 2 ,3, 4];
+        rolesArr = [1, 2, 3, 4];
     }
 
 
@@ -23,7 +23,7 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
 
     const users = await db.user.findMany({
         where: {
-            role: { in: rolesArr },
+            role: {in: rolesArr},
             firstName: {
                 startsWith: firstName,
             },
@@ -48,7 +48,10 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
     return {totalCount, users}
@@ -70,7 +73,10 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
 };
@@ -107,7 +113,7 @@ export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar} = user;
+    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
     return db.user.update({
         where: {
@@ -119,7 +125,10 @@ export const updateUserHandler = async (
             email,
             password,
             role,
-            avatar
+            avatar,
+            status,
+            birthAt,
+            location
         },
         select: {
             id: true,
@@ -130,7 +139,10 @@ export const updateUserHandler = async (
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
 };
