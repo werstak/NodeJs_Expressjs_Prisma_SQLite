@@ -6,6 +6,7 @@ import { UsersService } from '../../users.service';
 import { Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
+import { ROLES } from '../../../../shared/constants/roles';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -26,7 +27,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   ) {
   }
 
-
+  rolesList = ROLES;
   public userForm: FormGroup;
   private subUser: Subscription;
   hide = true;
@@ -83,6 +84,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   private initFormValue() {
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
+
+      console.log('getUser', data)
+
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;

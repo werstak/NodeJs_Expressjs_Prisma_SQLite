@@ -7,8 +7,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
-// import { MatTableModule } from '@angular/material/table';
-// import { MatCardModule } from '@angular/material/card';
+
 
 const modules = [
   CommonModule,
@@ -19,14 +18,13 @@ const modules = [
   MatListModule,
   MatSnackBarModule,
   MatDialogModule
-  // MatTableModule,
-  // MatCardModule
 ];
 
 @NgModule({
   imports: [...modules],
   exports: [...modules],
-  declarations: [],
+  declarations: [
+  ],
 })
 
 export class MaterialSharedModule {

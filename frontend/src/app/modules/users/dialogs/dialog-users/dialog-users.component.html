@@ -61,15 +61,44 @@
           </mat-error>
         </mat-form-field>
 
+<!--        <mat-form-field color="accent" class="example-full-width">-->
+<!--          <input matInput #role class="form-control" placeholder="Role" formControlName="role"-->
+<!--                 name="role"-->
+<!--                 maxlength="50" required>-->
+<!--          <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>-->
+<!--          <mat-error *ngIf="userForm.controls['role'].hasError('required')">-->
+<!--            Role <strong>required</strong>-->
+<!--          </mat-error>-->
+<!--        </mat-form-field>-->
+
+
+<!--        <mat-form-field color="accent" class="example-full-width">-->
+<!--          -->
+<!--          <input matInput #role class="form-control" placeholder="Role" formControlName="role"-->
+<!--                 name="role"-->
+<!--                 maxlength="50" required>-->
+<!--          -->
+<!--          <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>-->
+<!--          <mat-error *ngIf="userForm.controls['role'].hasError('required')">-->
+<!--            Role <strong>required</strong>-->
+<!--          </mat-error>-->
+<!--        </mat-form-field>-->
+
+
         <mat-form-field color="accent" class="example-full-width">
-          <input matInput #role class="form-control" placeholder="Role" formControlName="role"
-                 name="role"
-                 maxlength="50" required>
-          <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>
-          <mat-error *ngIf="userForm.controls['role'].hasError('required')">
-            Role <strong>required</strong>
-          </mat-error>
+
+          <mat-label>Roles</mat-label>
+          <mat-select formControlName="role">
+            <mat-option *ngFor="let role of rolesList" [value]="role.id">
+              {{role.viewValue}}
+            </mat-option>
+          </mat-select>
+
         </mat-form-field>
+
+
+
+
 
         <mat-form-field color="accent" class="example-full-width">
           <input type="password" matInput #password class="form-control" placeholder="Password"

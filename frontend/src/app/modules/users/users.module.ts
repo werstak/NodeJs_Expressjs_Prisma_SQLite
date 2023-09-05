@@ -24,6 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { FilterPanelComponent } from './components/filter-panel/filter-panel.component';
+import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
   {
@@ -49,6 +50,7 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
+    SharedModule,
     MatTableModule,
     MatCardModule,
     MatProgressSpinnerModule,

@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, ReplaySubject, takeUntil } from 'rxjs';
 import { UsersService } from '../../users.service';
 
+import { ROLES } from '../../../../shared/constants/roles';
+
 @Component({
   selector: 'app-filter-panel',
   templateUrl: './filter-panel.component.html',
@@ -16,15 +18,9 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  public userFilterForm: FormGroup;
-
+  public userFilterForm: FormGroup
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-
-  rolesList = [
-    {id: 1, viewValue: 'Super Admin'},
-    {id: 2, viewValue: 'Project Admin'},
-    {id: 3, viewValue: 'Manager'},
-    {id: 4, viewValue: 'Client'}];
+  rolesList = ROLES;
 
 
   ngOnInit() {

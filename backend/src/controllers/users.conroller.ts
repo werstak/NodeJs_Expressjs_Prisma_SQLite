@@ -24,7 +24,6 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     const users = await db.user.findMany({
         where: {
             role: { in: rolesArr },
-            // role: { in: [1, 3] },
             firstName: {
                 startsWith: firstName,
             },

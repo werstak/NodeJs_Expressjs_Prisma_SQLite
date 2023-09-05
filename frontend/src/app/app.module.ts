@@ -21,7 +21,7 @@ import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialo
     AppComponent,
     ErrorPageComponent,
     SnackBarMessageComponent,
-    DialogConfirmComponent
+    DialogConfirmComponent,
   ],
   imports: [
     BrowserModule,
