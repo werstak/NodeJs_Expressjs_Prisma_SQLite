@@ -3,11 +3,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../shared/models/user.model';
 import { UsersService } from '../../users.service';
-import { Subscription } from 'rxjs';
+import { Observable, startWith, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
+import { map } from 'rxjs/operators';
+import { CountriesModel } from '../../../../shared/models/countriesModel';
 
 const customProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -41,28 +43,32 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   previousImageUrl = '';
   avatarFile = '';
   avatarImageDefault: any;
-
+  filteredCountries: Observable<CountriesModel[]>;
 
   ngOnInit() {
     this.buildForm();
     console.log('DIALOG  data', this.data)
+
     this.avatarImageDefault = customProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
-      this. userForm.patchValue({
+      this.userForm.patchValue({
         status: true
       });
     } else {
       this.initFormValue();
     }
+
+    this.autocompleteCountries();
   }
+
 
   private buildForm() {
     this.userForm = this.fb.group({
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
-        Validators.maxLength(50)])
+        Validators.maxLength(100)])
       ],
       firstName: [null, Validators.compose([
         Validators.required,
@@ -78,27 +84,27 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.required,
         Validators.maxLength(50)])
       ],
-      location: '',
-      status: '',
+      location: [null, Validators.compose([
+        Validators.required])],
       password: [null, Validators.compose([
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
+      birthAt: [null, Validators.compose([
+        Validators.required])],
+      status: '',
     });
   }
 
   private initFormValue() {
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
-
-      console.log('getUser', data)
-
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
 
-      console.log('getUser()', this.currentUser)
+      console.log('getUser() = currentUser ', this.currentUser)
 
       this.userForm.setValue({
         email: data.email,
@@ -108,9 +114,23 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         location: data.location,
         status: data.status,
         password: data.password,
+        birthAt: data.birthAt,
       });
       this.store.dispatch(new SetSelectedUser(data));
     });
+  }
+
+
+  private autocompleteCountries() {
+    this.filteredCountries = this.userForm.controls['location'].valueChanges.pipe(
+      startWith(''),
+      map(state => (state ? this._filterStates(state) : this.countriesList.slice())),
+    );
+  }
+
+  private _filterStates(value: string): CountriesModel[] {
+    const filterValue = value.toLowerCase();
+    return this.countriesList.filter(state => state.name.toLowerCase().includes(filterValue));
   }
 
 
@@ -166,7 +186,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmitUser()', this.userForm.value)
+    console.log(1, 'addNewUser()', this.userForm.value)
 
     const avatar = this.avatarFile;
     const params: any = {
@@ -174,9 +194,11 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       password: this.userForm.value.password,
       firstName: this.userForm.value.firstName,
       lastName: this.userForm.value.lastName,
-      // role: this.userForm.value.role,
       role: Number(this.userForm.value.role),
-      avatar: '',
+      location: this.userForm.value.location,
+      status: this.userForm.value.status,
+      birthAt: this.userForm.value.birthAt,
+      avatar: ''
     };
     this.store.dispatch(new AddUser(params, avatar));
   }
@@ -189,7 +211,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'onSubmitUser()', this.userForm.value)
+    console.log(1, 'updateUser()', this.userForm.value)
 
     let {id} = this.currentUser
     const avatar = this.avatarFile;
@@ -205,7 +227,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       role: Number(this.userForm.value.role),
       location: this.userForm.value.location,
       status: this.userForm.value.status,
-      birthAt: this.currentUser.birthAt,
+      birthAt: this.userForm.value.birthAt,
       avatar: '',
     };
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
@@ -221,5 +243,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.subUser?.unsubscribe();
     this.dialogRef.close();
   }
+
 }
 

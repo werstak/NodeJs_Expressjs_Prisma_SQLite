@@ -17,9 +17,8 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
         rolesArr = [1, 2, 3, 4];
     }
 
-
-    const totalCount = await db.user.count();
     const skip = pageIndex * pageSize;
+    const totalCount = await db.user.count();
 
     const users = await db.user.findMany({
         where: {
@@ -82,7 +81,7 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
 };
 
 export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar} = user;
+    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
     const newUser = await db.user.create({
         data: {
@@ -91,7 +90,10 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
             email,
             password,
             role,
-            avatar
+            avatar,
+            status,
+            birthAt,
+            location
         },
         select: {
             id: true,
@@ -102,7 +104,10 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
     const totalCount = await db.user.count();

@@ -1,6 +1,6 @@
-import { CountiesModel } from '../models/counties.model';
+import { CountriesModel } from '../models/countriesModel';
 
-export const COUNTRIES: Array<CountiesModel> = [
+export const COUNTRIES: Array<CountriesModel> = [
   {
     "name": "Afghanistan",
     "dial_code": "+93",

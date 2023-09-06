@@ -80,7 +80,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   fetchData() {
-    console.log(1111, this.usersFilters)
+    // console.log(1111, this.usersFilters)
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
@@ -132,22 +132,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
         }
       });
   }
-
-  // private getUsersFilter() {
-  //   this.usersService.usersFilters$.pipe(
-  //     takeUntil(this.destroy))
-  //     .subscribe(resp => {
-  //       console.log(1111, resp)
-  //       this.usersFilters = resp;
-  //       if (!Object.keys(this.usersFilters).length) {
-  //         console.log(22222)
-  //         return;
-  //       } else {
-  //         this.fetchData();
-  //         console.log(33333)
-  //       }
-  //     });
-  // }
 
 
   handlePageEvent(e: PageEvent) {

@@ -61,29 +61,6 @@
           </mat-error>
         </mat-form-field>
 
-<!--        <mat-form-field color="accent" class="example-full-width">-->
-<!--          <input matInput #role class="form-control" placeholder="Role" formControlName="role"-->
-<!--                 name="role"-->
-<!--                 maxlength="50" required>-->
-<!--          <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>-->
-<!--          <mat-error *ngIf="userForm.controls['role'].hasError('required')">-->
-<!--            Role <strong>required</strong>-->
-<!--          </mat-error>-->
-<!--        </mat-form-field>-->
-
-
-<!--        <mat-form-field color="accent" class="example-full-width">-->
-<!--          -->
-<!--          <input matInput #role class="form-control" placeholder="Role" formControlName="role"-->
-<!--                 name="role"-->
-<!--                 maxlength="50" required>-->
-<!--          -->
-<!--          <mat-hint align="end">{{role.value.length || 0}}/50</mat-hint>-->
-<!--          <mat-error *ngIf="userForm.controls['role'].hasError('required')">-->
-<!--            Role <strong>required</strong>-->
-<!--          </mat-error>-->
-<!--        </mat-form-field>-->
-
 
         <mat-form-field color="accent" class="example-full-width">
 
@@ -93,26 +70,68 @@
               {{role.viewValue}}
             </mat-option>
           </mat-select>
-
+          <mat-error *ngIf="userForm.controls['role'].hasError('required')">
+            Role <strong>required</strong>
+          </mat-error>
         </mat-form-field>
 
 
-        <mat-form-field color="accent" class="example-full-width">
+        <!--        <mat-form-field color="accent" class="example-full-width">-->
+        <!--          <mat-label>Country</mat-label>-->
+        <!--          <mat-select formControlName="location">-->
+        <!--            <mat-option *ngFor="let country of countriesList" [value]="country.name">-->
+        <!--              {{country.name}}-->
+        <!--            </mat-option>-->
+        <!--          </mat-select>-->
+        <!--          <mat-error *ngIf="userForm.controls['location'].hasError('required')">-->
+        <!--            Country <strong>required</strong>-->
+        <!--          </mat-error>-->
+        <!--        </mat-form-field>-->
 
+
+        <mat-form-field class="example-full-width">
           <mat-label>Country</mat-label>
-          <mat-select formControlName="location">
-            <mat-option *ngFor="let country of countriesList" [value]="country.name">
+          <input type="text"
+                 matInput
+                 formControlName="location"
+                 placeholder="Pick Country"
+                 [matAutocomplete]="auto">
+
+          <mat-autocomplete #auto="matAutocomplete">
+            <mat-option *ngFor="let country of filteredCountries | async" [value]="country.name">
               {{country.name}}
             </mat-option>
-          </mat-select>
-
+          </mat-autocomplete>
+          <button *ngIf="userForm.controls['location'].value" matSuffix mat-icon-button aria-label="Clear" (click)="userForm.controls['location'].patchValue('')">
+            <mat-icon>close</mat-icon>
+          </button>
+          <mat-error *ngIf="userForm.controls['location'].hasError('required')">
+            Country <strong>required</strong>
+          </mat-error>
         </mat-form-field>
 
 
-
+        <!--        <mat-form-field color="accent" class="example-full-width">-->
+        <!--          <mat-label>Country</mat-label>-->
+        <!--          <input type="text"-->
+        <!--                 placeholder="Pick Country"-->
+        <!--                 aria-label="Country"-->
+        <!--                 matInput-->
+        <!--                 formControlName="location"-->
+        <!--                 [matAutocomplete]="auto">-->
+        <!--          <mat-autocomplete #auto="matAutocomplete">-->
+        <!--            <mat-option *ngFor="let country of filteredOptions | async" [value]="country">-->
+        <!--              {{country}}-->
+        <!--            </mat-option>-->
+        <!--          </mat-autocomplete>-->
+        <!--          <mat-error *ngIf="userForm.controls['location'].hasError('required')">-->
+        <!--            Country <strong>required</strong>-->
+        <!--          </mat-error>-->
+        <!--        </mat-form-field>-->
 
 
         <mat-form-field color="accent" class="example-full-width">
+          <mat-label>Password</mat-label>
           <input type="password" matInput #password class="form-control" placeholder="Password"
                  formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
                  name="password"
@@ -127,8 +146,21 @@
           </mat-error>
         </mat-form-field>
 
+
+        <mat-form-field color="accent" class="example-full-width">
+          <mat-label>Birth date</mat-label>
+          <input matInput [matDatepicker]="picker" placeholder="Choose a birth date"
+                 formControlName="birthAt">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="userForm.controls['birthAt'].hasError('required')">
+            Birth date <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
         <p>
-          <mat-checkbox formControlName="status">Status - {{ userForm.value.status == true ? 'Active' : 'Deactivated' }}</mat-checkbox>
+          <mat-checkbox formControlName="status">Status
+            - {{ userForm.value.status == true ? 'Active' : 'Deactivated' }}</mat-checkbox>
         </p>
 
       </div>

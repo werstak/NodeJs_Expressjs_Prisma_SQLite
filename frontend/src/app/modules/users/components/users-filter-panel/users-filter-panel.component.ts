@@ -6,11 +6,11 @@ import { UsersService } from '../../users.service';
 import { ROLES } from '../../../../shared/constants/roles';
 
 @Component({
-  selector: 'app-filter-panel',
-  templateUrl: './filter-panel.component.html',
-  styleUrls: ['./filter-panel.component.scss']
+  selector: 'app-users-filter-panel',
+  templateUrl: './users-filter-panel.component.html',
+  styleUrls: ['./users-filter-panel.component.scss']
 })
-export class FilterPanelComponent implements OnInit, OnDestroy {
+export class UsersFilterPanelComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,

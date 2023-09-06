@@ -29,6 +29,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
                     id: true,
                     firstName: true,
                     lastName: true,
+                    // location: true
                 },
             },
         },
