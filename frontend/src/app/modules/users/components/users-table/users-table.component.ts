@@ -79,7 +79,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
 
-  fetchData() {
+  private fetchData() {
     // console.log(1111, this.usersFilters)
     const params = {
       orderByColumn: this.orderByColumn,

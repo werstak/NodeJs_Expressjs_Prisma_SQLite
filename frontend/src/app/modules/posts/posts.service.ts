@@ -59,4 +59,13 @@ export class PostsService {
     return this.http.delete(config.API_URL + `/posts/` + id, {params});
   }
 
+  fetchListAllUsers(): Observable<any> {
+    return this.http.get(config.API_URL + `/users/list_all_users`)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
 }

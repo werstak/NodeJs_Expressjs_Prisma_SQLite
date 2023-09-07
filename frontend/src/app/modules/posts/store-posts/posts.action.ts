@@ -35,3 +35,10 @@ export class SetSelectedPost {
   constructor(public payload: PostModel) {
   }
 }
+
+export class GetListAllUsers {
+  static readonly type = '[Users] Get List All Users';
+
+  constructor() {
+  }
+}
