@@ -2,8 +2,16 @@
 
   <div class="dialog-post__header">
     <div class="dialog-post__title">
-      {{this.currentPost ? this.currentPost.title : 'Add Post'}}
+      <p>
+        {{this.currentPost ? this.currentPost.title : 'Add Post'}}
+      </p>
+      <p class="dialog-post__subTitle">
+        Author:
+        {{this.currentPost ? this.currentPost.user.firstName : ''}}
+        {{this.currentPost ? this.currentPost.user.lastName : ''}}
+      </p>
     </div>
+
 
     <div class="dialog-post__avatar">
       <label class="hoverable" for="fileInput">

@@ -58,51 +58,11 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
 
 
 export const getListAllUsersHandler = async (): Promise<any> => {
-    // const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles} = params;
-
-    // const parseRoles = JSON.parse(roles);
-    // console.log('ROLES', parseRoles)
-    // let rolesArr;
-    // if (parseRoles.length) {
-    //     rolesArr = parseRoles;
-    // } else {
-    //     rolesArr = [1, 2, 3, 4];
-    // }
-    //
-    // const skip = pageIndex * pageSize;
-    // const totalCount = await db.user.count();
-
     const users = await db.user.findMany({
-        // where: {
-        //     role: {in: rolesArr},
-        //     firstName: {
-        //         startsWith: firstName,
-        //     },
-        //     lastName: {
-        //         startsWith: lastName,
-        //     },
-        //     email: {
-        //         startsWith: email
-        //     }
-        // },
-        // take: parseInt(pageSize),
-        // skip: skip,
-        // orderBy: {
-        //     [orderByColumn]: orderByDirection,
-        // },
         select: {
             id: true,
             firstName: true,
-            lastName: true,
-            // email: true,
-            // createdAt: true,
-            // updatedAt: true,
-            // role: true,
-            // avatar: true,
-            // posts: true,
-            // status: true,
-            // birthAt: true,
-            // location: true
+            lastName: true
         },
     });
     return {users}

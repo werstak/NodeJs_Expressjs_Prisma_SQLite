@@ -1,13 +1,10 @@
-import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PostsService } from '../../posts.service';
-import { Observable, ReplaySubject, startWith, takeUntil } from 'rxjs';
-import { ROLES } from '../../../../shared/constants/roles';
+import { debounceTime, Observable, ReplaySubject, startWith, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { UsersService } from '../../../users/users.service';
 import { GetListAllUsers } from '../../store-posts/posts.action';
-import { UsersSelectors } from '../../../users/store-users/users.selectors';
-import { UserModel } from '../../../../shared/models/user.model';
 import { UserListModel } from '../../../../shared/models/user-list.model';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { map } from 'rxjs/operators';
@@ -24,7 +21,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     public postsService: PostsService,
     public store: Store,
-    public usersService: UsersService
+    public usersService: UsersService,
+    private cdref: ChangeDetectorRef
   ) {
   }
 
@@ -32,7 +30,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
   public postFilterForm: FormGroup
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  authorList = ROLES
 
 
   /** Searchable Multiselect Select*/
@@ -40,49 +37,60 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
   listAllUsers: any = [];
 
-  selectFormControl = new FormControl();
   searchTextboxControl = new FormControl();
   selectedValues: any = [];
-  data: any[] = [
-    'A1',
-    'A2',
-    'A3',
-    'B1',
-    'B2',
-    'B3',
-    'C1',
-    'C2',
-    'C3'
-  ]
 
-  filteredOptions: Observable<any[]>;
+  filteredOptions: Observable<any['']>;
 
 
   ngOnInit() {
     this.fetchData();
     this.buildForm();
-    this.filteredUsers();
+    this.onChanges();
 
-    // this.filteredOptions = this.searchTextboxControl.valueChanges
-    //   .pipe(
-    //     startWith<any>(''),
-    //     map(name => this._filter(name))
-    //   );
+  }
 
 
-    // this.onChanges();
+  private buildForm() {
+    this.postFilterForm = this.fb.group({
+      authors: []
+    });
+  }
+
+
+  private onChanges(): void {
+    this.postFilterForm.valueChanges.pipe(
+      debounceTime(250),
+      takeUntil(this.destroy)).subscribe(val => {
+
+      console.log(111, 'FORM Filter', val)
+      let arrAuthors = [];
+      if (val.authors) {
+        for (let i = 0; i < val.authors.length; i++) {
+          arrAuthors.push(val.authors[i].id);
+        }
+      } else {
+        arrAuthors = [];
+      }
+
+      let filterData = {
+        authors: arrAuthors
+      }
+
+      console.log(222, 'NEXT filterData', filterData)
+      this.postsService.postsFilters$.next(filterData)
+    });
   }
 
   private fetchData() {
     this.store.dispatch(new GetListAllUsers());
-
     this.listAllUsers$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.listAllUsers = resp;
-
-        console.log(1111, 'listAllUsers', this.listAllUsers)
-        // this.dataLoading = false;
+        if (this.listAllUsers.length) {
+          this.filteredUsers();
+        }
       });
   }
 
@@ -94,16 +102,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       );
   }
 
-  private buildForm() {
-    this.postFilterForm = this.fb.group({
-      author: [],
-      // firstName: '',
-      // lastName: '',
-      // email: '',
-      // roles: [],
-    });
-  }
-
 
   /**
    * Used to filter data based on search input
@@ -112,11 +110,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     const filterValue = name.toLowerCase();
     // Set selected values to retain the selected checkbox state
     this.setSelectedValues();
-    this.selectFormControl.patchValue(this.selectedValues);
+    this.postFilterForm.controls['authors'].patchValue(this.selectedValues);
     console.log(222, this.listAllUsers)
-    // let filteredList = this.listAllUsers.filter((option: any) => option.toLowerCase().indexOf(filterValue) === 0);
-    let filteredList = this.data.filter(option => option.toLowerCase().indexOf(filterValue) === 0);
-    return filteredList;
+    return this.listAllUsers.filter((option: any) => option.firstName.toLowerCase().indexOf(filterValue) === 0);
   }
 
   /**
@@ -150,9 +146,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    * Set selected values to retain the state
    */
   setSelectedValues() {
-    console.log('selectFormControl', this.selectFormControl.value);
-    if (this.selectFormControl.value && this.selectFormControl.value.length > 0) {
-      this.selectFormControl.value.forEach((e: any) => {
+    console.log('authors', this.postFilterForm.controls['authors'].value);
+    if (this.postFilterForm.controls['authors'].value && this.postFilterForm.controls['authors'].value.length > 0) {
+      this.postFilterForm.controls['authors'].value.forEach((e: any) => {
         if (this.selectedValues.indexOf(e) == -1) {
           this.selectedValues.push(e);
         }

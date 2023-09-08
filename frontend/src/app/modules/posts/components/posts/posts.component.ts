@@ -8,6 +8,8 @@ import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
+import { UserFilterModel } from '../../../../shared/models/user-filter.model';
+import { PostFilterModel } from '../../../../shared/models/post-filter.model';
 
 @Component({
   selector: 'app-posts',
@@ -44,15 +46,22 @@ export class PostsComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
+  /** Filters */
+    // private postsFilters: UserFilterModel;
+  private defaultPostsFilters: PostFilterModel = {authors: []};
+  private postsFilters: PostFilterModel = this.defaultPostsFilters;
+
 
   ngOnInit(): void {
     this.fetchData();
+    this.getPostsFilter();
   }
 
   fetchData() {
     const params = {
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      authors: this.postsFilters.authors
     }
 
     this.dataLoading = true;
@@ -63,6 +72,21 @@ export class PostsComponent implements OnInit, OnDestroy {
         this.length = resp;
       });
     this.dataLoading = false;
+  }
+
+  private getPostsFilter() {
+    this.postsService.postsFilters$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        if (!Object.keys(resp).length) {
+          this.postsFilters = this.defaultPostsFilters;
+          console.log(888888888, this.postsFilters)
+        } else {
+          console.log(999999999)
+          this.postsFilters = resp
+          this.fetchData();
+        }
+      });
   }
 
 

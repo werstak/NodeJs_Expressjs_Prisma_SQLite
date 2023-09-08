@@ -42,7 +42,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       debounceTime(250),
       takeUntil(this.destroy)).subscribe(val => {
 
-      // console.log(111, 'FORM', val)
+      console.log(111, 'FORM', val)
       let arrRoles = [];
       if (val.roles) {
         for (let i = 0; i < val.roles.length; i++) {

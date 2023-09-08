@@ -6,12 +6,27 @@ import db from '../utils/db';
  * */
 
 export const getAllPostsHandler = async (params: any): Promise<any> => {
-    const {pageIndex, pageSize} = params;
+    const {pageIndex, pageSize, authors} = params;
+
+    const parseAuthors = JSON.parse(authors);
+    console.log('ROLES = ', parseAuthors)
+    let authorsArr;
+    if (parseAuthors.length) {
+        authorsArr = parseAuthors;
+    } else {
+        // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
+        authorsArr = [1, 2, 3, 5, 14, 18];
+    }
 
     const totalCount = await db.post.count();
     const skip = pageIndex * pageSize;
 
     const posts = await db.post.findMany({
+        where: {
+            user: {
+                id: {in: authorsArr},
+            },
+        },
         take: parseInt(pageSize),
         skip: skip,
         select: {

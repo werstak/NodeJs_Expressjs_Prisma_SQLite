@@ -2,17 +2,49 @@
   <mat-card-content>
     <form [formGroup]="postFilterForm" class="filters__form">
 
+
       <mat-form-field>
-        <mat-label>Author</mat-label>
-        <mat-select formControlName="author" multiple>
-          <mat-option *ngFor="let author of authorList" [value]="author">
-            {{author.viewValue}}
-          </mat-option>
+        <mat-select class="filters__select" (openedChange)="openedChange($event)"
+                    placeholder="Select"
+                    formControlName="authors"
+                    multiple>
+
+          <mat-select-trigger>
+            <span *ngIf="postFilterForm.controls['authors'].value?.length > 0">
+              {{postFilterForm.controls['authors'].value ? postFilterForm.controls['authors'].value[0].firstName : ''}}
+            </span>
+            <span *ngIf="postFilterForm.controls['authors'].value?.length > 1" class="additional-selection">
+            (+{{postFilterForm.controls['authors'].value.length - 1}} {{postFilterForm.controls['authors'].value?.length === 2 ? 'other' : 'others'}}
+              )
+            </span>
+          </mat-select-trigger>
+
+          <div class="select-container">
+            <mat-optgroup>
+              <mat-form-field style="width:100%;">
+                <input #search autocomplete="off" placeholder="Search" aria-label="Search" matInput
+                       [formControl]="searchTextboxControl">
+                <button [disableRipple]="true" *ngIf="search.value" matSuffix mat-icon-button aria-label="Clear"
+                        (click)="clearSearch($event)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </mat-optgroup>
+
+            <mat-optgroup *ngIf="(filteredOptions | async)?.length == 0">
+              <div>No results found!</div>
+            </mat-optgroup>
+
+            <mat-option
+              (onSelectionChange)="selectionChange($event)"
+              *ngFor="let option of filteredOptions | async"
+              [value]="option">
+              {{option.firstName}}
+              {{option.lastName}}
+            </mat-option>
+          </div>
         </mat-select>
       </mat-form-field>
-
-
-      <!--      <div *ngIf="selectFormControl.value">{{ 'You have choosen ' + selectFormControl.value }}</div>-->
 
 
       <!--      <pre>-->
@@ -20,91 +52,6 @@
       <!--      </pre>-->
 
 
-      <!--      <mat-form-field class="filters__input">-->
-      <!--        <mat-label>First Name</mat-label>-->
-      <!--        <input matInput type="text" placeholder="First Name" formControlName="firstName" name="firstName">-->
-      <!--        <button *ngIf="postFilterForm.controls['firstName'].value"-->
-      <!--                matSuffix-->
-      <!--                mat-icon-button-->
-      <!--                aria-label="Clear"-->
-      <!--                (click)="postFilterForm.controls['firstName'].patchValue('')">-->
-      <!--          <mat-icon>close</mat-icon>-->
-      <!--        </button>-->
-      <!--      </mat-form-field>-->
-
-      <!--      <mat-form-field class="filters__input">-->
-      <!--        <mat-label>Last Name</mat-label>-->
-      <!--        <input matInput type="text" placeholder="Last Name" formControlName="lastName" name="lastName">-->
-      <!--        <button *ngIf="postFilterForm.controls['lastName'].value"-->
-      <!--                matSuffix-->
-      <!--                mat-icon-button-->
-      <!--                aria-label="Clear"-->
-      <!--                (click)="postFilterForm.controls['lastName'].patchValue('')">-->
-      <!--          <mat-icon>close</mat-icon>-->
-      <!--        </button>-->
-      <!--      </mat-form-field>-->
-
-      <!--      <mat-form-field class="filters__input">-->
-      <!--        <mat-label>Email</mat-label>-->
-      <!--        <input matInput type="text" placeholder="Email" formControlName="email" name="email">-->
-      <!--        <button *ngIf="postFilterForm.controls['email'].value"-->
-      <!--                matSuffix-->
-      <!--                mat-icon-button-->
-      <!--                aria-label="Clear"-->
-      <!--                (click)="postFilterForm.controls['email'].patchValue('')">-->
-      <!--          <mat-icon>close</mat-icon>-->
-      <!--        </button>-->
-      <!--      </mat-form-field>-->
-
-
     </form>
-
-
-
-
-    <mat-form-field>
-      <mat-select (openedChange)="openedChange($event)" placeholder="Select" [formControl]="selectFormControl"
-                  multiple>
-
-        <mat-select-trigger>
-          {{selectFormControl.value ? selectFormControl.value[0] : ''}}
-
-          <span *ngIf="selectFormControl.value?.length > 1" class="additional-selection">
-            (+{{selectFormControl.value.length - 1}} {{selectFormControl.value?.length === 2 ? 'other' : 'others'}})
-          </span>
-
-        </mat-select-trigger>
-
-        <div class="select-container">
-          <mat-optgroup>
-            <mat-form-field style="width:100%;">
-              <input #search autocomplete="off" placeholder="Search" aria-label="Search" matInput
-                     [formControl]="searchTextboxControl">
-              <button [disableRipple]="true" *ngIf="search.value" matSuffix mat-icon-button aria-label="Clear"
-                      (click)="clearSearch($event)">
-                <mat-icon>close</mat-icon>
-              </button>
-            </mat-form-field>
-          </mat-optgroup>
-
-          <mat-optgroup *ngIf="(filteredOptions | async)!.length == 0">
-            <div>No results found!</div>
-          </mat-optgroup>
-
-          <mat-option (onSelectionChange)="selectionChange($event)" *ngFor="let option of filteredOptions | async"
-                      [value]="option">
-            {{option}}
-          </mat-option>
-        </div>
-      </mat-select>
-    </mat-form-field>
-
-
-    <pre>
-      {{filteredOptions | async | json}}
-    </pre>
-
-
-
   </mat-card-content>
 </mat-card>

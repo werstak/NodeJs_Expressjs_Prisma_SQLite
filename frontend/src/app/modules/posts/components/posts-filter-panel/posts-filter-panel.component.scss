@@ -5,3 +5,12 @@
 .select-container{
   margin-top:10px;
 }
+
+.filters {
+  &__select {
+    .cdk-overlay-pane {
+      top: 100px !important;
+    }
+
+  }
+}

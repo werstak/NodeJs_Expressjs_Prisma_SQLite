@@ -14,12 +14,15 @@ export class PostsService {
   ) {
   }
 
+  postsFilters$ = new BehaviorSubject<any>({});
+
 
   fetchPosts(params: any): Observable<any> {
     return this.http.get(config.API_URL + `/posts`, {
       params: new HttpParams()
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
+        .set('authors', JSON.stringify(params.authors))
     })
       .pipe(
         catchError(error => {
