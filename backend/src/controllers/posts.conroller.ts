@@ -39,6 +39,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,
@@ -68,6 +69,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,

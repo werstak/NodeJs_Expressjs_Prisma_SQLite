@@ -95,7 +95,6 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.length = e.length;
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
-
     this.fetchData();
   }
 

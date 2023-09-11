@@ -4,9 +4,18 @@ import { PostModel } from '../../../shared/models/post.model';
 import { NotificationService } from '../../../shared/notification.service';
 import { PostsService } from '../posts.service';
 import { tap } from 'rxjs';
-import { AddPost, DeletePost, GetListAllUsers, GetPosts, SetSelectedPost, UpdatePost } from './posts.action';
+import {
+  AddPost,
+  DeletePost,
+  GetCategories,
+  GetListAllUsers,
+  GetPosts,
+  SetSelectedPost,
+  UpdatePost
+} from './posts.action';
 import * as _ from 'lodash';
 import { UserListModel } from '../../../shared/models/user-list.model';
+import { CategoriesModel } from '../../../../../../backend/src/models/categories.model';
 
 
 export class PostsStateModel {
@@ -14,6 +23,7 @@ export class PostsStateModel {
   postsCounter?: any;
   selectedPost?: any;
   usersList: UserListModel[];
+  categories: CategoriesModel[];
 
 }
 
@@ -24,6 +34,7 @@ export class PostsStateModel {
     postsCounter: null,
     selectedPost: null,
     usersList: [],
+    categories: [],
   }
 })
 
@@ -130,6 +141,17 @@ export class PostsState {
       setState({
         ...state,
         usersList: result.users
+      });
+    }));
+  }
+
+  @Action(GetCategories)
+  getListCategories({getState, setState}: StateContext<PostsStateModel>) {
+    return this.postsService.fetchListCategories().pipe(tap((result) => {
+      const state = getState();
+      setState({
+        ...state,
+        categories: result.categories
       });
     }));
   }

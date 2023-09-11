@@ -20,6 +20,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { PostsFilterPanelComponent } from './components/posts-filter-panel/posts-filter-panel.component';
 import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
 
 
 const routes: Routes = [
@@ -61,6 +62,7 @@ const routes: Routes = [
     MatTooltipModule,
     MatCheckboxModule,
     MatPaginatorModule,
+    MatChipsModule,
     MatProgressSpinnerModule
   ]
 })

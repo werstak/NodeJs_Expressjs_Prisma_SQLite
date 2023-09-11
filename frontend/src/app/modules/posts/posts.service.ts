@@ -71,4 +71,14 @@ export class PostsService {
         })
       );
   }
+
+  fetchListCategories(): Observable<any> {
+    return this.http.get(config.API_URL + `/categories`)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
 }

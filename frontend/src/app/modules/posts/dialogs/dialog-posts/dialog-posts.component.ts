@@ -1,11 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
-import { Store } from '@ngxs/store';
-import { AddPost, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { Select, Store } from '@ngxs/store';
+import { AddPost, GetCategories, GetListAllUsers, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
+import { UserListModel } from '../../../../shared/models/user-list.model';
+import { CategoriesModel } from '../../../../shared/models/categories.model';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -27,8 +30,15 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
+  listAllCategories: any = [];
+
+  toppingsControl = new FormControl([]);
+  toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
+
+  newCategoryControl = new FormControl();
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   public postForm: FormGroup;
-  private subPost: Subscription;
 
   currentPost: PostModel;
   respNewPost: PostModel;
@@ -41,6 +51,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    this.fetchCategories();
     this.buildForm();
     console.log('Open DIALOG data = ', this.data)
     this.pictureDefault = pictureDefault;
@@ -55,6 +66,50 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
+  private fetchCategories() {
+    this.store.dispatch(new GetCategories());
+    this.listAllCategories$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.listAllCategories = resp;
+
+        console.log(1111 ,'this.listAllCategories' , this.listAllCategories)
+
+        if (this.listAllCategories.length) {
+          // this.filteredUsers();
+        }
+      });
+  }
+
+  onToppingRemoved(topping: string) {
+    const toppings = this.toppingsControl.value;
+    // const toppings = this.toppingsControl.value as string[];
+    console.log(0, toppings)
+
+    this.removeFirst(toppings, topping);
+
+    console.log(1, topping)
+    console.log(2, toppings)
+    this.toppingsControl.setValue(toppings)
+  }
+
+  private removeFirst(array: any, toRemove: any): void {
+    const index = array.indexOf(toRemove);
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
+
+  //
+  // private removeFirst<T>(array: T[], toRemove: T): void {
+  //   const index = array.indexOf(toRemove);
+  //   if (index !== -1) {
+  //     array.splice(index, 1);
+  //   }
+  // }
+
+
+
   private buildForm() {
     this.postForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -66,7 +121,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
 
   private initPostFormValue() {
     const id: number = this.data.id;
-    this.subPost = this.postsService.getPost(id).subscribe(data => {
+    this.postsService.getPost(id).pipe(
+      takeUntil(this.destroy))
+      .subscribe(data => {
       this.currentPost = data
       this.previousPictureUrl = data.picture;
       this.pictureUrl = data.picture;
@@ -152,6 +209,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
    Update current post
    */
   private updatePost(): void {
+    console.log('this.postForm.value', this.postForm.value)
+
     if (this.postForm.invalid) {
       return;
     }
@@ -177,7 +236,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subPost?.unsubscribe();
+    this.destroy.next(null);
+    this.destroy.complete();
     this.dialogRef.close();
   }
 }

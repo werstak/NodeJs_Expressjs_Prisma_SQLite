@@ -42,3 +42,11 @@ export class GetListAllUsers {
   constructor() {
   }
 }
+
+
+export class GetCategories {
+  static readonly type = '[Categories] Get';
+
+  constructor() {
+  }
+}
