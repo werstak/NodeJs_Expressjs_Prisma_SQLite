@@ -21,6 +21,8 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { PostsFilterPanelComponent } from './components/posts-filter-panel/posts-filter-panel.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
+import { DialogCategoriesPostComponent } from './dialogs/dialog-categories-post/dialog-categories-post.component';
+import { MatListModule } from '@angular/material/list';
 
 
 const routes: Routes = [
@@ -43,7 +45,8 @@ const routes: Routes = [
     PostComponent,
     PostsComponent,
     DialogPostsComponent,
-    PostsFilterPanelComponent
+    PostsFilterPanelComponent,
+    DialogCategoriesPostComponent
   ],
   imports: [
     CommonModule,
@@ -63,6 +66,7 @@ const routes: Routes = [
     MatCheckboxModule,
     MatPaginatorModule,
     MatChipsModule,
+    MatListModule,
     MatProgressSpinnerModule
   ]
 })

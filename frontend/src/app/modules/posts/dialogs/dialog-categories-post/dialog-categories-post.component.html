@@ -1,0 +1,47 @@
+<h1 mat-dialog-title>Hi {{data.name}}</h1>
+<div mat-dialog-content class="category">
+  <mat-form-field class="category__field" (keydown.enter)="$event.preventDefault(); addCategory()">
+    <mat-label>Category</mat-label>
+    <input matInput [formControl]="category">
+    <button *ngIf="category.value !== ''"
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="category.patchValue('')">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <button
+    mat-mini-fab
+    color="primary"
+    aria-label="Add todo"
+    [disabled]="!category?.value"
+    (click)="addCategory()"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+
+
+<div class="categories-wrap">
+  <mat-divider></mat-divider>
+  <div class="categories" role="listitem" *ngFor="let category of listAllCategories$ | async">
+    <div class="categories__title">{{category.name}}</div>
+    <div class="categories__btn">
+      <button mat-icon-button color="primary" matTooltip="Edit" (click)="editCategory(category)">
+        <mat-icon aria-label="Edit">edit</mat-icon>
+      </button>
+      <button mat-icon-button color="primary" matTooltip="Delete" (click)="deleteCategory(category)">
+        <mat-icon aria-label="Delete">delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+</div>
+
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+</div>

@@ -1,0 +1,25 @@
+.category {
+  &__field {
+    margin: 0 20px 0 0;
+    width: 200px;
+  }
+}
+
+
+
+.categories-wrap {
+  padding: 0 20px 24px;
+  font-size: 16px;
+}
+
+.categories {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  &__title {
+
+  }
+  &__btn {
+
+  }
+}

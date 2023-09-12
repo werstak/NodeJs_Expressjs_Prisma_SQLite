@@ -83,7 +83,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 
 
 export const createPostHandler = async (post: any): Promise<any> => {
-    const {title, description, content, picture, published, userId} = post;
+    const {title, description, content, picture, published, userId, categories} = post;
     const newPost = await db.post.create({
         data: {
             title,
@@ -91,7 +91,8 @@ export const createPostHandler = async (post: any): Promise<any> => {
             content,
             picture,
             published,
-            userId
+            userId,
+            // categories
         },
         select: {
             id: true,
@@ -103,6 +104,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,
@@ -119,8 +121,12 @@ export const createPostHandler = async (post: any): Promise<any> => {
 
 export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
-    const {title, description, content, picture, published, userId} = post;
-    return db.post.update({
+    const {title, description, content, picture, published, userId, categories} = post;
+
+    console.log(5555, ' post', post)
+
+
+        return db.post.update({
         where: {
             id,
         },
@@ -130,7 +136,8 @@ export const updatePostHandler = async (post: any, id: number
             content,
             picture,
             published,
-            userId
+            userId,
+            // categories
         },
         select: {
             id: true,
@@ -142,6 +149,7 @@ export const updatePostHandler = async (post: any, id: number
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,

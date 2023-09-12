@@ -7,8 +7,8 @@ import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, GetListAllUsers, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { UserListModel } from '../../../../shared/models/user-list.model';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
+
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -33,7 +33,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
   listAllCategories: any = [];
 
-  toppingsControl = new FormControl([]);
   toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
 
   newCategoryControl = new FormControl();
@@ -81,33 +80,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
   }
 
-  onToppingRemoved(topping: string) {
-    const toppings = this.toppingsControl.value;
-    // const toppings = this.toppingsControl.value as string[];
-    console.log(0, toppings)
-
-    this.removeFirst(toppings, topping);
-
-    console.log(1, topping)
-    console.log(2, toppings)
-    this.toppingsControl.setValue(toppings)
-  }
-
-  private removeFirst(array: any, toRemove: any): void {
-    const index = array.indexOf(toRemove);
-    if (index !== -1) {
-      array.splice(index, 1);
-    }
-  }
-
-  //
-  // private removeFirst<T>(array: T[], toRemove: T): void {
-  //   const index = array.indexOf(toRemove);
-  //   if (index !== -1) {
-  //     array.splice(index, 1);
-  //   }
-  // }
-
 
 
   private buildForm() {
@@ -115,6 +87,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
       content: ['', []],
+      categories: ['', []],
       published: ['', []]
     });
   }
@@ -127,15 +100,49 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       this.currentPost = data
       this.previousPictureUrl = data.picture;
       this.pictureUrl = data.picture;
-      this.postForm.setValue({
+      this.postForm.patchValue({
         title: data.title,
         description: data.description,
         content: data.content,
+        categories: data.categories,
         published: data.published
       });
       this.store.dispatch(new SetSelectedPost(data));
     });
   }
+
+
+
+
+  onToppingRemoved(topping: string) {
+    console.log(0, topping)
+
+    const toppings = this.postForm.controls['categories'].value;
+    // const toppings = this.categories.value as string[];
+    console.log(1, toppings)
+
+    this.removeFirst(toppings, topping);
+
+    console.log(2, 'removeFirst', toppings)
+
+    this.postForm.controls['categories'].patchValue(toppings)
+  }
+
+  // private removeFirst(array: any, toRemove: any): void {
+  //   const index = array.indexOf(toRemove);
+  //   if (index !== -1) {
+  //     array.splice(index, 1);
+  //   }
+  // }
+
+
+  private removeFirst<T>(array: T[], toRemove: T): void {
+    const index = array.indexOf(toRemove);
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
+
 
 
   /**
@@ -198,6 +205,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       title: this.postForm.value.title,
       description: this.postForm.value.description,
       content: this.postForm.value.content,
+      categories: this.postForm.value.categories,
       published: this.postForm.value.published,
       userId: 1
     };
@@ -226,6 +234,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
+      categories: this.postForm.value.categories,
       userId: userId
     };
     this.store.dispatch(new UpdatePost(id, params, picture, pictureOrUrl, previousPictureUrl));

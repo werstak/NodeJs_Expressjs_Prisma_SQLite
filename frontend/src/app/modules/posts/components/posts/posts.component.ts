@@ -10,6 +10,7 @@ import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
 import { UserFilterModel } from '../../../../shared/models/user-filter.model';
 import { PostFilterModel } from '../../../../shared/models/post-filter.model';
+import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
 @Component({
   selector: 'app-posts',
@@ -52,6 +53,9 @@ export class PostsComponent implements OnInit, OnDestroy {
   private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
 
+  animal: string;
+  name: string;
+
   ngOnInit(): void {
     this.fetchData();
     this.getPostsFilter();
@@ -73,6 +77,19 @@ export class PostsComponent implements OnInit, OnDestroy {
       });
     this.dataLoading = false;
   }
+
+
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
+      data: {name: this.name, animal: this.animal},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
+  }
+
 
   private getPostsFilter() {
     this.postsService.postsFilters$.pipe(
@@ -116,6 +133,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.destroy.next(null);
     this.destroy.complete();
   }
+
 
 }
 
