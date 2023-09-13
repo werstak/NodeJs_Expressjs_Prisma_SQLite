@@ -23,6 +23,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { DialogCategoriesPostComponent } from './dialogs/dialog-categories-post/dialog-categories-post.component';
 import { MatListModule } from '@angular/material/list';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 
 const routes: Routes = [
@@ -65,6 +66,7 @@ const routes: Routes = [
     MatTooltipModule,
     MatCheckboxModule,
     MatPaginatorModule,
+    MatAutocompleteModule,
     MatChipsModule,
     MatListModule,
     MatProgressSpinnerModule

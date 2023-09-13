@@ -58,6 +58,7 @@ postsRouter.post(
         }
         try {
             console.log('Create POST = ', request.body)
+            console.log('Create POST = ', request.params)
             const post = JSON.parse(request.body.post_params);
             let filename = '';
             if (request.file?.filename) {

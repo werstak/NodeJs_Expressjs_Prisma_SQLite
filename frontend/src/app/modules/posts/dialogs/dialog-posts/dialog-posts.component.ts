@@ -1,13 +1,18 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, startWith, Subscription, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, GetListAllUsers, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
+import { map } from 'rxjs/operators';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
 
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
@@ -28,14 +33,18 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     public postsService: PostsService,
   ) {
+    // this.filteredFruits = this.fruitCtrl.valueChanges.pipe(
+    //   startWith(null),
+    //   map((fruit: string | null) => (fruit ? this._filter(fruit) : this.allFruits.slice())),
+    // );
   }
 
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
   listAllCategories: any = [];
-
-  toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
-
   newCategoryControl = new FormControl();
+
+
+
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   public postForm: FormGroup;
 
@@ -49,7 +58,23 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   pictureDefault: any;
 
 
+
+
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  fruitCtrl = new FormControl('');
+  filteredFruits: Observable<string[]>;
+  fruits: string[] = ['Lemon'];
+  allFruits: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+
+  // @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
+
+  announcer = inject(LiveAnnouncer);
+
+
+
+
   ngOnInit() {
+    // this.fetchPost();
     this.fetchCategories();
     this.buildForm();
     console.log('Open DIALOG data = ', this.data)
@@ -81,6 +106,22 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
 
+  private fetchPost() {
+    const id: number = this.data.id;
+    this.postsService.getPost(id).pipe(
+      takeUntil(this.destroy))
+      .subscribe(data => {
+        this.currentPost = data;
+        console.log(1111, 'getPost', this.currentPost);
+
+        this.previousPictureUrl = data.picture;
+        this.pictureUrl = data.picture;
+
+        this.store.dispatch(new SetSelectedPost(data));
+      });
+  }
+
+
 
   private buildForm() {
     this.postForm = this.fb.group({
@@ -97,7 +138,12 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.postsService.getPost(id).pipe(
       takeUntil(this.destroy))
       .subscribe(data => {
-      this.currentPost = data
+      this.currentPost = data;
+
+      const test = [ { id: 2, name: "WWWWWW" }, { id: 3, name: "1111111111" }, { id: 5, name: "rrrrrrr" } ];
+
+        console.log(1111, 'getPost', this.currentPost)
+
       this.previousPictureUrl = data.picture;
       this.pictureUrl = data.picture;
       this.postForm.patchValue({
@@ -109,7 +155,85 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
       this.store.dispatch(new SetSelectedPost(data));
     });
+
+    // this.postForm.patchValue({
+    //   title: this.currentPost.title,
+    //   description: this.currentPost.description,
+    //   content: this.currentPost.content,
+    //   categories: this.currentPost.categories,
+    //   published: this.currentPost.published
+    // });
+
   }
+
+
+
+
+
+  // private initPostFormValue() {
+  //   const id: number = this.data.id;
+  //   this.postsService.getPost(id).pipe(
+  //     takeUntil(this.destroy))
+  //     .subscribe(data => {
+  //     this.currentPost = data;
+  //
+  //       console.log(1111, 'getPost', this.currentPost)
+  //
+  //     this.previousPictureUrl = data.picture;
+  //     this.pictureUrl = data.picture;
+  //     this.postForm.patchValue({
+  //       title: data.title,
+  //       description: data.description,
+  //       content: data.content,
+  //       categories: data.categories,
+  //       published: data.published
+  //     });
+  //     this.store.dispatch(new SetSelectedPost(data));
+  //   });
+  // }
+
+
+
+
+
+
+  // add(event: MatChipInputEvent): void {
+  //   const value = (event.value || '').trim();
+  //
+  //   // Add our fruit
+  //   if (value) {
+  //     this.fruits.push(value);
+  //   }
+  //
+  //   // Clear the input value
+  //   event.chipInput!.clear();
+  //
+  //   this.fruitCtrl.setValue(null);
+  // }
+  //
+  // remove(fruit: string): void {
+  //   const index = this.fruits.indexOf(fruit);
+  //
+  //   if (index >= 0) {
+  //     this.fruits.splice(index, 1);
+  //
+  //     this.announcer.announce(`Removed ${fruit}`);
+  //   }
+  // }
+  //
+  // selected(event: MatAutocompleteSelectedEvent): void {
+  //   this.fruits.push(event.option.viewValue);
+  //   this.fruitInput.nativeElement.value = '';
+  //   this.fruitCtrl.setValue(null);
+  // }
+  //
+  // private _filter(value: string): string[] {
+  //   const filterValue = value.toLowerCase();
+  //
+  //   return this.allFruits.filter(fruit => fruit.toLowerCase().includes(filterValue));
+  // }
+
+
 
 
 
@@ -128,6 +252,16 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.postForm.controls['categories'].patchValue(toppings)
   }
 
+  private removeFirst(array: any, toRemove: any): void {
+    const index = array.indexOf(toRemove);
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
+
+
+
+  //
   // private removeFirst(array: any, toRemove: any): void {
   //   const index = array.indexOf(toRemove);
   //   if (index !== -1) {
@@ -136,12 +270,12 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   // }
 
 
-  private removeFirst<T>(array: T[], toRemove: T): void {
-    const index = array.indexOf(toRemove);
-    if (index !== -1) {
-      array.splice(index, 1);
-    }
-  }
+  // private removeFirst<T>(array: T[], toRemove: T): void {
+  //   const index = array.indexOf(toRemove);
+  //   if (index !== -1) {
+  //     array.splice(index, 1);
+  //   }
+  // }
 
 
 

@@ -1,3 +1,5 @@
+import { CategoriesModel } from './categories.model';
+
 export class PostModel {
   id: number;
   title: string;
@@ -9,6 +11,7 @@ export class PostModel {
   updatedAt: string;
   user: User;
   userId: number;
+  categories: CategoriesModel
 }
 
 export class User {
