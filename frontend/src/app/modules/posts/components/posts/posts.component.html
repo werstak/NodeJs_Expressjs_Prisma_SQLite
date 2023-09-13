@@ -11,10 +11,15 @@
       </mat-card-header>
       <mat-card-actions align="end">
 
-        <button mat-raised-button (click)="openDialog()">Manage post categories</button>
+        <button mat-raised-button
+                class="posts__btn"
+                (click)="openDialog()">
+          Manage post categories
+        </button>
 
-        <button mat-icon-button
+        <button mat-mini-fab
                 color="primary"
+                aria-label="Add"
                 matTooltip="Add new post"
                 (click)="addPost()">
           <mat-icon aria-label="Add">add</mat-icon>
@@ -48,6 +53,6 @@
   >
   </mat-progress-spinner>
   <div>
-<!--    <pre>{{posts$ | async | json}}</pre>-->
+    <!--    <pre>{{posts$ | async | json}}</pre>-->
   </div>
 </div>

@@ -1,7 +1,10 @@
-<h1 mat-dialog-title>Hi {{data.name}}</h1>
-<div mat-dialog-content class="category">
-  <mat-form-field class="category__field" (keydown.enter)="$event.preventDefault(); addCategory()">
-    <mat-label>Category</mat-label>
+<h1 mat-dialog-title>Manage post categories</h1>
+<div *ngIf="visibilityFields"
+     mat-dialog-content
+     class="category">
+  <mat-form-field class="category__field"
+                  (keydown.enter)="$event.preventDefault(); addFlag ? addCategory(): updateCategory()">
+    <mat-label>{{ addFlag ? 'Create a new category' : 'Update Category'}}</mat-label>
     <input matInput [formControl]="category">
     <button *ngIf="category.value !== ''"
             matSuffix
@@ -13,11 +16,23 @@
   </mat-form-field>
 
   <button
+    class="category__btnSubmit"
+    mat-raised-button
+    aria-label="Create - Update"
+    [disabled]="!category.value"
+    (click)="addFlag ? addCategory(): updateCategory()"
+  >{{addFlag ? 'Create' : 'Update'}}
+  </button>
+
+</div>
+
+<div class="btn-wrap">
+  <button
     mat-mini-fab
     color="primary"
-    aria-label="Add todo"
-    [disabled]="!category?.value"
-    (click)="addCategory()"
+    aria-label="Add"
+    matTooltip="Add new Category"
+    (click)="displayFields()"
   >
     <mat-icon>add</mat-icon>
   </button>
@@ -32,7 +47,7 @@
       <button mat-icon-button color="primary" matTooltip="Edit" (click)="editCategory(category)">
         <mat-icon aria-label="Edit">edit</mat-icon>
       </button>
-      <button mat-icon-button color="primary" matTooltip="Delete" (click)="deleteCategory(category)">
+      <button mat-icon-button color="primary" matTooltip="Delete" (click)="openDialogDeleteCategory(category)">
         <mat-icon aria-label="Delete">delete</mat-icon>
       </button>
     </div>
@@ -40,8 +55,6 @@
   <mat-divider></mat-divider>
 </div>
 
-
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button>
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onNoClick()">Cancel</button>
 </div>

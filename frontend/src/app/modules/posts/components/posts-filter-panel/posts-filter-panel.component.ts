@@ -111,7 +111,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     // Set selected values to retain the selected checkbox state
     this.setSelectedValues();
     this.postFilterForm.controls['authors'].patchValue(this.selectedValues);
-    console.log(222, this.listAllUsers)
     return this.listAllUsers.filter((option: any) => option.firstName.toLowerCase().indexOf(filterValue) === 0);
   }
 

@@ -14,11 +14,17 @@ export class PostsSelectors {
     return state.postsCounter;
   }
 
+  /**
+   USERS list
+   */
   @Selector([PostsState])
   static getListUsers(state: PostsStateModel) {
     return state.usersList;
   }
 
+  /**
+   CATEGORIES of posts
+   */
   @Selector([PostsState])
   static getListCategories(state: PostsStateModel) {
     return state.categories;

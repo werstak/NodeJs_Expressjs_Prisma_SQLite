@@ -58,7 +58,7 @@ export class PostComponent implements OnInit, OnDestroy {
       if (result === true) {
         this.store.dispatch(new DeletePost(id, params));
       } else {
-        return
+        return;
       }
     });
   }

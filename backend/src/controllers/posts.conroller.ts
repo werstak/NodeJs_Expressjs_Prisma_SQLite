@@ -2,7 +2,7 @@ import db from '../utils/db';
 // import { PostModel } from '../models/post.model';
 
 /**
- * will be realized through the prism
+ * will be realized through the prisma
  * */
 
 export const getAllPostsHandler = async (params: any): Promise<any> => {

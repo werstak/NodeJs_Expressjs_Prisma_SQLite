@@ -5,12 +5,13 @@ import { NotificationService } from '../../../shared/notification.service';
 import { PostsService } from '../posts.service';
 import { tap } from 'rxjs';
 import {
-  AddPost,
+  AddCategory,
+  AddPost, DeleteCategory,
   DeletePost,
   GetCategories,
   GetListAllUsers,
   GetPosts,
-  SetSelectedPost,
+  SetSelectedPost, UpdateCategory,
   UpdatePost
 } from './posts.action';
 import * as _ from 'lodash';
@@ -24,7 +25,6 @@ export class PostsStateModel {
   selectedPost?: any;
   usersList: UserListModel[];
   categories: CategoriesModel[];
-
 }
 
 @State<PostsStateModel>({
@@ -134,6 +134,9 @@ export class PostsState {
     ));
   }
 
+  /**
+   USERS list
+   */
   @Action(GetListAllUsers)
   getListAllUsers({getState, setState}: StateContext<PostsStateModel>) {
     return this.postsService.fetchListAllUsers().pipe(tap((result) => {
@@ -145,6 +148,9 @@ export class PostsState {
     }));
   }
 
+  /**
+   CATEGORIES of posts
+   */
   @Action(GetCategories)
   getListCategories({getState, setState}: StateContext<PostsStateModel>) {
     return this.postsService.fetchListCategories().pipe(tap((result) => {
@@ -154,6 +160,70 @@ export class PostsState {
         categories: result.categories
       });
     }));
+  }
+
+  @Action(AddCategory)
+  addNewCategory({getState, patchState}: StateContext<PostsStateModel>, {params}: AddCategory) {
+    return this.postsService.addCategory(params).pipe(tap((result) => {
+        this.notificationService.showSuccess('Category created successfully');
+        const state = getState();
+        patchState({
+          categories: [...state.categories, result.newCategory],
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
+
+
+  @Action(UpdateCategory)
+  updateCurrentCategory({getState, setState}: StateContext<PostsStateModel>, {
+    id, params
+  }: UpdateCategory) {
+    return this.postsService.updateCategory(id, params).pipe(tap((result) => {
+        this.notificationService.showSuccess('Category updated successfully');
+        const state = getState();
+        const categoriesList = [...state.categories];
+        const postIndex = categoriesList.findIndex(item => item.id === id);
+        categoriesList[postIndex] = result;
+        setState({
+          ...state,
+          categories: categoriesList,
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
+
+  @Action(DeleteCategory)
+  deleteCategory({getState, setState}: StateContext<PostsStateModel>, {id}: DeleteCategory) {
+    return this.postsService.removeCategory(id).pipe(tap(() => {
+        this.notificationService.showSuccess('Category delete successfully');
+
+        const state = getState();
+        const filteredArray = state.categories.filter(item => item.id !== id);
+        setState({
+          ...state,
+          categories: filteredArray
+        });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
   }
 
 }

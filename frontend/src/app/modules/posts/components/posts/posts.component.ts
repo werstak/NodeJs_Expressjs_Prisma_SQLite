@@ -97,9 +97,7 @@ export class PostsComponent implements OnInit, OnDestroy {
       .subscribe(resp => {
         if (!Object.keys(resp).length) {
           this.postsFilters = this.defaultPostsFilters;
-          console.log(888888888, this.postsFilters)
         } else {
-          console.log(999999999)
           this.postsFilters = resp
           this.fetchData();
         }

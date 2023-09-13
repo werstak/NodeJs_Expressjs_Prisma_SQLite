@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { PostModel } from '../../shared/models/post.model';
 import * as config from '../../../app-config';
+import { CategoriesModel } from '../../shared/models/categories.model';
 
 @Injectable({
   providedIn: 'root'
@@ -72,6 +73,9 @@ export class PostsService {
       );
   }
 
+  /**
+   CATEGORIES of posts
+   */
   fetchListCategories(): Observable<any> {
     return this.http.get(config.API_URL + `/categories`)
       .pipe(
@@ -81,4 +85,17 @@ export class PostsService {
         })
       );
   }
+
+  addCategory(params: CategoriesModel): Observable<any> {
+    return this.http.post(config.API_URL + `/categories/`, params);
+  }
+
+  updateCategory(id: number, params: CategoriesModel): Observable<any> {
+    return this.http.put(config.API_URL + `/categories/` + id, params);
+  }
+
+  removeCategory(id: number): Observable<any> {
+    return this.http.delete(config.API_URL + `/categories/` + id);
+  }
+
 }
