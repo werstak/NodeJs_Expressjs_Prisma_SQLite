@@ -1,21 +1,21 @@
-import { Component, ElementRef, inject, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, ReplaySubject, startWith, Subscription, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, GetListAllUsers, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
-import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { LiveAnnouncer } from '@angular/cdk/a11y';
-import { map } from 'rxjs/operators';
-import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatChipInputEvent } from '@angular/material/chips';
-
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
+
+
+export interface Food {
+  value: string;
+  viewValue: string;
+}
 
 @Component({
   selector: 'app-dialogs-posts',
@@ -33,18 +33,14 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     public postsService: PostsService,
   ) {
-    // this.filteredFruits = this.fruitCtrl.valueChanges.pipe(
-    //   startWith(null),
-    //   map((fruit: string | null) => (fruit ? this._filter(fruit) : this.allFruits.slice())),
-    // );
   }
 
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
   listAllCategories: any = [];
+
+  toppingList: string[] = ['Extra cheese', 'Mushroom', 'Onion', 'Pepperoni', 'Sausage', 'Tomato'];
+
   newCategoryControl = new FormControl();
-
-
-
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   public postForm: FormGroup;
 
@@ -57,47 +53,49 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   pictureFile: any;
   pictureDefault: any;
 
+  public isSameCategory(categoryA?: any, categoryB?: any): boolean {
+    return categoryA.id === categoryB.id
+  }
 
 
-
-  separatorKeysCodes: number[] = [ENTER, COMMA];
-  fruitCtrl = new FormControl('');
-  filteredFruits: Observable<string[]>;
-  fruits: string[] = ['Lemon'];
-  allFruits: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
-
-  // @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
-
-  announcer = inject(LiveAnnouncer);
-
-
-
+  // allfoods: Food[] = [
+  //   {value: 'steak-0', viewValue: 'Steak'},
+  //   {value: 'pizza-1', viewValue: 'Pizza'},
+  //   {value: 'tacos-2', viewValue: 'Tacos'},
+  //   {value: 'pasta-3', viewValue: 'Pasta'}
+  // ];
+  // myselectedFoods = ['pasta-3', 'steak-0'];
+  // foodForm: FormControl = new FormControl(this.myselectedFoods);
 
   ngOnInit() {
-    // this.fetchPost();
     this.fetchCategories();
     this.buildForm();
-    console.log('Open DIALOG data = ', this.data)
-    this.pictureDefault = pictureDefault;
 
+    console.log('Open DIALOG data = ', this.data)
+
+    this.pictureDefault = pictureDefault;
     if (this.data.newPost) {
       this.postForm.reset();
       this.postForm.patchValue({
         published: true
       });
     } else {
-      this.initPostFormValue();
+      this.fetchCurrentPost();
+      // this.initPostFormValue();
     }
   }
 
   private fetchCategories() {
+
+    console.log(11111, 'fetchCategories')
+
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.listAllCategories = resp;
 
-        console.log(1111 ,'this.listAllCategories' , this.listAllCategories)
+        console.log('listAllCategories' , this.listAllCategories)
 
         if (this.listAllCategories.length) {
           // this.filteredUsers();
@@ -106,17 +104,19 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
 
-  private fetchPost() {
+  fetchCurrentPost() {
     const id: number = this.data.id;
     this.postsService.getPost(id).pipe(
       takeUntil(this.destroy))
       .subscribe(data => {
-        this.currentPost = data;
-        console.log(1111, 'getPost', this.currentPost);
+        this.currentPost = data
+        console.log(222222222, this.currentPost)
+        if (this.currentPost) {
+          this.initPostFormValue();
+        }
 
         this.previousPictureUrl = data.picture;
         this.pictureUrl = data.picture;
-
         this.store.dispatch(new SetSelectedPost(data));
       });
   }
@@ -134,107 +134,41 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   private initPostFormValue() {
-    const id: number = this.data.id;
-    this.postsService.getPost(id).pipe(
-      takeUntil(this.destroy))
-      .subscribe(data => {
-      this.currentPost = data;
-
-      const test = [ { id: 2, name: "WWWWWW" }, { id: 3, name: "1111111111" }, { id: 5, name: "rrrrrrr" } ];
-
-        console.log(1111, 'getPost', this.currentPost)
-
-      this.previousPictureUrl = data.picture;
-      this.pictureUrl = data.picture;
-      this.postForm.patchValue({
-        title: data.title,
-        description: data.description,
-        content: data.content,
-        categories: data.categories,
-        published: data.published
-      });
-      this.store.dispatch(new SetSelectedPost(data));
+    console.log(333333333, 'initPostFormValue')
+    this.postForm.patchValue({
+      title: this.currentPost.title,
+      description: this.currentPost.description,
+      content: this.currentPost.content,
+      categories: this.currentPost.categories,
+      published: this.currentPost.published
     });
-
-    // this.postForm.patchValue({
-    //   title: this.currentPost.title,
-    //   description: this.currentPost.description,
-    //   content: this.currentPost.content,
-    //   categories: this.currentPost.categories,
-    //   published: this.currentPost.published
-    // });
-
   }
 
 
 
-
-
   // private initPostFormValue() {
+  //
   //   const id: number = this.data.id;
+  //
   //   this.postsService.getPost(id).pipe(
   //     takeUntil(this.destroy))
   //     .subscribe(data => {
-  //     this.currentPost = data;
+  //       this.currentPost = data
+  //       this.previousPictureUrl = data.picture;
+  //       this.pictureUrl = data.picture;
   //
-  //       console.log(1111, 'getPost', this.currentPost)
   //
-  //     this.previousPictureUrl = data.picture;
-  //     this.pictureUrl = data.picture;
-  //     this.postForm.patchValue({
-  //       title: data.title,
-  //       description: data.description,
-  //       content: data.content,
-  //       categories: data.categories,
-  //       published: data.published
+  //       this.postForm.patchValue({
+  //         title: data.title,
+  //         description: data.description,
+  //         content: data.content,
+  //         categories: data.categories,
+  //         published: data.published
+  //       });
+  //       this.store.dispatch(new SetSelectedPost(data));
   //     });
-  //     this.store.dispatch(new SetSelectedPost(data));
-  //   });
-  // }
-
-
-
-
-
-
-  // add(event: MatChipInputEvent): void {
-  //   const value = (event.value || '').trim();
-  //
-  //   // Add our fruit
-  //   if (value) {
-  //     this.fruits.push(value);
-  //   }
-  //
-  //   // Clear the input value
-  //   event.chipInput!.clear();
-  //
-  //   this.fruitCtrl.setValue(null);
   // }
   //
-  // remove(fruit: string): void {
-  //   const index = this.fruits.indexOf(fruit);
-  //
-  //   if (index >= 0) {
-  //     this.fruits.splice(index, 1);
-  //
-  //     this.announcer.announce(`Removed ${fruit}`);
-  //   }
-  // }
-  //
-  // selected(event: MatAutocompleteSelectedEvent): void {
-  //   this.fruits.push(event.option.viewValue);
-  //   this.fruitInput.nativeElement.value = '';
-  //   this.fruitCtrl.setValue(null);
-  // }
-  //
-  // private _filter(value: string): string[] {
-  //   const filterValue = value.toLowerCase();
-  //
-  //   return this.allFruits.filter(fruit => fruit.toLowerCase().includes(filterValue));
-  // }
-
-
-
 
 
 
@@ -258,9 +192,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       array.splice(index, 1);
     }
   }
-
-
-
   //
   // private removeFirst(array: any, toRemove: any): void {
   //   const index = array.indexOf(toRemove);

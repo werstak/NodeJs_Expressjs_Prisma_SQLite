@@ -58,54 +58,51 @@
 
 
 
+
 <!--      <mat-form-field class="example-full-width">-->
-<!--        <mat-label>Favorite Fruits</mat-label>-->
-<!--        <mat-chip-grid #chipGrid aria-label="Fruit selection">-->
-<!--          <mat-chip-row *ngFor="let fruit of fruits" (removed)="remove(fruit)">-->
-<!--            {{fruit}}-->
-<!--            <button matChipRemove [attr.aria-label]="'remove ' + fruit">-->
-<!--              <mat-icon>cancel</mat-icon>-->
-<!--            </button>-->
-<!--          </mat-chip-row>-->
-<!--        </mat-chip-grid>-->
-<!--        <input placeholder="New Fruit..." #fruitInput [formControl]="fruitCtrl"-->
-<!--               [matChipInputFor]="chipGrid" [matAutocomplete]="auto"-->
-<!--               [matChipInputSeparatorKeyCodes]="separatorKeysCodes"-->
-<!--               (matChipInputTokenEnd)="add($event)"/>-->
-<!--        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">-->
-<!--          <mat-option *ngFor="let fruit of filteredFruits | async" [value]="fruit">-->
-<!--            {{fruit}}-->
+<!--        <mat-select formControlName="categories" placeholder="Favorite food" multiple [compareWith]="isSameCategory">-->
+<!--          <mat-option *ngFor="let category of listAllCategories" [value]="category">-->
+<!--            {{category.name}}-->
 <!--          </mat-option>-->
-<!--        </mat-autocomplete>-->
+<!--        </mat-select>-->
 <!--      </mat-form-field>-->
 
+<!--      <br/>-->
+<!--      {{  postForm.controls['categories'].value | json }}-->
 
 
 
-      <mat-form-field class="example-full-width">
-        <mat-label>Select categories</mat-label>
-        <mat-select formControlName="categories" multiple>
 
-          <mat-select-trigger>
-            <mat-chip-listbox multiple>
-              <mat-chip-option *ngFor="let topping of postForm.controls['categories'].value"
-                               [selectable]="true"
-                               selected
-                               [removable]="true"
-                               (removed)="onToppingRemoved(topping)">
-                {{ topping.name }}
-                <mat-icon matChipRemove>cancel</mat-icon>
-              </mat-chip-option>
-<!--              <mat-chip-option color="accent" selected>Accent fish</mat-chip-option>-->
-            </mat-chip-listbox>
-          </mat-select-trigger>
 
-          <mat-option *ngFor="let topping of listAllCategories" [value]="topping">{{topping.name}}</mat-option>
 
-        </mat-select>
-      </mat-form-field>
-      <br/>
-      {{  postForm.controls['categories'].value | json }}
+            <mat-form-field class="example-full-width">
+              <mat-label>Select categories</mat-label>
+              <mat-select formControlName="categories" multiple [compareWith]="isSameCategory">
+
+                <mat-select-trigger>
+                  <mat-chip-listbox>
+                    <mat-chip-option *ngFor="let category of postForm.controls['categories'].value"
+                                     [value]="category"
+                                     [selected]="true"
+                                     [removable]="true"
+                                     (removed)="onToppingRemoved(category)">
+                      {{ category.name }}
+                      <mat-icon matChipRemove>cancel</mat-icon>
+                    </mat-chip-option>
+                  </mat-chip-listbox>
+                </mat-select-trigger>
+
+                <mat-option *ngFor="let category of listAllCategories" [value]="category">{{category.name}}</mat-option>
+
+              </mat-select>
+            </mat-form-field>
+
+            <br/>
+
+            {{  postForm.controls['categories'].value | json }}
+
+
+
 
     </div>
 

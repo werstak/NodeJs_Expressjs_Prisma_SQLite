@@ -126,16 +126,7 @@ export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
     const {title, description, content, picture, published, userId, categories} = post;
 
-    console.log(5555, post)
-    console.log(6666, title)
-    console.log(7777, userId)
-
-    // let categories = [
-    //     {id: 2},
-    //     {id: 3}
-    // ]
-
-
+    console.log(777777, 'categories', categories)
     return db.post.update({
         where: {
             id,
@@ -147,13 +138,12 @@ export const updatePostHandler = async (post: any, id: number
             picture,
             published,
             userId,
-            // categories: {
-            //     connect: [{ id: 2}, { id: 18 }]
-            // }
+            categories: {
+                connect: categories,
+                // connect: [{ id: 5}, { id: 18 }],
+                // disconnect: [{ id: 5}, { id: 18 }]
+            }
         },
-        // include: {
-        //     categories: true
-        // },
         select: {
             id: true,
             title: true,
@@ -173,8 +163,6 @@ export const updatePostHandler = async (post: any, id: number
                 },
             },
         },
-    }).catch(error =>  {
-        console.log(error)
     });
 };
 

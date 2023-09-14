@@ -11,7 +11,7 @@ export class PostModel {
   updatedAt: string;
   user: User;
   userId: number;
-  categories: CategoriesModel
+  categories: CategoriesModel[]
 }
 
 export class User {
