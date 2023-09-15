@@ -12,5 +12,5 @@ export type PostModel = {
     updatedAt: string;
     user: User;
     userId: number;
-    categories?: CategoriesModel
+    categories?: CategoriesModel[]
 };

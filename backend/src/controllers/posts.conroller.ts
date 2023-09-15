@@ -16,7 +16,14 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
     } else {
         // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
         authorsArr = [1, 2, 3, 5, 14, 18];
+
     }
+
+    let categoriesArr;
+    // categoriesArr = [2, 3, 5];
+    categoriesArr = [ { "id": 2, "name": "Sport" }, { "id": 3, "name": "News" }, { "id": 5, "name": "Technologies" } ]
+
+
 
     const totalCount = await db.post.count();
     const skip = pageIndex * pageSize;
@@ -26,6 +33,12 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
             user: {
                 id: {in: authorsArr},
             },
+            // categories: {
+            //     some: {
+            //         id: {in: [18, 5]}
+            //
+            //     }
+            // }
         },
         take: parseInt(pageSize),
         skip: skip,
@@ -85,8 +98,6 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 export const createPostHandler = async (post: any): Promise<any> => {
     const {title, description, content, picture, published, userId, categories} = post;
 
-    console.log(11111111, categories)
-
     const newPost = await db.post.create({
         data: {
             title,
@@ -95,7 +106,9 @@ export const createPostHandler = async (post: any): Promise<any> => {
             picture,
             published,
             userId,
-            // categories
+            categories: {
+                connect: categories
+            }
         },
         select: {
             id: true,
@@ -124,9 +137,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
 
 export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
-    const {title, description, content, picture, published, userId, categories} = post;
-
-    console.log(777777, 'categories', categories)
+    const {title, description, content, picture, published, userId, includedCategories, excludedCategories} = post;
     return db.post.update({
         where: {
             id,
@@ -139,9 +150,8 @@ export const updatePostHandler = async (post: any, id: number
             published,
             userId,
             categories: {
-                connect: categories,
-                // connect: [{ id: 5}, { id: 18 }],
-                // disconnect: [{ id: 5}, { id: 18 }]
+                connect: includedCategories,
+                disconnect: excludedCategories
             }
         },
         select: {

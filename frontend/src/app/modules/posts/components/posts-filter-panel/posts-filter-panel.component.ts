@@ -4,10 +4,11 @@ import { PostsService } from '../../posts.service';
 import { debounceTime, Observable, ReplaySubject, startWith, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { UsersService } from '../../../users/users.service';
-import { GetListAllUsers } from '../../store-posts/posts.action';
+import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
 import { UserListModel } from '../../../../shared/models/user-list.model';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { map } from 'rxjs/operators';
+import { CategoriesModel } from '../../../../shared/models/categories.model';
 
 @Component({
   // changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +28,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   @Select(PostsSelectors.getListUsers) listAllUsers$: Observable<UserListModel[]>;
+  @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
+
 
   public postFilterForm: FormGroup
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
@@ -36,6 +39,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   @ViewChild('search') searchTextBox: ElementRef;
 
   listAllUsers: any = [];
+  listAllCategories: CategoriesModel[] = [];
 
   searchTextboxControl = new FormControl();
   selectedValues: any = [];
@@ -44,16 +48,48 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    this.fetchData();
+    this.fetchUsers();
+    this.fetchCategories();
     this.buildForm();
     this.onChanges();
 
   }
 
 
+  private fetchUsers() {
+    this.store.dispatch(new GetListAllUsers());
+    this.listAllUsers$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.listAllUsers = resp;
+        if (this.listAllUsers.length) {
+          this.filteredUsers();
+        }
+      });
+  }
+
+  private fetchCategories() {
+    this.store.dispatch(new GetCategories());
+    this.listAllCategories$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.listAllCategories = resp;
+      });
+  }
+
+  private filteredUsers() {
+    this.filteredOptions = this.searchTextboxControl.valueChanges
+      .pipe(
+        startWith<any>(''),
+        map(name => this._filter(name))
+      );
+  }
+
+
   private buildForm() {
     this.postFilterForm = this.fb.group({
-      authors: []
+      authors: [],
+      categories: []
     });
   }
 
@@ -82,26 +118,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-  private fetchData() {
-    this.store.dispatch(new GetListAllUsers());
-    this.listAllUsers$.pipe(
-      takeUntil(this.destroy))
-      .subscribe(resp => {
-        this.listAllUsers = resp;
-        if (this.listAllUsers.length) {
-          this.filteredUsers();
-        }
-      });
-  }
-
-  private filteredUsers() {
-    this.filteredOptions = this.searchTextboxControl.valueChanges
-      .pipe(
-        startWith<any>(''),
-        map(name => this._filter(name))
-      );
-  }
-
 
   /**
    * Used to filter data based on search input
@@ -124,7 +140,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     }
   }
 
-  openedChange(e: any) {
+  openedChangeAuthors(e: any) {
     // Set search textbox value as empty while opening selectbox
     this.searchTextboxControl.patchValue('');
     // Focus to search textbox while clicking on selectbox

@@ -6,9 +6,7 @@ import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
 import {
   AddCategory,
-  AddPost,
   DeleteCategory,
-  DeletePost,
   GetCategories,
   UpdateCategory
 } from '../../store-posts/posts.action';
@@ -38,7 +36,7 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
-  listAllCategories: any = [];
+  listAllCategories: CategoriesModel[] = [];
   category = new FormControl('');
   selectedCategory: CategoriesModel;
   categoryName: string | null;
@@ -70,11 +68,6 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.listAllCategories = resp;
-
-        if (this.listAllCategories.length) {
-          // this.filteredUsers();
-        }
-
       });
   }
 

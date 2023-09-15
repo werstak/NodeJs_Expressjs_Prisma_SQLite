@@ -2,11 +2,17 @@
   opacity: 0.75;
   font-size: 0.75em;
 }
-.select-container{
-  margin-top:10px;
+
+.select-container {
+  margin-top: 10px;
 }
 
 .filters {
+
+  &__field {
+    margin: 0 25px 0 0;
+  }
+
   &__select {
     .cdk-overlay-pane {
       top: 100px !important;
