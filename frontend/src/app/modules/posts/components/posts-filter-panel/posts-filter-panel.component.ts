@@ -9,21 +9,22 @@ import { UserListModel } from '../../../../shared/models/user-list.model';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { map } from 'rxjs/operators';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
+import * as _ from 'lodash';
+import { PostFilterModel } from '../../../../shared/models/post-filter.model';
 
 @Component({
-  // changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-posts-filter-panel',
   templateUrl: './posts-filter-panel.component.html',
   styleUrls: ['./posts-filter-panel.component.scss']
 })
 export class PostsFilterPanelComponent implements OnInit, OnDestroy {
+  private filterData: any = {authors: [], categories: []};
 
   constructor(
     private fb: FormBuilder,
     public postsService: PostsService,
     public store: Store,
-    public usersService: UsersService,
-    private cdref: ChangeDetectorRef
+    public usersService: UsersService
   ) {
   }
 
@@ -37,22 +38,27 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
   /** Searchable Multiselect Select*/
   @ViewChild('search') searchTextBox: ElementRef;
+  @ViewChild('searchCategories') searchCategories: ElementRef;
 
   listAllUsers: any = [];
   listAllCategories: CategoriesModel[] = [];
 
   searchTextboxControl = new FormControl();
+  searchTextboxControlCategories = new FormControl();
+
   selectedValues: any = [];
+  selectedValuesCategories: any = [];
 
   filteredOptions: Observable<any['']>;
+  filteredOptionsCategories: Observable<any['']>;
 
 
   ngOnInit() {
     this.fetchUsers();
     this.fetchCategories();
     this.buildForm();
-    this.onChanges();
-
+    this.onChangesControlAuthors();
+    this.onChangesControlCategories();
   }
 
 
@@ -68,15 +74,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       });
   }
 
-  private fetchCategories() {
-    this.store.dispatch(new GetCategories());
-    this.listAllCategories$.pipe(
-      takeUntil(this.destroy))
-      .subscribe(resp => {
-        this.listAllCategories = resp;
-      });
-  }
-
   private filteredUsers() {
     this.filteredOptions = this.searchTextboxControl.valueChanges
       .pipe(
@@ -85,7 +82,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       );
   }
 
-
   private buildForm() {
     this.postFilterForm = this.fb.group({
       authors: [],
@@ -93,28 +89,21 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-
-  private onChanges(): void {
-    this.postFilterForm.valueChanges.pipe(
+  private onChangesControlAuthors(): void {
+    this.postFilterForm.controls['authors'].valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)).subscribe(val => {
-
-      console.log(111, 'FORM Filter', val)
+      takeUntil(this.destroy)
+    ).subscribe(val => {
       let arrAuthors = [];
-      if (val.authors) {
-        for (let i = 0; i < val.authors.length; i++) {
-          arrAuthors.push(val.authors[i].id);
+      if (val.length) {
+        for (let i = 0; i < val.length; i++) {
+          arrAuthors.push(val[i].id);
         }
-      } else {
+      } else if (!Object.keys(val).length) {
         arrAuthors = [];
       }
-
-      let filterData = {
-        authors: arrAuthors
-      }
-
-      console.log(222, 'NEXT filterData', filterData)
-      this.postsService.postsFilters$.next(filterData)
+      this.filterData.authors = arrAuthors;
+      this.postsService.postsFilters$.next(this.filterData)
     });
   }
 
@@ -161,11 +150,106 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    * Set selected values to retain the state
    */
   setSelectedValues() {
-    console.log('authors', this.postFilterForm.controls['authors'].value);
     if (this.postFilterForm.controls['authors'].value && this.postFilterForm.controls['authors'].value.length > 0) {
       this.postFilterForm.controls['authors'].value.forEach((e: any) => {
         if (this.selectedValues.indexOf(e) == -1) {
           this.selectedValues.push(e);
+        }
+      });
+    }
+  }
+
+
+  /**
+   Filter Categories
+   */
+  private fetchCategories() {
+    this.store.dispatch(new GetCategories());
+    this.listAllCategories$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.listAllCategories = resp;
+        if (this.listAllUsers.length) {
+          this.filteredCategories();
+        }
+      });
+  }
+
+  private filteredCategories() {
+    this.filteredOptionsCategories = this.searchTextboxControlCategories.valueChanges
+      .pipe(
+        startWith<any>(''),
+        map(name => this._filterCategories(name))
+      );
+  }
+
+  /**
+   * Used to filter data based on search input in Categories
+   */
+  private _filterCategories(name: string): any[] {
+    const filterValue = name.toLowerCase();
+    // Set selected values to retain the selected checkbox state
+    this.setSelectedValuesCategories();
+    this.postFilterForm.controls['categories'].patchValue(this.selectedValuesCategories);
+    return this.listAllCategories.filter((option: any) => option.name.toLowerCase().indexOf(filterValue) === 0);
+  }
+
+  private onChangesControlCategories(): void {
+    this.postFilterForm.controls['categories'].valueChanges.pipe(
+      debounceTime(250),
+      takeUntil(this.destroy)
+    ).subscribe(val => {
+        let arrCategories = [];
+        if (val.length) {
+          for (let i = 0; i < val.length; i++) {
+            arrCategories.push(val[i].id);
+          }
+        } else if (!Object.keys(val).length) {
+          arrCategories = [];
+        }
+        this.filterData.categories = arrCategories;
+        this.postsService.postsFilters$.next(this.filterData)
+
+      }
+    );
+  }
+
+
+  /**
+   * Remove from selected values based on uncheck Categories
+   */
+  selectionChangeCategories(event: any) {
+    if (event.isUserInput && event.source.selected == false) {
+      let index = this.selectedValuesCategories.indexOf(event.source.value);
+      this.selectedValuesCategories.splice(index, 1)
+    }
+  }
+
+  openedChangeCategories(e: any) {
+    // Set search textbox value as empty while opening selectbox
+    this.searchTextboxControlCategories.patchValue('');
+    // Focus to search textbox while clicking on selectbox
+    if (e == true) {
+      this.searchCategories.nativeElement.focus();
+    }
+  }
+
+  /**
+   * Clearing search textbox value Categories
+   */
+  clearSearchCategories(event: any) {
+    event.stopPropagation();
+    this.searchTextboxControlCategories.patchValue('');
+  }
+
+  /**
+   * Set selected values to retain the state Categories
+   */
+  setSelectedValuesCategories() {
+    if (this.postFilterForm.controls['categories'].value && this.postFilterForm.controls['categories'].value.length > 0) {
+      this.postFilterForm.controls['categories'].value.forEach((e: any) => {
+        if (this.selectedValuesCategories.indexOf(e) == -1) {
+          this.selectedValuesCategories.push(e);
         }
       });
     }

@@ -1,5 +1,5 @@
 import { PostModel } from '../../../shared/models/post.model';
-import { CategoriesModel } from '../../../shared/models/categories.model';
+
 
 export class GetPosts {
   static readonly type = '[Posts] Get';

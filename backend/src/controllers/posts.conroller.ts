@@ -6,39 +6,44 @@ import db from '../utils/db';
  * */
 
 export const getAllPostsHandler = async (params: any): Promise<any> => {
-    const {pageIndex, pageSize, authors} = params;
+    const {pageIndex, pageSize, authors, categories} = params;
 
+    const totalCount = await db.post.count();
+    const skip = pageIndex * pageSize;
     const parseAuthors = JSON.parse(authors);
+
     console.log('ROLES = ', parseAuthors)
     let authorsArr;
     if (parseAuthors.length) {
         authorsArr = parseAuthors;
     } else {
         // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
-        authorsArr = [1, 2, 3, 5, 14, 18];
-
+        // authorsArr = [1, 2, 3, 5, 14, 18];
+        authorsArr = undefined;
     }
 
+    const parseCategories = JSON.parse(categories);
+    console.log('CATEGORIES = ', parseCategories)
     let categoriesArr;
-    // categoriesArr = [2, 3, 5];
-    categoriesArr = [ { "id": 2, "name": "Sport" }, { "id": 3, "name": "News" }, { "id": 5, "name": "Technologies" } ]
+    if (parseCategories.length) {
+        categoriesArr = parseCategories;
+    } else {
+        // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
+        categoriesArr = undefined;
+        // categoriesArr = [2, 3];
+    }
 
-
-
-    const totalCount = await db.post.count();
-    const skip = pageIndex * pageSize;
 
     const posts = await db.post.findMany({
         where: {
             user: {
                 id: {in: authorsArr},
             },
-            // categories: {
-            //     some: {
-            //         id: {in: [18, 5]}
-            //
-            //     }
-            // }
+            categories: {
+                some: {
+                    id: {in: categoriesArr}
+                }
+            }
         },
         take: parseInt(pageSize),
         skip: skip,
@@ -63,7 +68,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
             },
         },
     });
-     return {posts, totalCount}
+    return {posts, totalCount}
 };
 
 

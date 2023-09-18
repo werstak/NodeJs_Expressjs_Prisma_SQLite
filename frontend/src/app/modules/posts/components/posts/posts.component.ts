@@ -4,11 +4,10 @@ import { Select, Store } from '@ngxs/store';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
-import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
-import { UserFilterModel } from '../../../../shared/models/user-filter.model';
 import { PostFilterModel } from '../../../../shared/models/post-filter.model';
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
@@ -48,8 +47,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   /** Filters */
-    // private postsFilters: UserFilterModel;
-  private defaultPostsFilters: PostFilterModel = {authors: []};
+  private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
   private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
 
@@ -57,7 +55,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   name: string;
 
   ngOnInit(): void {
-    this.fetchData();
+    // this.fetchData();
     this.getPostsFilter();
   }
 
@@ -65,7 +63,8 @@ export class PostsComponent implements OnInit, OnDestroy {
     const params = {
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
-      authors: this.postsFilters.authors
+      authors: this.postsFilters.authors,
+      categories: this.postsFilters.categories
     }
 
     this.dataLoading = true;
@@ -95,6 +94,9 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.postsService.postsFilters$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
+
+        console.log('getPostsFilter', resp)
+
         if (!Object.keys(resp).length) {
           this.postsFilters = this.defaultPostsFilters;
         } else {

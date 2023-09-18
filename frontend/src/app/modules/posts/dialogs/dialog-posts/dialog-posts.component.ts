@@ -110,8 +110,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         this.currentPost = data;
         this.initCategories = data.categories;
 
-        console.log(222222222, this.currentPost)
-        console.log(1, 'initCategories', this.initCategories)
+        console.log('CurrentPos', this.currentPost)
 
         if (this.currentPost) {
           this.initPostFormValue();
@@ -129,13 +128,12 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
       content: ['', []],
-      categories: ['', []],
+      categories: ['', [Validators.required]],
       published: ['', []]
     });
   }
 
   private initPostFormValue() {
-    console.log(333333333, 'initPostFormValue')
     this.postForm.patchValue({
       title: this.currentPost.title,
       description: this.currentPost.description,
@@ -177,31 +175,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       }
     );
   }
-
-
-  // private initPostFormValue() {
-  //
-  //   const id: number = this.data.id;
-  //
-  //   this.postsService.getPost(id).pipe(
-  //     takeUntil(this.destroy))
-  //     .subscribe(data => {
-  //       this.currentPost = data
-  //       this.previousPictureUrl = data.picture;
-  //       this.pictureUrl = data.picture;
-  //
-  //
-  //       this.postForm.patchValue({
-  //         title: data.title,
-  //         description: data.description,
-  //         content: data.content,
-  //         categories: data.categories,
-  //         published: data.published
-  //       });
-  //       this.store.dispatch(new SetSelectedPost(data));
-  //     });
-  // }
-  //
 
 
   onToppingRemoved(topping: CategoriesModel) {

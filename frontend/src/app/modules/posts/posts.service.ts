@@ -24,6 +24,7 @@ export class PostsService {
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
         .set('authors', JSON.stringify(params.authors))
+        .set('categories', JSON.stringify(params.categories))
     })
       .pipe(
         catchError(error => {

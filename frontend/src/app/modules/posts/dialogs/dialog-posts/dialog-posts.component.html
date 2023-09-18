@@ -56,18 +56,6 @@
       </mat-form-field>
 
 
-      <!--      <mat-form-field class="example-full-width">-->
-      <!--        <mat-select formControlName="categories" placeholder="Favorite food" multiple [compareWith]="isSameCategory">-->
-      <!--          <mat-option *ngFor="let category of listAllCategories" [value]="category">-->
-      <!--            {{category.name}}-->
-      <!--          </mat-option>-->
-      <!--        </mat-select>-->
-      <!--      </mat-form-field>-->
-
-      <!--      <br/>-->
-      <!--      {{  postForm.controls['categories'].value | json }}-->
-
-
       <mat-form-field class="example-full-width">
         <mat-label>Select categories</mat-label>
         <mat-select formControlName="categories" multiple [compareWith]="isSameCategory">

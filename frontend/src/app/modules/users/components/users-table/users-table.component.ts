@@ -161,7 +161,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   editUser(id: UserModel) {
-    console.log('edit', id)
     const dialogRef = this.dialog.open(DialogUsersComponent, {
       data: {id, newUser: false}
     });
