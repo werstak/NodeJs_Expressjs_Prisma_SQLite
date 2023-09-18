@@ -28,13 +28,12 @@ export class PostComponent implements OnInit, OnDestroy {
   }
 
   openDialogEditPost(id: number): void {
-    console.log('edit', id)
     const dialogRef = this.dialog.open(DialogPostsComponent, {
       data: {id, newPost: false},
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log('111 The dialog was closed', result);
+      console.log('The dialog was closed', result);
     });
   }
 
@@ -58,7 +57,7 @@ export class PostComponent implements OnInit, OnDestroy {
       if (result === true) {
         this.store.dispatch(new DeletePost(id, params));
       } else {
-        return
+        return;
       }
     });
   }

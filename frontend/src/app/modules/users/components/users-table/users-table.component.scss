@@ -17,6 +17,16 @@
       height: auto;
     }
   }
+
+  &__status {
+    &-active {
+      color: green;
+    }
+    &-inactive {
+      color: red;
+    }
+
+  }
 }
 
 table {

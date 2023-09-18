@@ -14,16 +14,15 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     if (parseRoles.length) {
         rolesArr = parseRoles;
     } else {
-        rolesArr = [1, 2 ,3, 4];
+        rolesArr = [1, 2, 3, 4];
     }
 
-
-    const totalCount = await db.user.count();
     const skip = pageIndex * pageSize;
+    const totalCount = await db.user.count();
 
     const users = await db.user.findMany({
         where: {
-            role: { in: rolesArr },
+            role: {in: rolesArr},
             firstName: {
                 startsWith: firstName,
             },
@@ -48,10 +47,25 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
     return {totalCount, users}
+};
+
+
+export const getListAllUsersHandler = async (): Promise<any> => {
+    const users = await db.user.findMany({
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true
+        },
+    });
+    return {users}
 };
 
 
@@ -70,13 +84,16 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
 };
 
 export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar} = user;
+    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
     const newUser = await db.user.create({
         data: {
@@ -85,7 +102,10 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
             email,
             password,
             role,
-            avatar
+            avatar,
+            status,
+            birthAt,
+            location
         },
         select: {
             id: true,
@@ -96,7 +116,10 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
     const totalCount = await db.user.count();
@@ -107,7 +130,7 @@ export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar} = user;
+    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
     return db.user.update({
         where: {
@@ -119,7 +142,10 @@ export const updateUserHandler = async (
             email,
             password,
             role,
-            avatar
+            avatar,
+            status,
+            birthAt,
+            location
         },
         select: {
             id: true,
@@ -130,7 +156,10 @@ export const updateUserHandler = async (
             updatedAt: true,
             role: true,
             avatar: true,
-            posts: true
+            posts: true,
+            status: true,
+            birthAt: true,
+            location: true
         },
     });
 };

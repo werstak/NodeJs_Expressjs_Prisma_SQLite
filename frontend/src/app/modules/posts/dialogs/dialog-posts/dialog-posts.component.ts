@@ -1,13 +1,22 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
-import { Store } from '@ngxs/store';
-import { AddPost, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { Select, Store } from '@ngxs/store';
+import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
+import { CategoriesModel } from '../../../../shared/models/categories.model';
+import * as _ from 'lodash';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
+
+
+export interface Food {
+  value: string;
+  viewValue: string;
+}
 
 @Component({
   selector: 'app-dialogs-posts',
@@ -27,8 +36,12 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
+  listAllCategories: any = [];
+
+
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   public postForm: FormGroup;
-  private subPost: Subscription;
 
   currentPost: PostModel;
   respNewPost: PostModel;
@@ -39,10 +52,23 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   pictureFile: any;
   pictureDefault: any;
 
+  initCategories: CategoriesModel[] = [];
+  selectedCategories: CategoriesModel[] = [];
+
+  includedCategories: CategoriesModel[] = [];
+  excludedCategories: CategoriesModel[] = [];
+
+  public isSameCategory(categoryA?: any, categoryB?: any): boolean {
+    return categoryA.id === categoryB.id
+  }
+
 
   ngOnInit() {
+    this.fetchCategories();
     this.buildForm();
+
     console.log('Open DIALOG data = ', this.data)
+
     this.pictureDefault = pictureDefault;
 
     if (this.data.newPost) {
@@ -51,35 +77,119 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         published: true
       });
     } else {
-      this.initPostFormValue();
+      this.fetchCurrentPost();
+      // this.initPostFormValue();
     }
+    this.calculationSelectedCategories();
   }
+
+  private fetchCategories() {
+
+    // console.log(11111, 'fetchCategories')
+
+    this.store.dispatch(new GetCategories());
+    this.listAllCategories$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        this.listAllCategories = resp;
+
+        // console.log('listAllCategories' , this.listAllCategories)
+
+        if (this.listAllCategories.length) {
+          // this.filteredUsers();
+        }
+      });
+  }
+
+
+  fetchCurrentPost() {
+    const id: number = this.data.id;
+    this.postsService.getPost(id).pipe(
+      takeUntil(this.destroy))
+      .subscribe(data => {
+        this.currentPost = data;
+        this.initCategories = data.categories;
+
+        console.log('CurrentPos', this.currentPost)
+
+        if (this.currentPost) {
+          this.initPostFormValue();
+        }
+
+        this.previousPictureUrl = data.picture;
+        this.pictureUrl = data.picture;
+        this.store.dispatch(new SetSelectedPost(data));
+      });
+  }
+
 
   private buildForm() {
     this.postForm = this.fb.group({
       title: ['', [Validators.required]],
       description: ['', [Validators.required]],
       content: ['', []],
+      categories: ['', [Validators.required]],
       published: ['', []]
     });
   }
 
   private initPostFormValue() {
-    const id: number = this.data.id;
-    this.subPost = this.postsService.getPost(id).subscribe(data => {
-      this.currentPost = data
-      this.previousPictureUrl = data.picture;
-      this.pictureUrl = data.picture;
-      this.postForm.setValue({
-        title: data.title,
-        description: data.description,
-        content: data.content,
-        published: data.published
-      });
-      this.store.dispatch(new SetSelectedPost(data));
+    this.postForm.patchValue({
+      title: this.currentPost.title,
+      description: this.currentPost.description,
+      content: this.currentPost.content,
+      categories: this.currentPost.categories,
+      published: this.currentPost.published
     });
   }
 
+
+  private calculationSelectedCategories() {
+    this.postForm.controls['categories'].valueChanges.pipe(
+      debounceTime(250),
+      takeUntil(this.destroy)
+    ).subscribe(val => {
+        this.selectedCategories = val;
+
+        const oldArray = [...this.initCategories];
+        const newArray = [...this.selectedCategories];
+
+        const changed = newArray.filter(newitem => {
+          const olditem = oldArray.find(o => o.id == newitem.id)
+          return !_.isEqual(newitem, olditem)
+        })
+        this.includedCategories = [...changed];
+        console.log(1, 'changed', this.includedCategories)
+
+
+        const deleted = oldArray.filter(olditem => {
+          const newitem = newArray.find(n => n.id == olditem.id)
+          return !_.isEqual(newitem, olditem)
+        }).filter(items => {
+          const item = changed.find(cd => cd.id == items.id);
+          return !item
+        })
+        this.excludedCategories = [...deleted];
+        console.log(1, 'deleted', this.excludedCategories)
+
+      }
+    );
+  }
+
+
+  onToppingRemoved(topping: CategoriesModel) {
+    this.excludedCategories.push(topping);
+    const toppings = this.postForm.controls['categories'].value;
+    this.removeFirst(toppings, topping);
+    this.postForm.controls['categories'].patchValue(toppings)
+  }
+
+  private removeFirst(array: any, toRemove: any): void {
+    const index = array.indexOf(toRemove);
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
 
   /**
    Picture upload
@@ -141,6 +251,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       title: this.postForm.value.title,
       description: this.postForm.value.description,
       content: this.postForm.value.content,
+      categories: this.postForm.value.categories ? this.postForm.value.categories : [],
       published: this.postForm.value.published,
       userId: 1
     };
@@ -152,6 +263,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
    Update current post
    */
   private updatePost(): void {
+    console.log('this.postForm.value', this.postForm.value)
+
     if (this.postForm.invalid) {
       return;
     }
@@ -167,6 +280,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       description: this.postForm.value.description,
       content: this.postForm.value.content,
       published: this.postForm.value.published,
+      includedCategories: this.includedCategories,
+      excludedCategories: this.excludedCategories,
       userId: userId
     };
     this.store.dispatch(new UpdatePost(id, params, picture, pictureOrUrl, previousPictureUrl));
@@ -177,7 +292,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.subPost?.unsubscribe();
+    this.destroy.next(null);
+    this.destroy.complete();
     this.dialogRef.close();
   }
 }

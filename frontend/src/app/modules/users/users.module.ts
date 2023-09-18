@@ -23,8 +23,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { FilterPanelComponent } from './components/filter-panel/filter-panel.component';
+import { UsersFilterPanelComponent } from './components/users-filter-panel/users-filter-panel.component';
 import { SharedModule } from '../../shared/shared.module';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 const routes: Routes = [
   {
@@ -46,7 +49,7 @@ const routes: Routes = [
     UsersComponent,
     UsersTableComponent,
     DialogUsersComponent,
-    FilterPanelComponent,
+    UsersFilterPanelComponent,
   ],
   imports: [
     CommonModule,
@@ -60,6 +63,7 @@ const routes: Routes = [
     MatInputModule,
     MatIconModule,
     MatSortModule,
+    MatCheckboxModule,
     MatToolbarModule,
     MatPaginatorModule,
     ReactiveFormsModule,
@@ -67,6 +71,8 @@ const routes: Routes = [
     MatAutocompleteModule,
     MatSelectModule,
     MatDividerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatTooltipModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,

@@ -1,5 +1,6 @@
 import { PostModel } from '../../../shared/models/post.model';
 
+
 export class GetPosts {
   static readonly type = '[Posts] Get';
 
@@ -35,3 +36,45 @@ export class SetSelectedPost {
   constructor(public payload: PostModel) {
   }
 }
+
+/**
+ USERS list
+ */
+export class GetListAllUsers {
+  static readonly type = '[Users] Get List All Users';
+
+  constructor() {
+  }
+}
+
+/**
+ CATEGORIES of posts
+ */
+export class GetCategories {
+  static readonly type = '[Categories] Get';
+
+  constructor() {
+  }
+}
+
+export class AddCategory {
+  static readonly type = '[Categories] Add';
+
+  constructor(public params: any) {
+  }
+}
+
+export class UpdateCategory {
+  static readonly type = '[Categories] Update';
+
+  constructor(public id: number, public params: any) {
+  }
+}
+
+export class DeleteCategory {
+  static readonly type = '[Categories] Delete';
+
+  constructor(public id: number) {
+  }
+}
+

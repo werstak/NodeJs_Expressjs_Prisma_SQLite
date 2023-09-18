@@ -10,7 +10,10 @@
     font-size: 18px;
     font-weight: 500;
     line-height: 1;
+    max-width: 330px;
+    overflow: hidden;
   }
+
 
   &__avatar {
     img {
@@ -33,6 +36,7 @@
     align-items: center;
     justify-content: space-between;
   }
+
 }
 
 .example-form {

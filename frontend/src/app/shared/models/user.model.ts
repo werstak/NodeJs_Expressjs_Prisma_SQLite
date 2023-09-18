@@ -8,7 +8,10 @@ export class UserModel {
   updatedAt?: string;
   role: number;
   avatar: string;
-  posts?: PostsModel[]
+  posts?: PostsModel[];
+  status: boolean;
+  birthAt: string;
+  location: string;
 }
 
 

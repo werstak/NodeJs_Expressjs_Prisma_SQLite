@@ -6,11 +6,11 @@ import { UsersService } from '../../users.service';
 import { ROLES } from '../../../../shared/constants/roles';
 
 @Component({
-  selector: 'app-filter-panel',
-  templateUrl: './filter-panel.component.html',
-  styleUrls: ['./filter-panel.component.scss']
+  selector: 'app-users-filter-panel',
+  templateUrl: './users-filter-panel.component.html',
+  styleUrls: ['./users-filter-panel.component.scss']
 })
-export class FilterPanelComponent implements OnInit, OnDestroy {
+export class UsersFilterPanelComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
@@ -42,7 +42,7 @@ export class FilterPanelComponent implements OnInit, OnDestroy {
       debounceTime(250),
       takeUntil(this.destroy)).subscribe(val => {
 
-      // console.log(111, 'FORM', val)
+      console.log(111, 'FORM', val)
       let arrRoles = [];
       if (val.roles) {
         for (let i = 0; i < val.roles.length; i++) {
