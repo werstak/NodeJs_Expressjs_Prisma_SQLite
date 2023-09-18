@@ -4,10 +4,12 @@ import { Select, Store } from '@ngxs/store';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
-import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
+import { PostFilterModel } from '../../../../shared/models/post-filter.model';
+import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
 @Component({
   selector: 'app-posts',
@@ -32,7 +34,7 @@ export class PostsComponent implements OnInit, OnDestroy {
    pagination variables
    */
   length = 0;
-  pageSize = 2;
+  pageSize = 3;
   pageIndex = 0;
   pageSizeOptions = [2, 3, 5, 10, 15, 20, 25];
   previousPageIndex = 0;
@@ -44,15 +46,25 @@ export class PostsComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
+  /** Filters */
+  private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
+  private postsFilters: PostFilterModel = this.defaultPostsFilters;
+
+
+  animal: string;
+  name: string;
 
   ngOnInit(): void {
-    this.fetchData();
+    // this.fetchData();
+    this.getPostsFilter();
   }
 
   fetchData() {
     const params = {
       pageIndex: this.pageIndex,
-      pageSize: this.pageSize
+      pageSize: this.pageSize,
+      authors: this.postsFilters.authors,
+      categories: this.postsFilters.categories
     }
 
     this.dataLoading = true;
@@ -66,12 +78,40 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
 
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
+      data: {name: this.name, animal: this.animal},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      this.animal = result;
+    });
+  }
+
+
+  private getPostsFilter() {
+    this.postsService.postsFilters$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+
+        console.log('getPostsFilter', resp)
+
+        if (!Object.keys(resp).length) {
+          this.postsFilters = this.defaultPostsFilters;
+        } else {
+          this.postsFilters = resp
+          this.fetchData();
+        }
+      });
+  }
+
+
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
     this.length = e.length;
     this.pageSize = e.pageSize;
     this.pageIndex = e.pageIndex;
-
     this.fetchData();
   }
 
@@ -93,6 +133,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.destroy.next(null);
     this.destroy.complete();
   }
+
 
 }
 

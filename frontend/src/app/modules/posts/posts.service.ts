@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { PostModel } from '../../shared/models/post.model';
 import * as config from '../../../app-config';
+import { CategoriesModel } from '../../shared/models/categories.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,16 @@ export class PostsService {
   ) {
   }
 
+  postsFilters$ = new BehaviorSubject<any>({});
+
 
   fetchPosts(params: any): Observable<any> {
     return this.http.get(config.API_URL + `/posts`, {
       params: new HttpParams()
         .set('pageIndex', params.pageIndex)
         .set('pageSize', params.pageSize)
+        .set('authors', JSON.stringify(params.authors))
+        .set('categories', JSON.stringify(params.categories))
     })
       .pipe(
         catchError(error => {
@@ -57,6 +62,41 @@ export class PostsService {
 
   removePost(id: number, params: any): Observable<any> {
     return this.http.delete(config.API_URL + `/posts/` + id, {params});
+  }
+
+  fetchListAllUsers(): Observable<any> {
+    return this.http.get(config.API_URL + `/users/list_all_users`)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
+  /**
+   CATEGORIES of posts
+   */
+  fetchListCategories(): Observable<any> {
+    return this.http.get(config.API_URL + `/categories`)
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
+  addCategory(params: CategoriesModel): Observable<any> {
+    return this.http.post(config.API_URL + `/categories/`, params);
+  }
+
+  updateCategory(id: number, params: CategoriesModel): Observable<any> {
+    return this.http.put(config.API_URL + `/categories/` + id, params);
+  }
+
+  removeCategory(id: number): Observable<any> {
+    return this.http.delete(config.API_URL + `/categories/` + id);
   }
 
 }

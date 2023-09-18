@@ -52,7 +52,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
 
 
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'actions'];
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
   users$ = this.usersService.users$;
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
@@ -79,8 +79,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
 
-  fetchData() {
-    console.log(1111, this.usersFilters)
+  private fetchData() {
+    // console.log(1111, this.usersFilters)
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
@@ -133,22 +133,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
-  // private getUsersFilter() {
-  //   this.usersService.usersFilters$.pipe(
-  //     takeUntil(this.destroy))
-  //     .subscribe(resp => {
-  //       console.log(1111, resp)
-  //       this.usersFilters = resp;
-  //       if (!Object.keys(this.usersFilters).length) {
-  //         console.log(22222)
-  //         return;
-  //       } else {
-  //         this.fetchData();
-  //         console.log(33333)
-  //       }
-  //     });
-  // }
-
 
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
@@ -177,7 +161,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   editUser(id: UserModel) {
-    console.log('edit', id)
     const dialogRef = this.dialog.open(DialogUsersComponent, {
       data: {id, newUser: false}
     });

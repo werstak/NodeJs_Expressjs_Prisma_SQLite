@@ -12,7 +12,7 @@ export const usersRouter = express.Router();
 
 
 /**
- GET: List of all USERS
+ GET: all USERS
  */
 usersRouter.get('/', async (request: Request, response: Response) => {
 
@@ -22,6 +22,23 @@ usersRouter.get('/', async (request: Request, response: Response) => {
 
     try {
         const users = await UserHandler.getAllUsersHandler(params);
+        return response.status(200).json(users);
+    } catch (error: any) {
+        return response.status(500).json(error.message);
+    }
+});
+
+
+/**
+ GET: List of all USERS
+ */
+usersRouter.get('/list_all_users', async (request: Request, response: Response) => {
+    console.log('Root GET - LIST All USERS')
+    const req = (request);
+    console.log('USERS', req)
+
+    try {
+        const users = await UserHandler.getListAllUsersHandler();
         return response.status(200).json(users);
     } catch (error: any) {
         return response.status(500).json(error.message);

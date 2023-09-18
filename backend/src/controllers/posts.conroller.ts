@@ -2,16 +2,49 @@ import db from '../utils/db';
 // import { PostModel } from '../models/post.model';
 
 /**
- * will be realized through the prism
+ * will be realized through the prisma
  * */
 
 export const getAllPostsHandler = async (params: any): Promise<any> => {
-    const {pageIndex, pageSize} = params;
+    const {pageIndex, pageSize, authors, categories} = params;
 
     const totalCount = await db.post.count();
     const skip = pageIndex * pageSize;
+    const parseAuthors = JSON.parse(authors);
+
+    console.log('ROLES = ', parseAuthors)
+    let authorsArr;
+    if (parseAuthors.length) {
+        authorsArr = parseAuthors;
+    } else {
+        // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
+        // authorsArr = [1, 2, 3, 5, 14, 18];
+        authorsArr = undefined;
+    }
+
+    const parseCategories = JSON.parse(categories);
+    console.log('CATEGORIES = ', parseCategories)
+    let categoriesArr;
+    if (parseCategories.length) {
+        categoriesArr = parseCategories;
+    } else {
+        // TODO convert it into a real array or so that everything is displayed without specifying the ID of each
+        categoriesArr = undefined;
+        // categoriesArr = [2, 3];
+    }
+
 
     const posts = await db.post.findMany({
+        where: {
+            user: {
+                id: {in: authorsArr},
+            },
+            categories: {
+                some: {
+                    id: {in: categoriesArr}
+                }
+            }
+        },
         take: parseInt(pageSize),
         skip: skip,
         select: {
@@ -24,16 +57,18 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,
                     firstName: true,
                     lastName: true,
+                    // location: true
                 },
             },
         },
     });
-     return {posts, totalCount}
+    return {posts, totalCount}
 };
 
 
@@ -52,6 +87,7 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,
@@ -65,7 +101,8 @@ export const getSinglePostHandler = async (id: number): Promise<any | null> => {
 
 
 export const createPostHandler = async (post: any): Promise<any> => {
-    const {title, description, content, picture, published, userId} = post;
+    const {title, description, content, picture, published, userId, categories} = post;
+
     const newPost = await db.post.create({
         data: {
             title,
@@ -73,7 +110,10 @@ export const createPostHandler = async (post: any): Promise<any> => {
             content,
             picture,
             published,
-            userId
+            userId,
+            categories: {
+                connect: categories
+            }
         },
         select: {
             id: true,
@@ -85,6 +125,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,
@@ -101,7 +142,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
 
 export const updatePostHandler = async (post: any, id: number
 ): Promise<any> => {
-    const {title, description, content, picture, published, userId} = post;
+    const {title, description, content, picture, published, userId, includedCategories, excludedCategories} = post;
     return db.post.update({
         where: {
             id,
@@ -112,7 +153,11 @@ export const updatePostHandler = async (post: any, id: number
             content,
             picture,
             published,
-            userId
+            userId,
+            categories: {
+                connect: includedCategories,
+                disconnect: excludedCategories
+            }
         },
         select: {
             id: true,
@@ -124,6 +169,7 @@ export const updatePostHandler = async (post: any, id: number
             createdAt: true,
             updatedAt: true,
             userId: true,
+            categories: true,
             user: {
                 select: {
                     id: true,

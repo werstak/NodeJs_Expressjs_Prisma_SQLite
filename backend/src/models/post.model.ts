@@ -1,4 +1,5 @@
 import { User } from './user.model';
+import { CategoriesModel } from './categories.model';
 
 export type PostModel = {
     id: number;
@@ -11,4 +12,5 @@ export type PostModel = {
     updatedAt: string;
     user: User;
     userId: number;
+    categories?: CategoriesModel[]
 };

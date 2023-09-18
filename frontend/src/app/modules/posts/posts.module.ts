@@ -18,6 +18,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { PostsFilterPanelComponent } from './components/posts-filter-panel/posts-filter-panel.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { DialogCategoriesPostComponent } from './dialogs/dialog-categories-post/dialog-categories-post.component';
+import { MatListModule } from '@angular/material/list';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 
 const routes: Routes = [
@@ -39,7 +45,9 @@ const routes: Routes = [
   declarations: [
     PostComponent,
     PostsComponent,
-    DialogPostsComponent
+    DialogPostsComponent,
+    PostsFilterPanelComponent,
+    DialogCategoriesPostComponent
   ],
   imports: [
     CommonModule,
@@ -54,9 +62,13 @@ const routes: Routes = [
     MatCardModule,
     MatDividerModule,
     MatIconModule,
+    MatSelectModule,
     MatTooltipModule,
     MatCheckboxModule,
     MatPaginatorModule,
+    MatAutocompleteModule,
+    MatChipsModule,
+    MatListModule,
     MatProgressSpinnerModule
   ]
 })
