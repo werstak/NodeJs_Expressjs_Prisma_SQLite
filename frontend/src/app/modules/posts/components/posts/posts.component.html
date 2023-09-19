@@ -4,29 +4,31 @@
     <app-posts-filter-panel></app-posts-filter-panel>
   </div>
 
-  <div class="posts__panel">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Control Panel</mat-card-title>
-      </mat-card-header>
-      <mat-card-actions align="end">
+<!--  <div class="posts__panel">-->
+<!--    <mat-card>-->
+<!--      <mat-card-header>-->
+<!--        <mat-card-title>Control Panel</mat-card-title>-->
+<!--      </mat-card-header>-->
+<!--      -->
+<!--      <mat-card-actions align="end">-->
 
-        <button mat-raised-button
-                class="posts__btn"
-                (click)="openDialog()">
-          Manage post categories
-        </button>
+<!--        <button mat-raised-button-->
+<!--                class="posts__btn"-->
+<!--                (click)="openDialog()">-->
+<!--          Manage post categories-->
+<!--        </button>-->
 
-        <button mat-mini-fab
-                color="primary"
-                aria-label="Add"
-                matTooltip="Add new post"
-                (click)="addPost()">
-          <mat-icon aria-label="Add">add</mat-icon>
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+<!--        <button mat-mini-fab-->
+<!--                color="primary"-->
+<!--                aria-label="Add"-->
+<!--                matTooltip="Add new post"-->
+<!--                (click)="addPost()">-->
+<!--          <mat-icon aria-label="Add">add</mat-icon>-->
+<!--        </button>-->
+<!--      </mat-card-actions>-->
+<!--      -->
+<!--    </mat-card>-->
+<!--  </div>-->
 
   <app-post *ngFor="let post of posts$ | async;"
             [post]="post"

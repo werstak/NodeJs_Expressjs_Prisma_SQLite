@@ -2,10 +2,14 @@
 <div *ngIf="visibilityFields"
      mat-dialog-content
      class="category">
+
   <mat-form-field class="category__field"
                   (keydown.enter)="$event.preventDefault(); addFlag ? addCategory(): updateCategory()">
     <mat-label>{{ addFlag ? 'Create a new category' : 'Update Category'}}</mat-label>
     <input matInput [formControl]="category">
+    <mat-error *ngIf="category.hasError('required')">
+      Category <strong>required</strong>
+    </mat-error>
     <button *ngIf="category.value !== ''"
             matSuffix
             mat-icon-button

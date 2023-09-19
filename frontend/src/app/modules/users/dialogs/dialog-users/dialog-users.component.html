@@ -76,19 +76,6 @@
         </mat-form-field>
 
 
-        <!--        <mat-form-field color="accent" class="example-full-width">-->
-        <!--          <mat-label>Country</mat-label>-->
-        <!--          <mat-select formControlName="location">-->
-        <!--            <mat-option *ngFor="let country of countriesList" [value]="country.name">-->
-        <!--              {{country.name}}-->
-        <!--            </mat-option>-->
-        <!--          </mat-select>-->
-        <!--          <mat-error *ngIf="userForm.controls['location'].hasError('required')">-->
-        <!--            Country <strong>required</strong>-->
-        <!--          </mat-error>-->
-        <!--        </mat-form-field>-->
-
-
         <mat-form-field class="example-full-width">
           <mat-label>Country</mat-label>
           <input type="text"
@@ -102,32 +89,14 @@
               {{country.name}}
             </mat-option>
           </mat-autocomplete>
-          <button *ngIf="userForm.controls['location'].value" matSuffix mat-icon-button aria-label="Clear" (click)="userForm.controls['location'].patchValue('')">
+          <button *ngIf="userForm.controls['location'].value" matSuffix mat-icon-button aria-label="Clear"
+                  (click)="userForm.controls['location'].patchValue('')">
             <mat-icon>close</mat-icon>
           </button>
           <mat-error *ngIf="userForm.controls['location'].hasError('required')">
             Country <strong>required</strong>
           </mat-error>
         </mat-form-field>
-
-
-        <!--        <mat-form-field color="accent" class="example-full-width">-->
-        <!--          <mat-label>Country</mat-label>-->
-        <!--          <input type="text"-->
-        <!--                 placeholder="Pick Country"-->
-        <!--                 aria-label="Country"-->
-        <!--                 matInput-->
-        <!--                 formControlName="location"-->
-        <!--                 [matAutocomplete]="auto">-->
-        <!--          <mat-autocomplete #auto="matAutocomplete">-->
-        <!--            <mat-option *ngFor="let country of filteredOptions | async" [value]="country">-->
-        <!--              {{country}}-->
-        <!--            </mat-option>-->
-        <!--          </mat-autocomplete>-->
-        <!--          <mat-error *ngIf="userForm.controls['location'].hasError('required')">-->
-        <!--            Country <strong>required</strong>-->
-        <!--          </mat-error>-->
-        <!--        </mat-form-field>-->
 
 
         <mat-form-field color="accent" class="example-full-width">

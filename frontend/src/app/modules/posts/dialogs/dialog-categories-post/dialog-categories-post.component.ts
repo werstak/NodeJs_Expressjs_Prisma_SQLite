@@ -10,7 +10,7 @@ import {
   GetCategories,
   UpdateCategory
 } from '../../store-posts/posts.action';
-import { FormControl } from '@angular/forms';
+import { FormControl, Validators } from '@angular/forms';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 
 export interface DialogData {
@@ -37,7 +37,7 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   listAllCategories: CategoriesModel[] = [];
-  category = new FormControl('');
+  category = new FormControl('', [Validators.required]);
   selectedCategory: CategoriesModel;
   categoryName: string | null;
 

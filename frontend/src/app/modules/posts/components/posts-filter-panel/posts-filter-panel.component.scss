@@ -8,6 +8,18 @@
 }
 
 .filters {
+  margin-bottom: 25px;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+
+  &__form {
+
+  }
 
   &__field {
     margin: 0 25px 0 0;
@@ -18,5 +30,9 @@
       top: 100px !important;
     }
 
+  }
+
+  &__btnAdd {
+    margin: 0 20px 0 0;
   }
 }

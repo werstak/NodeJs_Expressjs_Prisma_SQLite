@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PostsService } from '../../posts.service';
 import { debounceTime, Observable, ReplaySubject, startWith, takeUntil } from 'rxjs';
@@ -9,20 +9,23 @@ import { UserListModel } from '../../../../shared/models/user-list.model';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { map } from 'rxjs/operators';
 import { CategoriesModel } from '../../../../shared/models/categories.model';
-import * as _ from 'lodash';
-import { PostFilterModel } from '../../../../shared/models/post-filter.model';
+import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
 @Component({
   selector: 'app-posts-filter-panel',
   templateUrl: './posts-filter-panel.component.html',
   styleUrls: ['./posts-filter-panel.component.scss']
 })
+
 export class PostsFilterPanelComponent implements OnInit, OnDestroy {
-  private filterData: any = {authors: [], categories: []};
+
 
   constructor(
     private fb: FormBuilder,
     public postsService: PostsService,
+    public dialog: MatDialog,
     public store: Store,
     public usersService: UsersService
   ) {
@@ -31,20 +34,20 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListUsers) listAllUsers$: Observable<UserListModel[]>;
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
-
+  private filterData: any = {authors: [], categories: []};
   public postFilterForm: FormGroup
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
 
-  /** Searchable Multiselect Select*/
+  /** Searchable Multiselect Filters*/
   @ViewChild('search') searchTextBox: ElementRef;
   @ViewChild('searchCategories') searchCategories: ElementRef;
 
-  listAllUsers: any = [];
-  listAllCategories: CategoriesModel[] = [];
-
   searchTextboxControl = new FormControl();
   searchTextboxControlCategories = new FormControl();
+
+  listAllUsers: any = [];
+  listAllCategories: CategoriesModel[] = [];
 
   selectedValues: any = [];
   selectedValuesCategories: any = [];
@@ -256,10 +259,32 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
 
+  openDialog(): void {
+    const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
+      // data: {name: this.name, animal: this.animal},
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      // this.animal = result;
+    });
+  }
+
+
+  addPost() {
+    const dialogRef = this.dialog.open(DialogPostsComponent, {
+      data: {newPost: true}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('dialogRef result', result)
+    });
+  }
+
   ngOnDestroy() {
     this.destroy.next(null);
     this.destroy.complete();
   }
+
 
 
 }

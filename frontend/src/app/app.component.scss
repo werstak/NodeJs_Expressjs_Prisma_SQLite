@@ -1,14 +1,28 @@
 .sidenav-container {
   height: 100%;
 }
+
 .sidenav {
   width: 200px;
+
   .mat-toolbar {
     background: inherit;
   }
+
+  &__icon {
+    margin: 0 10px 0 0;
+    color: #737373;
+  }
 }
+
 .mat-toolbar.mat-primary {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+::ng-deep.mdc-list-item__primary-text {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }

@@ -80,12 +80,12 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
-      data: {name: this.name, animal: this.animal},
+      // data: {name: this.name, animal: this.animal},
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      this.animal = result;
+      // this.animal = result;
     });
   }
 
