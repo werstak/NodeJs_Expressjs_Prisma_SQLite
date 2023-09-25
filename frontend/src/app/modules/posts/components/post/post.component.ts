@@ -43,7 +43,6 @@ export class PostComponent implements OnInit, OnDestroy {
       picture
     }
 
-    console.log('DIALOG dell post', post)
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
         subtitle: title,
@@ -64,5 +63,4 @@ export class PostComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
   }
-
 }

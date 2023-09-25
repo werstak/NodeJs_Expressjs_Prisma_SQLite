@@ -1,9 +1,7 @@
 <mat-card class="post">
   <mat-card-header class="post__header">
-    <div class="post__description">
+    <div class="post__details">
       <h2 class="post__title">{{post.title}}</h2>
-      <div class="post__subTitle">Created: {{post.createdAt | date: "d/M/yy"}}</div>
-      <div class="post__subTitle">Updated: {{post.updatedAt | date: "d/M/yy"}}</div>
       <div class="post__subTitle">
         Author: {{post.user ? post.user.firstName : ''}} {{post.user ? post.user.lastName : ''}}</div>
       <div class="post__subTitle" *ngIf="post.categories">Categories:
@@ -11,6 +9,8 @@
           {{category.name}},
         </span>
       </div>
+      <div class="post__subTitle">Created: {{post.createdAt | date: "d/M/yy"}}</div>
+      <div class="post__subTitle">Updated: {{post.updatedAt | date: "d/M/yy"}}</div>
     </div>
 
     <div class="post__img">
@@ -19,8 +19,8 @@
 
   </mat-card-header>
   <mat-card-content>
-    <p>{{post.description}}</p>
-    <p>{{post.content}}</p>
+    <p class="post__description">{{post.description}}</p>
+    <p class="post__text">{{post.content}}</p>
   </mat-card-content>
   <mat-card-actions>
     <button mat-icon-button class="material-icons app-toolbar-menu save-button"

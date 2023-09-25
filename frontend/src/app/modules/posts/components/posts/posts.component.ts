@@ -3,13 +3,11 @@ import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { PostModel } from '../../../../shared/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
-import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
 import { PostFilterModel } from '../../../../shared/models/post-filter.model';
-import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
 @Component({
   selector: 'app-posts',
@@ -26,15 +24,20 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
-  @Select(PostsSelectors.getPostsCounter) postsCounter: Observable<any>;
+  @Select(PostsSelectors.getPostsCounter) postsCounter$s: Observable<any>;
 
   dataLoading: boolean = false;
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+
+  /** Filters */
+  private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
+  private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
   /**
-   pagination variables
+   Pagination variables
    */
   length = 0;
-  pageSize = 3;
+  pageSize = 2;
   pageIndex = 0;
   pageSizeOptions = [2, 3, 5, 10, 15, 20, 25];
   previousPageIndex = 0;
@@ -44,22 +47,29 @@ export class PostsComponent implements OnInit, OnDestroy {
   showFirstLastButtons = true;
   disabled = false;
   pageEvent: PageEvent;
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-
-  /** Filters */
-  private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
-  private postsFilters: PostFilterModel = this.defaultPostsFilters;
-
-
-  animal: string;
-  name: string;
 
   ngOnInit(): void {
-    // this.fetchData();
     this.getPostsFilter();
   }
 
-  fetchData() {
+  private getPostsFilter() {
+    this.postsService.postsFilters$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+        // console.log(1111111111, resp)
+        if (!Object.keys(resp).length) {
+          this.postsFilters = this.defaultPostsFilters;
+        } else {
+          this.postsFilters = resp
+          this.fetchData();
+          // console.log(22222222222)
+        }
+      });
+  }
+
+  private fetchData() {
+    this.dataLoading = true;
+
     const params = {
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
@@ -67,45 +77,16 @@ export class PostsComponent implements OnInit, OnDestroy {
       categories: this.postsFilters.categories
     }
 
-    this.dataLoading = true;
     this.store.dispatch(new GetPosts(params));
-    this.postsCounter.pipe(
+    this.postsCounter$s.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.length = resp;
-      });
-    this.dataLoading = false;
-  }
-
-
-  openDialog(): void {
-    const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
-      // data: {name: this.name, animal: this.animal},
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      // this.animal = result;
-    });
-  }
-
-
-  private getPostsFilter() {
-    this.postsService.postsFilters$.pipe(
-      takeUntil(this.destroy))
-      .subscribe(resp => {
-
-        console.log('getPostsFilter', resp)
-
-        if (!Object.keys(resp).length) {
-          this.postsFilters = this.defaultPostsFilters;
-        } else {
-          this.postsFilters = resp
-          this.fetchData();
+        if (resp) {
+          this.dataLoading = false;
         }
       });
   }
-
 
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
@@ -115,25 +96,13 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.fetchData();
   }
 
-  addPost() {
-    const dialogRef = this.dialog.open(DialogPostsComponent, {
-      data: {newPost: true}
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('dialogRef result', result)
-    });
+  trackByFn(index: any, item: any) {
+    return item.id;
   }
-
-
-  // trackByFn(index, item) {
-  //   return item.id; // unique id corresponding to the item
-  // }
 
   ngOnDestroy() {
     this.destroy.next(null);
     this.destroy.complete();
   }
-
-
 }
 

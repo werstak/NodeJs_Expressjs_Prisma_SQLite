@@ -11,7 +11,7 @@ import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { CountriesModel } from '../../../../shared/models/countriesModel';
 
-const customProfileImage = 'assets/images/avatar_1.jpg';
+const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
 
 @Component({
@@ -30,10 +30,12 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  dataLoading: boolean = false;
+
+  private subUser: Subscription;
   rolesList = ROLES;
   countriesList = COUNTRIES;
-  public userForm: FormGroup;
-  private subUser: Subscription;
+  userForm: FormGroup;
   hide = true;
   currentUser: UserModel;
   respNewUser: UserModel;
@@ -48,8 +50,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.buildForm();
     console.log('DIALOG  data', this.data)
-
-    this.avatarImageDefault = customProfileImage;
+    this.avatarImageDefault = defaultProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
       this.userForm.patchValue({
@@ -58,10 +59,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     } else {
       this.initFormValue();
     }
-
     this.autocompleteCountries();
   }
-
 
   private buildForm() {
     this.userForm = this.fb.group({
@@ -98,8 +97,13 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   private initFormValue() {
+    this.dataLoading = true;
+
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
+      if (data) {
+        this.dataLoading = false;
+      }
       this.currentUser = data;
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
@@ -120,7 +124,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-
   private autocompleteCountries() {
     this.filteredCountries = this.userForm.controls['location'].valueChanges.pipe(
       startWith(''),
@@ -133,8 +136,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     return this.countriesList.filter(state => state.name.toLowerCase().includes(filterValue));
   }
 
-
-  /** Image upload */
+  /**
+   Image upload
+   */
   handleImageLoaded(event: any) {
     if (event.target.files && event.target.files[0]) {
       const files = event.target.files;
@@ -150,6 +154,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   Adding Image Preview
+   */
   handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
@@ -178,7 +185,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    Adding a new User
    */
@@ -202,7 +208,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new AddUser(params, avatar));
   }
-
 
   /**
    Update User
@@ -233,16 +238,13 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
-
   closeClick(): void {
     this.dialogRef.close();
   }
-
 
   ngOnDestroy(): void {
     this.subUser?.unsubscribe();
     this.dialogRef.close();
   }
-
 }
 

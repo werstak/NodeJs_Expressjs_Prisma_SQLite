@@ -4,33 +4,7 @@
     <app-posts-filter-panel></app-posts-filter-panel>
   </div>
 
-<!--  <div class="posts__panel">-->
-<!--    <mat-card>-->
-<!--      <mat-card-header>-->
-<!--        <mat-card-title>Control Panel</mat-card-title>-->
-<!--      </mat-card-header>-->
-<!--      -->
-<!--      <mat-card-actions align="end">-->
-
-<!--        <button mat-raised-button-->
-<!--                class="posts__btn"-->
-<!--                (click)="openDialog()">-->
-<!--          Manage post categories-->
-<!--        </button>-->
-
-<!--        <button mat-mini-fab-->
-<!--                color="primary"-->
-<!--                aria-label="Add"-->
-<!--                matTooltip="Add new post"-->
-<!--                (click)="addPost()">-->
-<!--          <mat-icon aria-label="Add">add</mat-icon>-->
-<!--        </button>-->
-<!--      </mat-card-actions>-->
-<!--      -->
-<!--    </mat-card>-->
-<!--  </div>-->
-
-  <app-post *ngFor="let post of posts$ | async;"
+  <app-post *ngFor="let post of posts$ | async; trackBy: trackByFn; let i = index"
             [post]="post"
   ></app-post>
 
@@ -47,14 +21,12 @@
   </mat-paginator>
 
   <mat-progress-spinner
+    *ngIf="dataLoading"
     color="primary"
     diameter="70"
     mode="indeterminate"
-    *ngIf="dataLoading"
-    class="data-spinner"
+    class="posts-spinner"
   >
   </mat-progress-spinner>
-  <div>
-    <!--    <pre>{{posts$ | async | json}}</pre>-->
-  </div>
+
 </div>

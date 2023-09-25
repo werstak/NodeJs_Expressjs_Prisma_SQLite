@@ -16,6 +16,7 @@
 }
 
 .categories-wrap {
+  position: relative;
   padding: 0 20px 24px;
   font-size: 16px;
   min-width: 313px;
@@ -42,4 +43,11 @@
   align-items: center;
   justify-content: flex-end;
   padding: 0 24px 10px;
+}
+
+.categories-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%)
 }

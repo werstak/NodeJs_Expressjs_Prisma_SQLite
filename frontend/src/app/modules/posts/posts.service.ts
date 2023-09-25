@@ -8,6 +8,7 @@ import { CategoriesModel } from '../../shared/models/categories.model';
 @Injectable({
   providedIn: 'root'
 })
+
 export class PostsService {
 
   constructor(

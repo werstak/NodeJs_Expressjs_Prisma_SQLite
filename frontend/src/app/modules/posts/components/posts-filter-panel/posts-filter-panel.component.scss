@@ -14,11 +14,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-
-
-  &__form {
-
+    flex-wrap: wrap;
   }
 
   &__field {

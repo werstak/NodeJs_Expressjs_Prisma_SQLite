@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../shared/models/user.model';
-import { Observable, ReplaySubject, Subscription, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
@@ -35,7 +35,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   @ViewChild(MatSort) sort: MatSort;
 
 
-
   /**
    pagination variables
    */
@@ -51,9 +50,11 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   disabled = false;
   pageEvent: PageEvent;
 
-
+  /** Columns table*/
   displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
+
   users$ = this.usersService.users$;
+
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
@@ -62,15 +63,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   orderByDirection = 'asc' as SortDirection;
 
   /** Filters */
-  // private usersFilters: UserFilterModel;
   private defaultUsersFilters: UserFilterModel = {email: '', firstName: '', lastName: '', roles: []};
   private usersFilters: UserFilterModel = this.defaultUsersFilters;
-
-  // private usersFilters: UserFilterModel = {
-  //   email: '',
-  //   firstName: '',
-  //   lastName: ''
-  // };
 
 
   ngOnInit(): void {
@@ -78,9 +72,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.getUsersFilter();
   }
 
-
   private fetchData() {
-    // console.log(1111, this.usersFilters)
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
@@ -101,7 +93,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.usersService.users$.next(resp);
-        this.dataLoading = false;
+        if (resp) {
+          this.dataLoading = false;
+        }
       });
 
     this.usersCounter.pipe(
@@ -111,14 +105,11 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
-
   sortData($event: any) {
     this.orderByColumn = $event.active;
     this.orderByDirection = $event.direction;
     this.fetchData();
   }
-
-  // this.usersFilters.firstName == '' && this.usersFilters.lastName == ''&& this.usersFilters.email == ''
 
   private getUsersFilter() {
     this.usersService.usersFilters$.pipe(
@@ -133,7 +124,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
-
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
     this.length = e.length;
@@ -141,7 +131,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.pageIndex = e.pageIndex;
     this.fetchData();
   }
-
 
   addUser() {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
@@ -159,7 +148,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
   }
 
-
   editUser(id: UserModel) {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
       data: {id, newUser: false}
@@ -176,7 +164,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       // }
     });
   }
-
 
   deleteUser(user: UserModel): void {
     let {id, firstName, avatar} = user;
@@ -201,7 +188,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       }
     });
   }
-
 
   ngOnDestroy() {
     this.destroy.next(null);

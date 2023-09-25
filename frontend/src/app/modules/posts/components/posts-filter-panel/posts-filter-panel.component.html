@@ -1,8 +1,6 @@
 <mat-card class="filters">
   <mat-card-content class="filters__content">
     <form [formGroup]="postFilterForm" class="filters__form">
-
-
       <mat-form-field class="filters__field">
         <mat-select class="filters__select" (openedChange)="openedChangeAuthors($event)"
                     placeholder="Select authors"
@@ -46,7 +44,6 @@
         </mat-select>
       </mat-form-field>
 
-
       <mat-form-field>
         <mat-select class="filters__select" (openedChange)="openedChangeCategories($event)"
                     placeholder="Select categories"
@@ -89,10 +86,7 @@
           </div>
         </mat-select>
       </mat-form-field>
-
     </form>
-
-
 
     <mat-card-actions align="end">
 
@@ -110,7 +104,6 @@
         <mat-icon aria-label="Add">add</mat-icon>
       </button>
     </mat-card-actions>
-
 
   </mat-card-content>
 </mat-card>

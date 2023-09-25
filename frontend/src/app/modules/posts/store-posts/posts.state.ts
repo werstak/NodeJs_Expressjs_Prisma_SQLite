@@ -48,6 +48,9 @@ export class PostsState {
   ) {
   }
 
+  /**
+   POSTS
+   */
   @Action(GetPosts)
   getAllPosts({getState, setState}: StateContext<PostsStateModel>, {params}: GetPosts) {
     return this.postsService.fetchPosts(params).pipe(tap((result) => {
@@ -135,7 +138,7 @@ export class PostsState {
   }
 
   /**
-   USERS list
+   USERS list All
    */
   @Action(GetListAllUsers)
   getListAllUsers({getState, setState}: StateContext<PostsStateModel>) {

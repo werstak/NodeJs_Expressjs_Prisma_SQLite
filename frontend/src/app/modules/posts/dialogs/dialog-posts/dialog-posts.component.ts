@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../shared/models/post.model';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
@@ -39,7 +39,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
   listAllCategories: any = [];
 
-
+  dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   public postForm: FormGroup;
 
@@ -78,29 +78,22 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
     } else {
       this.fetchCurrentPost();
-      // this.initPostFormValue();
     }
     this.calculationSelectedCategories();
   }
 
   private fetchCategories() {
-
-    // console.log(11111, 'fetchCategories')
-
+    this.dataLoading = true;
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.listAllCategories = resp;
-
-        // console.log('listAllCategories' , this.listAllCategories)
-
-        if (this.listAllCategories.length) {
-          // this.filteredUsers();
+        if (resp) {
+          this.dataLoading = false;
         }
       });
   }
-
 
   fetchCurrentPost() {
     const id: number = this.data.id;
@@ -121,7 +114,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new SetSelectedPost(data));
       });
   }
-
 
   private buildForm() {
     this.postForm = this.fb.group({
@@ -161,7 +153,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         this.includedCategories = [...changed];
         console.log(1, 'changed', this.includedCategories)
 
-
         const deleted = oldArray.filter(olditem => {
           const newitem = newArray.find(n => n.id == olditem.id)
           return !_.isEqual(newitem, olditem)
@@ -171,11 +162,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         })
         this.excludedCategories = [...deleted];
         console.log(1, 'deleted', this.excludedCategories)
-
       }
     );
   }
-
 
   onToppingRemoved(topping: CategoriesModel) {
     this.excludedCategories.push(topping);
@@ -189,6 +178,10 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     if (index !== -1) {
       array.splice(index, 1);
     }
+  }
+
+  trackByFn(index: any, item: any) {
+    return item.id;
   }
 
   /**
@@ -205,7 +198,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
           alert('invalid format');
         }
       }
-      console.log('handleImageLoaded() files[0]', files)
       this.handleImagePreview(files);
     }
   }
@@ -238,7 +230,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
    Adding a new post
    */
@@ -258,13 +249,10 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new AddPost(params, picture));
   }
 
-
   /**
    Update current post
    */
   private updatePost(): void {
-    console.log('this.postForm.value', this.postForm.value)
-
     if (this.postForm.invalid) {
       return;
     }

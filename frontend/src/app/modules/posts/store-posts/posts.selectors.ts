@@ -1,9 +1,10 @@
 import { Selector } from '@ngxs/store';
 import { PostsState, PostsStateModel } from './posts.state';
-import { GetListAllUsers } from './posts.action';
 
 export class PostsSelectors {
-
+  /**
+   POSTS
+   */
   @Selector([PostsState])
   static getPostsList(state: PostsStateModel) {
     return state.posts;

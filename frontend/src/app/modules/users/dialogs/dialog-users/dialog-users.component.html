@@ -1,6 +1,4 @@
 <div class="dialog">
-
-  <div>
     <div class="dialog__header">
       <div class="dialog__title">{{this.currentUser ? this.currentUser.firstName : 'Add User'}}</div>
 
@@ -150,7 +148,13 @@
       </div>
     </form>
 
-  </div>
-
+  <mat-progress-spinner
+    *ngIf="dataLoading"
+    color="primary"
+    diameter="70"
+    mode="indeterminate"
+    class="user-spinner"
+  >
+  </mat-progress-spinner>
 </div>
 

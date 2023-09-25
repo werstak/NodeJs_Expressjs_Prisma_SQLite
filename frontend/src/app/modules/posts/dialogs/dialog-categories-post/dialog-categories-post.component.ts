@@ -1,5 +1,5 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Select, Store } from '@ngxs/store';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
@@ -13,27 +13,25 @@ import {
 import { FormControl, Validators } from '@angular/forms';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 
-export interface DialogData {
-  animal: string;
-  name: string;
-}
-
 
 @Component({
   selector: 'app-dialog-categories-post',
   templateUrl: './dialog-categories-post.component.html',
   styleUrls: ['./dialog-categories-post.component.scss']
 })
+
 export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
+
   constructor(
     public store: Store,
     public dialog: MatDialog,
     public dialogRef: MatDialogRef<DialogCategoriesPostComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
   ) {
   }
 
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
+
+  dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   listAllCategories: CategoriesModel[] = [];
@@ -49,7 +47,6 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
     this.onChangesCategory();
   }
 
-
   private onChangesCategory() {
     this.category.valueChanges.pipe(
       debounceTime(250),
@@ -61,16 +58,22 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
     );
   }
 
-
   private fetchCategories() {
+    this.dataLoading = true;
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.listAllCategories = resp;
+        if (resp) {
+          this.dataLoading = false;
+        }
       });
   }
 
+  trackByFn(index: any, item: any) {
+    return item.id;
+  }
 
   editCategory(category: any) {
     console.log('category = ', category)
@@ -111,8 +114,6 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   }
 
   openDialogDeleteCategory(category: any) {
-    console.log('DIALOG dell category', category)
-
     let {id, name} = category;
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
@@ -132,17 +133,14 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
     });
   }
 
-
   onNoClick(): void {
     this.dialogRef.close();
     this.category.valueChanges;
   }
-
 
   ngOnDestroy(): void {
     this.destroy.next(null);
     this.destroy.complete();
     this.dialogRef.close();
   }
-
 }

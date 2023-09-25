@@ -49,7 +49,6 @@
   width: 100%;
 }
 
-
 .hoverable {
   position: relative;
   display: block;
@@ -94,4 +93,11 @@
 
 #fileInput {
   display: none;
+}
+
+.user-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%)
 }

@@ -30,15 +30,7 @@ const routes: Routes = [
   {
     path: '',
     component: PostsComponent
-  },
-  // {
-  //   path: 'auth',
-  //   component: AuthComponent
-  // },
-  // {
-  //   path: 'documents/:pageId',
-  //   component: DocumentsComponent
-  // }
+  }
 ];
 
 @NgModule({

@@ -42,7 +42,6 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       debounceTime(250),
       takeUntil(this.destroy)).subscribe(val => {
 
-      console.log(111, 'FORM', val)
       let arrRoles = [];
       if (val.roles) {
         for (let i = 0; i < val.roles.length; i++) {
@@ -58,16 +57,12 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
         email: val.email,
         roles: arrRoles
       }
-
-      console.log(222, 'NEXT filterData', filterData)
       this.usersService.usersFilters$.next(filterData)
     });
   }
-
 
   ngOnDestroy() {
     this.destroy.next(null);
     this.destroy.complete();
   }
-
 }

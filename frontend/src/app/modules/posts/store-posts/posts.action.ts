@@ -1,6 +1,8 @@
 import { PostModel } from '../../../shared/models/post.model';
 
-
+/**
+ POSTS
+ */
 export class GetPosts {
   static readonly type = '[Posts] Get';
 

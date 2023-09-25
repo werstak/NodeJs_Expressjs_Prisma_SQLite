@@ -21,7 +21,6 @@ import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-p
 
 export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
-
   constructor(
     private fb: FormBuilder,
     public postsService: PostsService,
@@ -64,7 +63,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.onChangesControlCategories();
   }
 
-
   private fetchUsers() {
     this.store.dispatch(new GetListAllUsers());
     this.listAllUsers$.pipe(
@@ -97,6 +95,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       debounceTime(250),
       takeUntil(this.destroy)
     ).subscribe(val => {
+
       let arrAuthors = [];
       if (val.length) {
         for (let i = 0; i < val.length; i++) {
@@ -110,13 +109,11 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     });
   }
 
-
   /**
    * Used to filter data based on search input
    */
   private _filter(name: string): any[] {
     const filterValue = name.toLowerCase();
-    // Set selected values to retain the selected checkbox state
     this.setSelectedValues();
     this.postFilterForm.controls['authors'].patchValue(this.selectedValues);
     return this.listAllUsers.filter((option: any) => option.firstName.toLowerCase().indexOf(filterValue) === 0);
@@ -133,9 +130,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   openedChangeAuthors(e: any) {
-    // Set search textbox value as empty while opening selectbox
     this.searchTextboxControl.patchValue('');
-    // Focus to search textbox while clicking on selectbox
     if (e == true) {
       this.searchTextBox.nativeElement.focus();
     }
@@ -161,7 +156,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       });
     }
   }
-
 
   /**
    Filter Categories
@@ -191,7 +185,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    */
   private _filterCategories(name: string): any[] {
     const filterValue = name.toLowerCase();
-    // Set selected values to retain the selected checkbox state
     this.setSelectedValuesCategories();
     this.postFilterForm.controls['categories'].patchValue(this.selectedValuesCategories);
     return this.listAllCategories.filter((option: any) => option.name.toLowerCase().indexOf(filterValue) === 0);
@@ -202,7 +195,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       debounceTime(250),
       takeUntil(this.destroy)
     ).subscribe(val => {
-        let arrCategories = [];
+      let arrCategories = [];
         if (val.length) {
           for (let i = 0; i < val.length; i++) {
             arrCategories.push(val[i].id);
@@ -212,11 +205,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
         }
         this.filterData.categories = arrCategories;
         this.postsService.postsFilters$.next(this.filterData)
-
       }
     );
   }
-
 
   /**
    * Remove from selected values based on uncheck Categories
@@ -258,18 +249,14 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     }
   }
 
-
   openDialog(): void {
     const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
-      // data: {name: this.name, animal: this.animal},
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      // this.animal = result;
     });
   }
-
 
   addPost() {
     const dialogRef = this.dialog.open(DialogPostsComponent, {
@@ -284,7 +271,4 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.destroy.next(null);
     this.destroy.complete();
   }
-
-
-
 }

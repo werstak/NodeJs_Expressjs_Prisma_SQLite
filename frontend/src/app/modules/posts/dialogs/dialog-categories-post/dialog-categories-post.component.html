@@ -45,7 +45,7 @@
 
 <div class="categories-wrap">
   <mat-divider></mat-divider>
-  <div class="categories" role="listitem" *ngFor="let category of listAllCategories$ | async">
+  <div class="categories" role="listitem" *ngFor="let category of listAllCategories$ | async; trackBy: trackByFn; let i = index">
     <div class="categories__title">{{category.name}}</div>
     <div class="categories__btn">
       <button mat-icon-button color="primary" matTooltip="Edit" (click)="editCategory(category)">
@@ -57,6 +57,14 @@
     </div>
   </div>
   <mat-divider></mat-divider>
+
+  <mat-progress-spinner
+    *ngIf="dataLoading"
+    diameter="40"
+    mode="indeterminate"
+    class="categories-spinner"
+  >
+  </mat-progress-spinner>
 </div>
 
 <div mat-dialog-actions align="end">
