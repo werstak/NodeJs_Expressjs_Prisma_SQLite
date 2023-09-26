@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import { UserModel } from '../../shared/models/user.model';
+import { UserModel } from '../../core/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as config from '../../../app-config';
+import { UserParamsModel } from '../../core/models/user-params.model';
 
 
 @Injectable({
@@ -22,7 +23,7 @@ export class UsersService {
   usersFilters$ = new BehaviorSubject<any>({});
 
 
-  fetchUsers(params: any): Observable<any> {
+  fetchUsers(params: UserParamsModel): Observable<any> {
     return this.http.get(config.API_URL + `/users`, {
       params: new HttpParams()
         .set('orderByColumn', params.orderByColumn)
@@ -52,7 +53,7 @@ export class UsersService {
       );
   }
 
-  updateUser(id: number, params: any, avatar: any, imageOrUrl: any, previousImageUrl: any): Observable<any> {
+  updateUser(id: number, params: UserModel, avatar: any, imageOrUrl: boolean, previousImageUrl: string): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', avatar);
     uploadData.append('user_params', JSON.stringify(params));

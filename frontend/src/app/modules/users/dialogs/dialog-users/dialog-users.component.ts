@@ -1,7 +1,7 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { UserModel } from '../../../../shared/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
@@ -9,7 +9,7 @@ import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.ac
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
-import { CountriesModel } from '../../../../shared/models/countriesModel';
+import { CountriesModel } from '../../../../core/models/countriesModel';
 
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -33,7 +33,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   dataLoading: boolean = false;
 
   private subUser: Subscription;
-  rolesList = ROLES;
+  roleList = ROLES;
   countriesList = COUNTRIES;
   userForm: FormGroup;
   hide = true;
@@ -192,8 +192,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'addNewUser()', this.userForm.value)
-
     const avatar = this.avatarFile;
     const params: any = {
       email: this.userForm.value.email,
@@ -216,8 +214,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     if (this.userForm.invalid) {
       return;
     }
-    console.log(1, 'updateUser()', this.userForm.value)
-
     let {id} = this.currentUser
     const avatar = this.avatarFile;
     const previousImageUrl = this.previousImageUrl;

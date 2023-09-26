@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
-import { PostModel } from '../../../../shared/models/post.model';
+import { PostModel } from '../../../../core/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { PageEvent } from '@angular/material/paginator';
-import { PostFilterModel } from '../../../../shared/models/post-filter.model';
+import { PostFilterModel } from '../../../../core/models/post-filter.model';
 
 @Component({
   selector: 'app-posts',
@@ -24,7 +24,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
-  @Select(PostsSelectors.getPostsCounter) postsCounter$s: Observable<any>;
+  @Select(PostsSelectors.getPostsCounter) postsCounter$: Observable<number>;
 
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
@@ -78,7 +78,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     this.store.dispatch(new GetPosts(params));
-    this.postsCounter$s.pipe(
+    this.postsCounter$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.length = resp;

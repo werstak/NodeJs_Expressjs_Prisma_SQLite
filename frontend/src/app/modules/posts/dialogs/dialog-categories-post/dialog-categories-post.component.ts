@@ -3,7 +3,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Select, Store } from '@ngxs/store';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
-import { CategoriesModel } from '../../../../shared/models/categories.model';
+import { CategoriesModel } from '../../../../core/models/categories.model';
 import {
   AddCategory,
   DeleteCategory,
@@ -93,8 +93,8 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // this.addFlag = false;
-    // this.visibilityFields = false;
+    this.addFlag = false;
+    this.visibilityFields = false;
     this.category.patchValue('');
   }
 
@@ -104,6 +104,7 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
       name: this.categoryName
     }
     this.store.dispatch(new UpdateCategory(id, params));
+    this.visibilityFields = false;
     return this.category.patchValue('');
   }
 

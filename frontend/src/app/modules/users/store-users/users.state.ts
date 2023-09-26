@@ -1,6 +1,6 @@
 import { Action, State, StateContext } from '@ngxs/store';
 import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser } from './users.action';
-import { UserModel } from '../../../shared/models/user.model';
+import { UserModel } from '../../../core/models/user.model';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 export class UsersStateModel {
   users: UserModel[];
   usersCounter?: any;
-  selectedUser?: any;
+  selectedUser?: UserModel | null;
 }
 
 @State<UsersStateModel>({

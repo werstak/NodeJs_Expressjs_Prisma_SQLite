@@ -18,7 +18,7 @@ export class SetAppName {
 export class AppState {
   @Selector()
   static getAppName(state: AppStateModel): string {
-    return state.appName = '77777777777777';
+    return state.appName = 'App State';
   }
 
   @Action(SetAppName)

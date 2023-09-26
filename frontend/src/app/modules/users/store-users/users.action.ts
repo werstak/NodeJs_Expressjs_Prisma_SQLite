@@ -1,4 +1,4 @@
-import { UserModel } from '../../../shared/models/user.model';
+import { UserModel } from '../../../core/models/user.model';
 
 export class GetUsers {
   static readonly type = '[Users] Get';

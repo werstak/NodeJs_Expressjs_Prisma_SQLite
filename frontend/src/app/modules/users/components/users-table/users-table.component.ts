@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
-import { UserModel } from '../../../../shared/models/user.model';
+import { UserModel } from '../../../../core/models/user.model';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
@@ -11,7 +11,7 @@ import { DeleteUser, GetUsers } from '../../store-users/users.action';
 import { UsersSelectors } from '../../store-users/users.selectors';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSort, SortDirection } from '@angular/material/sort';
-import { UserFilterModel } from '../../../../shared/models/user-filter.model';
+import { UserFilterModel } from '../../../../core/models/user-filter.model';
 
 
 @Component({
@@ -36,7 +36,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
 
   /**
-   pagination variables
+   Pagination variables
    */
   length = 0;
   pageSize = 5;

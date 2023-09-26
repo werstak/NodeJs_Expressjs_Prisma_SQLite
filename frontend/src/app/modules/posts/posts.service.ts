@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import { PostModel } from '../../shared/models/post.model';
+import { PostModel } from '../../core/models/post.model';
 import * as config from '../../../app-config';
-import { CategoriesModel } from '../../shared/models/categories.model';
+import { CategoriesModel } from '../../core/models/categories.model';
+import { PostParamsModel } from '../../core/models/post-params.model';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class PostsService {
   postsFilters$ = new BehaviorSubject<any>({});
 
 
-  fetchPosts(params: any): Observable<any> {
+  fetchPosts(params: PostParamsModel): Observable<any> {
     return this.http.get(config.API_URL + `/posts`, {
       params: new HttpParams()
         .set('pageIndex', params.pageIndex)
@@ -45,7 +46,7 @@ export class PostsService {
       );
   }
 
-  updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: any, previousPictureUrl: any): Observable<any> {
+  updatePost(id: number, params: PostModel, picture: any, pictureOrUrl: boolean, previousPictureUrl: string): Observable<any> {
     const uploadData = new FormData();
     uploadData.append('ProfilePicture', picture);
     uploadData.append('post_params', JSON.stringify(params));

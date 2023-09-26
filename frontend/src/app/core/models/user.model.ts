@@ -7,7 +7,7 @@ export class UserModel {
   createdAt?: string;
   updatedAt?: string;
   role: number;
-  avatar: string;
+  avatar?: string;
   posts?: PostsModel[];
   status: boolean;
   birthAt: string;

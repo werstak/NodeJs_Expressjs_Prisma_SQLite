@@ -1,4 +1,4 @@
-import { PostModel } from '../../../shared/models/post.model';
+import { PostModel } from '../../../core/models/post.model';
 
 /**
  POSTS

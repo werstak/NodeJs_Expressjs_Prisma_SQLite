@@ -1,6 +1,6 @@
 import { Action, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { PostModel } from '../../../shared/models/post.model';
+import { PostModel } from '../../../core/models/post.model';
 import { NotificationService } from '../../../shared/notification.service';
 import { PostsService } from '../posts.service';
 import { tap } from 'rxjs';
@@ -15,7 +15,7 @@ import {
   UpdatePost
 } from './posts.action';
 import * as _ from 'lodash';
-import { UserListModel } from '../../../shared/models/user-list.model';
+import { UserListModel } from '../../../core/models/user-list.model';
 import { CategoriesModel } from '../../../../../../backend/src/models/categories.model';
 
 

@@ -5,10 +5,10 @@ import { debounceTime, Observable, ReplaySubject, startWith, takeUntil } from 'r
 import { Select, Store } from '@ngxs/store';
 import { UsersService } from '../../../users/users.service';
 import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
-import { UserListModel } from '../../../../shared/models/user-list.model';
+import { UserListModel } from '../../../../core/models/user-list.model';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { map } from 'rxjs/operators';
-import { CategoriesModel } from '../../../../shared/models/categories.model';
+import { CategoriesModel } from '../../../../core/models/categories.model';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';

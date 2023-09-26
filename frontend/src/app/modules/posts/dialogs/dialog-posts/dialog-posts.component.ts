@@ -1,13 +1,13 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { PostModel } from '../../../../shared/models/post.model';
+import { PostModel } from '../../../../core/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { CategoriesModel } from '../../../../shared/models/categories.model';
+import { CategoriesModel } from '../../../../core/models/categories.model';
 import * as _ from 'lodash';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
@@ -37,11 +37,12 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
+
   listAllCategories: any = [];
 
   dataLoading: boolean = false;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  public postForm: FormGroup;
+  postForm: FormGroup;
 
   currentPost: PostModel;
   respNewPost: PostModel;
@@ -58,19 +59,16 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   includedCategories: CategoriesModel[] = [];
   excludedCategories: CategoriesModel[] = [];
 
-  public isSameCategory(categoryA?: any, categoryB?: any): boolean {
-    return categoryA.id === categoryB.id
+  public isSameCategory(categoryA?: CategoriesModel, categoryB?: CategoriesModel): boolean {
+    return categoryA?.id === categoryB?.id
   }
 
 
   ngOnInit() {
     this.fetchCategories();
     this.buildForm();
-
     console.log('Open DIALOG data = ', this.data)
-
     this.pictureDefault = pictureDefault;
-
     if (this.data.newPost) {
       this.postForm.reset();
       this.postForm.patchValue({
@@ -95,20 +93,17 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
   }
 
-  fetchCurrentPost() {
+  private fetchCurrentPost() {
     const id: number = this.data.id;
     this.postsService.getPost(id).pipe(
       takeUntil(this.destroy))
       .subscribe(data => {
         this.currentPost = data;
         this.initCategories = data.categories;
-
         console.log('CurrentPos', this.currentPost)
-
         if (this.currentPost) {
           this.initPostFormValue();
         }
-
         this.previousPictureUrl = data.picture;
         this.pictureUrl = data.picture;
         this.store.dispatch(new SetSelectedPost(data));
@@ -202,7 +197,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  handleImagePreview(files: any): void {
+  private handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
       this.pictureUrl = event.target.result;
