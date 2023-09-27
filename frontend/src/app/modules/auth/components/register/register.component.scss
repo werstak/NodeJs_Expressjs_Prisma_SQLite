@@ -4,11 +4,12 @@
   margin: 100px 0;
 }
 
-.login {
+.register {
   &__title {
     padding: 20px 0;
     text-align: center;
   }
+
   &__form {
     min-width: 150px;
     max-width: 500px;
@@ -19,13 +20,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-  }
-  &__link {
-    text-decoration: none;
-    color: gray;
-    :hover {
-      color: blue;
-    }
   }
 }
 
@@ -49,7 +43,7 @@
   min-width: 400px;
 }
 
-.login-spinner {
+.user-spinner {
   position: absolute;
   left: 50%;
   top: 50%;

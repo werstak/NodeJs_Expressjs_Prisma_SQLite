@@ -67,7 +67,6 @@ const routes: Routes = [
     MatNativeDateModule,
     MatTooltipModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule,
     MatPaginatorModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([UsersState])

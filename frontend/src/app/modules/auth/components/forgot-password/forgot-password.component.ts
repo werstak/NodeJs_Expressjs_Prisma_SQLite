@@ -1,14 +1,14 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReplaySubject } from 'rxjs';
 import { AuthService } from '../../auth.service';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  selector: 'app-forgot-password',
+  templateUrl: './forgot-password.component.html',
+  styleUrls: ['./forgot-password.component.scss']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class ForgotPasswordComponent implements OnInit, OnDestroy{
   constructor(
     private fb: FormBuilder,
     private authService: AuthService
@@ -17,33 +17,28 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
-  authForm: FormGroup;
+  recoveryForm: FormGroup;
   hide = true;
 
 
   ngOnInit() {
-    this.buildForm();
+    this.buildRecoveryForm();
   }
 
-  private buildForm() {
-    this.authForm = this.fb.group({
+  private buildRecoveryForm() {
+    this.recoveryForm = this.fb.group({
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
         Validators.maxLength(100)])
-      ],
-      password: [null, Validators.compose([
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(50)])
       ]
     });
   }
 
-  onSubmitAuth(): void {
-    if (this.authForm.valid) {
+  onSubmitRecovery(): void {
+    if (this.recoveryForm.valid) {
       this.dataLoading = true;
-      this.authService.account$.next(true);
+      // this.addNewUser();
       this.dataLoading = false;
     }
   }
@@ -53,4 +48,3 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.destroy.complete();
   }
 }
-

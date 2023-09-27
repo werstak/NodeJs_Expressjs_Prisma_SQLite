@@ -9,24 +9,39 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
-
+import { RegisterComponent } from './components/register/register.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSortModule } from '@angular/material/sort';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 
 const routes: Routes = [
   {
-    path: '',
-    component: AuthComponent
-  },
-  {
-    path: 'login',
-    component: LoginComponent
+    path: '', component: AuthComponent,
+    children: [
+      { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
+      // { path: 'verify-email', component: VerifyEmailComponent },
+      { path: 'forgot-password', component: ForgotPasswordComponent },
+      // { path: 'reset-password', component: ResetPasswordComponent }
+    ]
   }
 ];
 
 @NgModule({
   declarations: [
     AuthComponent,
-    LoginComponent
+    LoginComponent,
+    RegisterComponent,
+    ForgotPasswordComponent
   ],
   imports: [
     CommonModule,
@@ -37,6 +52,16 @@ const routes: Routes = [
     MatIconModule,
     ReactiveFormsModule,
     MatFormFieldModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatCheckboxModule,
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatDividerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatTooltipModule,
+    MatSnackBarModule,
     RouterModule.forChild(routes),
     // NgxsModule.forFeature([AuthState])
   ]
