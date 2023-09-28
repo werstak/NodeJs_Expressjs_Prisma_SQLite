@@ -3,35 +3,35 @@
   <mat-card-content>
     <form [formGroup]="authForm" (ngSubmit)="onSubmitAuth()" class="login__form">
 
-      <mat-form-field color="accent" class="field-full-width">
-        <input matInput #email class="form-control" placeholder="Email" formControlName="email"
-               name="email"
-               maxlength="50" required>
-        <mat-hint align="end">{{email.value.length || 0}}/50</mat-hint>
-        <mat-error *ngIf="authForm.controls['email'].hasError('required')">
-          Email <strong>required</strong>
-        </mat-error>
-      </mat-form-field>
+      <div>
+        <mat-form-field color="accent" class="field-full-width">
+          <input matInput #email class="form-control" placeholder="Email" formControlName="email"
+                 name="email"
+                 maxlength="50" required>
+          <mat-hint align="end">{{email.value.length || 0}}/50</mat-hint>
+          <mat-error *ngIf="authForm.controls['email'].hasError('required')">
+            Email <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field color="accent" class="field-full-width">
-        <mat-label>Password</mat-label>
-        <input type="password" matInput #password class="form-control" placeholder="Password"
-               formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
-               name="password"
-               maxlength="50" required>
-        <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
-                [attr.aria-pressed]="hide">
-          <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-        <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
-        <mat-error *ngIf="authForm.controls['password'].hasError('required')">
-          Password <strong>required</strong>
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field color="accent" class="field-full-width">
+          <mat-label>Password</mat-label>
+          <input type="password" matInput #password class="form-control" placeholder="Password"
+                 formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
+                 name="password"
+                 maxlength="50" required>
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hide">
+            <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
+          <mat-error *ngIf="authForm.controls['password'].hasError('required')">
+            Password <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-
-
-      <div mat-dialog-actions class="login__actions">
+      <div mat-actions class="login__actions">
         <button mat-raised-button color="primary"
                 type="submit"
                 [disabled]="!authForm.valid">

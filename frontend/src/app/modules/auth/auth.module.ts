@@ -21,6 +21,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
 
 const routes: Routes = [
@@ -31,7 +32,7 @@ const routes: Routes = [
       { path: 'register', component: RegisterComponent },
       // { path: 'verify-email', component: VerifyEmailComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
-      // { path: 'reset-password', component: ResetPasswordComponent }
+      { path: 'reset-password', component: ResetPasswordComponent }
     ]
   }
 ];
@@ -41,7 +42,8 @@ const routes: Routes = [
     AuthComponent,
     LoginComponent,
     RegisterComponent,
-    ForgotPasswordComponent
+    ForgotPasswordComponent,
+    ResetPasswordComponent
   ],
   imports: [
     CommonModule,

@@ -38,7 +38,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy{
   onSubmitRecovery(): void {
     if (this.recoveryForm.valid) {
       this.dataLoading = true;
-      // this.addNewUser();
+      // this.someFunction();
       this.dataLoading = false;
     }
   }

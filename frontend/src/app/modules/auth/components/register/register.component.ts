@@ -6,6 +6,7 @@ import { COUNTRIES } from '../../../../shared/constants/countries';
 import { UserModel } from '../../../../core/models/user.model';
 import { CountriesModel } from '../../../../core/models/countriesModel';
 import { map } from 'rxjs/operators';
+import { MustMatch } from '../../../../core/helpers/must-match.validator';
 
 @Component({
   selector: 'app-register',
@@ -76,9 +77,16 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
+      confirmPassword: [null, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)])
+      ],
       birthAt: [null, Validators.compose([
         Validators.required])],
       status: '',
+    }, {
+      validator: MustMatch('password', 'confirmPassword')
     });
   }
 
@@ -125,7 +133,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   onSubmitNewUser(): void {
     if (this.registerForm.valid) {
       this.dataLoading = true;
-      // this.addNewUser();
+      // this.someFunction();
       this.dataLoading = false;
     }
   }

@@ -2,7 +2,7 @@
   <mat-card-title class="register__title">Register Account</mat-card-title>
   <mat-card-content>
     <form [formGroup]="registerForm" novalidate (ngSubmit)="onSubmitNewUser()" class="register__form">
-      <div mat-dialog-content>
+      <div>
 
         <mat-form-field color="accent" class="field-full-width">
           <input matInput #email class="form-control" placeholder="Email" formControlName="email"
@@ -85,6 +85,27 @@
           <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
           <mat-error *ngIf="registerForm.controls['password'].hasError('required')">
             Password <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+
+        <mat-form-field color="accent" class="field-full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input type="password" matInput #confirmPassword class="form-control" placeholder="Password"
+                 formControlName="confirmPassword" autocomplete="off" [type]="hide ? 'password' : 'text'"
+                 name="confirmPassword"
+                 maxlength="50" required>
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hide">
+            <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-hint align="end">{{confirmPassword.value.length || 0}}/50</mat-hint>
+          <mat-error *ngIf="registerForm.controls['confirmPassword'].hasError('required')">
+            Confirm Password <strong>required</strong>
+          </mat-error>
+
+          <mat-error *ngIf="registerForm.controls['confirmPassword'].hasError('mustMatch')">
+            Passwords must match <strong>required</strong>
           </mat-error>
         </mat-form-field>
 
