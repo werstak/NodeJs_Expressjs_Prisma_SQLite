@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as config from '../../../app-config';
 import { map } from 'rxjs/operators';
+import { LoginUser } from '../../core/models/login-user';
+import { RegisterUser } from '../../core/models/register-user';
 
 @Injectable({
   providedIn: 'root'
@@ -29,14 +31,25 @@ export class AuthService {
   }
 
 
-  // login(email: string, password: string) {
-  //   return this.http.post<any>(config.API_URL + `/authenticate/`, {email, password}, {withCredentials: true})
-  //     .pipe(map(account => {
-  //       this.accountSubject.next(account);
-  //       this.startRefreshTokenTimer();
-  //       return account;
-  //     }));
-  // }
+  login(loginUserData: LoginUser) {
+    console.log('AuthService = LOGIN()', loginUserData)
+    return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
+      .pipe(map(account => {
+        // this.accountSubject.next(account);
+        // this.startRefreshTokenTimer();
+        return account;
+      }));
+  }
+
+  register(registerUserData: RegisterUser) {
+    console.log('AuthService = REGISTER()', registerUserData)
+    return this.http.post<any>(config.API_URL + `/auth/register/`, {registerUserData})
+      .pipe(map(account => {
+        // this.accountSubject.next(account);
+        // this.startRefreshTokenTimer();
+        return account;
+      }));
+  }
 
 
 }

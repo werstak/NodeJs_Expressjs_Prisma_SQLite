@@ -1,12 +1,13 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable, startWith, Subscription } from 'rxjs';
+import { Observable, ReplaySubject, startWith, Subscription, takeUntil } from 'rxjs';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { UserModel } from '../../../../core/models/user.model';
 import { CountriesModel } from '../../../../core/models/countriesModel';
 import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { AuthService } from '../../auth.service';
 
 @Component({
   selector: 'app-register',
@@ -14,12 +15,16 @@ import { MustMatch } from '../../../../core/helpers/must-match.validator';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit, OnDestroy {
+  private registerUserResp: any;
+
   constructor(
     private fb: FormBuilder,
+    private authService: AuthService
   ) {
   }
 
 
+  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
 
   private subUser: Subscription;
@@ -132,14 +137,29 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onSubmitNewUser(): void {
     if (this.registerForm.valid) {
+      const registerUserData = this.registerForm.value;
+      console.log(1, 'registerUserData', registerUserData)
+
+      this.authService.register(registerUserData).pipe(
+        takeUntil(this.destroy))
+        .subscribe(resp => {
+          this.registerUserResp = resp;
+          console.log('registerUserResp', this.registerUserResp)
+          if (resp) {
+            this.dataLoading = false;
+          }
+        });
+
       this.dataLoading = true;
-      // this.someFunction();
+      this.authService.account$.next(true);
       this.dataLoading = false;
     }
   }
 
   ngOnDestroy(): void {
     this.subUser?.unsubscribe();
+    this.destroy.next(null);
+    this.destroy.complete();
   }
 
 

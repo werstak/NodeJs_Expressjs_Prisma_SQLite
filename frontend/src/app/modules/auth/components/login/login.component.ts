@@ -1,7 +1,8 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
-import { ReplaySubject } from 'rxjs';
+import { ReplaySubject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth.service';
+import { LoginUser } from '../../../../core/models/login-user';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   dataLoading: boolean = false;
   authForm: FormGroup;
   hide = true;
+
+
+  private loginResp: any;
 
 
   ngOnInit() {
@@ -42,6 +46,19 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmitAuth(): void {
     if (this.authForm.valid) {
+      const loginUserData = this.authForm.value;
+      console.log(1, 'loginUserData', loginUserData)
+
+      this.authService.login(loginUserData).pipe(
+        takeUntil(this.destroy))
+        .subscribe(resp => {
+          this.loginResp = resp;
+          console.log('loginResp', this.loginResp)
+          if (resp) {
+            this.dataLoading = false;
+          }
+        });
+
       this.dataLoading = true;
       this.authService.account$.next(true);
       this.dataLoading = false;

@@ -2,10 +2,8 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
-// import upload from '../middleware/upload';
 import fs from 'fs';
-import db from '../utils/db';
-
+import bcrypt from 'bcrypt';
 const path = require('path');
 
 export const usersRouter = express.Router();
@@ -81,6 +79,8 @@ usersRouter.post(
             console.log('Root POST - Create USER = ', request.body)
 
             const user = JSON.parse(request.body.user_params);
+            const hashPassword = bcrypt.hashSync(user.password, 7);
+
             let filename = '';
 
             if (request.file?.filename) {
@@ -89,7 +89,10 @@ usersRouter.post(
                 filename = '';
             }
 
+            user.password = hashPassword;
             user.avatar = filename;
+
+            console.log(111111111, user)
             const newUser = await UserHandler.createUserHandler(user);
             return response.status(201).json(newUser);
         } catch (error: any) {

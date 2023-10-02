@@ -1,5 +1,6 @@
 import express from 'express';
 
+import { authRouter } from './authRouter';
 import { rootRouter } from './root.rout'
 import { usersRouter } from './users.rout';
 import { postsRouter } from './posts.rout';
@@ -11,6 +12,7 @@ console.log('index - ROUTS')
 
 export const router = express.Router();
 
+router.use('/auth', upload, authRouter);
 router.use('/posts', upload, postsRouter);
 router.use('/categories', categoriesRouter);
 router.use('/users', upload, usersRouter);
