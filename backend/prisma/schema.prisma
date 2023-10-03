@@ -11,19 +11,30 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  firstName String
-  lastName  String
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  role      Int
-  avatar    String?
-  posts     Post[]
-  status    Boolean?  @default(true)
-  birthAt   DateTime?
-  location  String
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  password      String
+  firstName     String
+  lastName      String
+  createdAt     DateTime?      @default(now())
+  updatedAt     DateTime?      @updatedAt
+  role          Int
+  avatar        String?
+  posts         Post[]
+  status        Boolean?       @default(true)
+  birthAt       DateTime?
+  location      String
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id          String   @id @unique @default(uuid())
+  hashedToken String
+  userId      Int
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Post {

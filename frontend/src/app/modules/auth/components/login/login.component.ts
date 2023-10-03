@@ -62,6 +62,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         });
     }
+    // this.authService.account$.next(true);
+
   }
 
   ngOnDestroy(): void {

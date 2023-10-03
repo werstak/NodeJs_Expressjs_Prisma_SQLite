@@ -35,7 +35,12 @@ authRouter.post(
             // console.log('111 Login = ', request.body)
             const {email, password} = request.body.loginUserData;
 
-            const user = await LoginUserHandler.loginUserHandler(email);
+            if (!email || !password) {
+                response.status(400);
+                return response.status(400).json({message: `You must provide an email and a password`})
+            }
+
+            const user = await LoginUserHandler.findUserByEmail(email);
             console.log(111111111111, 'user', user)
 
             if (!user) {
@@ -75,11 +80,44 @@ authRouter.post(
     '/register',
     async (request: Request, response: Response) => {
         try {
-            console.log('register = ', request.body)
+            console.log(1111111, 'register = ', request.body)
             const register = '555555555555';
 
+            const {email, password} = request.body.registerUserData;
+
+            const user = request.body.registerUserData;
+            const hashPassword = bcrypt.hashSync(user.password, 7);
+
+            if (!email || !password) {
+                return response.status(400).json({message: `You must provide an email and a password`})
+            }
+
+
+            const existingUser = await LoginUserHandler.findUserByEmail(email);
+            console.log(2222222222222, 'existingUser', existingUser)
+
+            if (existingUser) {
+                return response.status(400).json({message: `Email already in use`})
+            }
+
+            user.password = hashPassword;
+            // const user = await createUserByEmailAndPassword({ email, password });
+            const newUser = await UserHandler.createUserHandler(user);
+            return response.status(201).json(newUser);
+
+            // const jti = uuidv4();
+            // const { accessToken, refreshToken } = generateTokens(user, jti);
+            // await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
+            //
+            // res.json({
+            //     accessToken,
+            //     refreshToken
+            // });
+
+
+
             // const newCategory = await CategoryHandler.createCategoryHandler(request.body);
-            return response.status(201).json(register);
+            // return response.status(201).json(register);
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

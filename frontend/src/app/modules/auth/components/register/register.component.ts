@@ -71,6 +71,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
+      role: 4,
       // role: [null, Validators.compose([
       //   Validators.required,
       //   Validators.maxLength(50)])
