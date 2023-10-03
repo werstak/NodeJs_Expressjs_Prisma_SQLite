@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { Account } from '../../core/models/account';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
@@ -40,6 +40,17 @@ export class AuthService {
         return account;
       }));
   }
+
+
+  // login(loginUserData: LoginUser): Observable<any> {
+  //   return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
 
   register(registerUserData: RegisterUser) {
     console.log('AuthService = REGISTER()', registerUserData)

@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit {
       .getData()
       .subscribe(resp => {
         this.data = resp;
-        console.log(this.data)
+        // console.log(this.data)
       });
   }
 }

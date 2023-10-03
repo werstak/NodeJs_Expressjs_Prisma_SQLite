@@ -136,6 +136,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   onSubmitNewUser(): void {
+    this.dataLoading = true;
+
     if (this.registerForm.valid) {
       const registerUserData = this.registerForm.value;
       console.log(1, 'registerUserData', registerUserData)
@@ -146,13 +148,10 @@ export class RegisterComponent implements OnInit, OnDestroy {
           this.registerUserResp = resp;
           console.log('registerUserResp', this.registerUserResp)
           if (resp) {
+            this.authService.account$.next(true);
             this.dataLoading = false;
           }
         });
-
-      this.dataLoading = true;
-      this.authService.account$.next(true);
-      this.dataLoading = false;
     }
   }
 

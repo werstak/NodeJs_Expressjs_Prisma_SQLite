@@ -45,9 +45,11 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSubmitAuth(): void {
+    this.dataLoading = true;
+
     if (this.authForm.valid) {
       const loginUserData = this.authForm.value;
-      console.log(1, 'loginUserData', loginUserData)
+      // console.log(1, 'loginUserData', loginUserData)
 
       this.authService.login(loginUserData).pipe(
         takeUntil(this.destroy))
@@ -56,12 +58,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           console.log('loginResp', this.loginResp)
           if (resp) {
             this.dataLoading = false;
+            this.authService.account$.next(true);
           }
         });
-
-      this.dataLoading = true;
-      this.authService.account$.next(true);
-      this.dataLoading = false;
     }
   }
 
