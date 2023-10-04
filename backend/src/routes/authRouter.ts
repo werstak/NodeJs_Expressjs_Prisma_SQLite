@@ -1,11 +1,14 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import * as LoginUserHandler from '../controllers/authController';
+import * as AuthUserHandler from '../controllers/authController';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { v4 as uuidv4 } from 'uuid';
 import { check } from 'express-validator';
 
 import * as UserHandler from '../controllers/users.conroller';
+// import * as JWT  from '../utils/jwt';
+import { generateTokens } from '../utils/jwt';
 
 export const authRouter = express.Router();
 
@@ -40,7 +43,7 @@ authRouter.post(
                 return response.status(400).json({message: `You must provide an email and a password`})
             }
 
-            const user = await LoginUserHandler.findUserByEmail(email);
+            const user = await AuthUserHandler.findUserByEmail(email);
             console.log(111111111111, 'user', user)
 
             if (!user) {
@@ -80,8 +83,7 @@ authRouter.post(
     '/register',
     async (request: Request, response: Response) => {
         try {
-            console.log(1111111, 'register = ', request.body)
-            const register = '555555555555';
+            console.log(1111111, 'post register = ', request.body)
 
             const {email, password} = request.body.registerUserData;
 
@@ -93,7 +95,7 @@ authRouter.post(
             }
 
 
-            const existingUser = await LoginUserHandler.findUserByEmail(email);
+            const existingUser = await AuthUserHandler.findUserByEmail(email);
             console.log(2222222222222, 'existingUser', existingUser)
 
             if (existingUser) {
@@ -101,23 +103,28 @@ authRouter.post(
             }
 
             user.password = hashPassword;
+            const createdUser = await UserHandler.createUserHandler(user);
+            const userId = createdUser.newUser.id;
+
             // const user = await createUserByEmailAndPassword({ email, password });
-            const newUser = await UserHandler.createUserHandler(user);
-            return response.status(201).json(newUser);
+            // return response.status(201).json(newUser);
 
-            // const jti = uuidv4();
-            // const { accessToken, refreshToken } = generateTokens(user, jti);
-            // await addRefreshTokenToWhitelist({ jti, refreshToken, userId: user.id });
-            //
-            // res.json({
-            //     accessToken,
-            //     refreshToken
-            // });
+            const jti: any = uuidv4();
+            const { accessToken, refreshToken } = generateTokens(createdUser.newUser, jti);
 
+            // const { accessToken, refreshToken } = await JWT.generateTokens(newUser, jti);
+            console.log(8888888, 'accessToken, refreshToken', accessToken, refreshToken)
 
+            console.log(4545454545, 'createdUser', createdUser.newUser)
+            console.log(5656565656, 'userId' , userId)
 
-            // const newCategory = await CategoryHandler.createCategoryHandler(request.body);
-            // return response.status(201).json(register);
+            await AuthUserHandler.addRefreshTokenToWhitelist({ jti, refreshToken, userId  });
+
+            return response.status(201).json({
+                accessToken,
+                refreshToken
+            });
+
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

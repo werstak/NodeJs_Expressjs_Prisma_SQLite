@@ -2,33 +2,59 @@ import jwt from 'jsonwebtoken';
 
 
 
-function generateAccessToken(user) {
-    return jwt.sign({ userId: user.id }, process.env.JWT_ACCESS_SECRET, {
+export function generateAccessToken (user: any) {
+    const accessSecret = process.env.JWT_ACCESS_SECRET as string;
+    return jwt.sign({ userId: user.id }, accessSecret, {
         expiresIn: '5m',
     });
 }
 
-function generateRefreshToken(user, jti) {
+export function generateRefreshToken (user: any, jti: any) {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET as string;
     return jwt.sign({
         userId: user.id,
         jti
-    }, process.env.JWT_REFRESH_SECRET, {
+    }, refreshSecret, {
         expiresIn: '4h',
     });
 }
 
-function generateTokens(user, jti) {
+export function generateTokens (user: any, jti: any){
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user, jti);
-
     return {
         accessToken,
         refreshToken,
     };
 }
 
-module.exports = {
-    generateAccessToken,
-    generateRefreshToken,
-    generateTokens
-};
+
+
+
+//
+// export const generateAccessToken = async (user: any): Promise<any | null> => {
+//     const accessSecret = process.env.JWT_ACCESS_SECRET as string;
+//     return jwt.sign({ userId: user.id }, accessSecret, {
+//         expiresIn: '5m',
+//     });
+// }
+//
+// export const generateRefreshToken = async (user: any, jti: any): Promise<any | null> =>{
+//     const refreshSecret = process.env.JWT_REFRESH_SECRET as string;
+//     return jwt.sign({
+//         userId: user.id,
+//         jti
+//     }, refreshSecret, {
+//         expiresIn: '4h',
+//     });
+// }
+//
+// export const generateTokens = async (user: any, jti: any): Promise<any | null> =>{
+//     const accessToken = generateAccessToken(user);
+//     const refreshToken = generateRefreshToken(user, jti);
+//     return {
+//         accessToken,
+//         refreshToken,
+//     };
+// }
+

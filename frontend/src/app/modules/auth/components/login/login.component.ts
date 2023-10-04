@@ -62,6 +62,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         });
     }
+    // this.dataLoading = false;
     // this.authService.account$.next(true);
 
   }

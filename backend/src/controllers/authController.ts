@@ -14,11 +14,15 @@ export const findUserByEmail = async (email: string): Promise<any | null> => {
 
 
 export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: any): Promise<any | null> => {
+    console.log(101010100, 'jti', jti)
+    console.log(101010100, 'refreshToken', refreshToken)
+    console.log(101010100, 'userId', userId)
     return db.refreshToken.create({
         data: {
             id: jti,
+            // hashedToken: refreshToken,
             hashedToken: hashToken(refreshToken),
-            userId
+            userId: userId
         },
     });
 }
