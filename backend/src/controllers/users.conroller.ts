@@ -171,3 +171,14 @@ export const deleteUserHandler = async (id: number): Promise<void> => {
         },
     });
 };
+
+/**
+ * This applies to authentication
+ */
+export const findUserById = async (id: any): Promise<any | null> => {
+    return db.user.findUnique({
+        where: {
+            id,
+        },
+    });
+};

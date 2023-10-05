@@ -2,26 +2,72 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import * as AuthUserHandler from '../controllers/authController';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { check } from 'express-validator';
 
 import * as UserHandler from '../controllers/users.conroller';
-// import * as JWT  from '../utils/jwt';
+// import * as GenerateJWT  from '../utils/jwt';
 import { generateTokens } from '../utils/jwt';
+import { hashToken } from '../utils/hashToken';
+
+
+export interface RefreshToken {
+    userId: number
+    jti: string
+    iat: number
+    exp: number
+}
+
 
 export const authRouter = express.Router();
 
 
-const generateAccessToken = (id: any, email: any) => {
-    const payload = {
-        id,
-        email
-    }
-    const secret = 'SECRET_KEY_RANDOM'
+/**
+ POST: Register
+ */
+authRouter.post(
+    '/register',
+    async (request: Request, response: Response) => {
+        try {
+            const {email, password} = request.body.registerUserData;
+            const user = request.body.registerUserData;
+            const hashPassword = bcrypt.hashSync(user.password, 7);
 
-    return jwt.sign(payload, secret, {expiresIn: '24h'})
-}
+            if (!email || !password) {
+                return response.status(400).json({message: `You must provide an email and a password`})
+            }
+
+            const existingUser = await AuthUserHandler.findUserByEmail(email);
+            if (existingUser) {
+                return response.status(400).json({message: `Email already in use`})
+            }
+
+            user.password = hashPassword;
+            const createdUser = await UserHandler.createUserHandler(user);
+            const userId = createdUser.newUser.id;
+
+            const jti: any = uuidv4();
+            const {accessToken, refreshToken} = generateTokens(createdUser.newUser, jti);
+            // const { accessToken, refreshToken } = await GenerateJWT.generateTokens(newUser, jti);
+
+            // console.log(8888888, 'accessToken, refreshToken', accessToken, refreshToken)
+            // console.log(4545454545, 'createdUser', createdUser.newUser)
+            // console.log(5656565656, 'userId', userId)
+
+            await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
+
+            return response.status(201).json({
+                accessToken,
+                refreshToken
+            });
+
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
 
 /**
  POST: Login
@@ -35,96 +81,94 @@ authRouter.post(
 
     async (request: Request, response: Response) => {
         try {
-            // console.log('111 Login = ', request.body)
             const {email, password} = request.body.loginUserData;
-
             if (!email || !password) {
-                response.status(400);
                 return response.status(400).json({message: `You must provide an email and a password`})
             }
 
-            const user = await AuthUserHandler.findUserByEmail(email);
-            console.log(111111111111, 'user', user)
-
-            if (!user) {
+            const existingUser = await AuthUserHandler.findUserByEmail(email);
+            const userId = existingUser.id;
+            if (!existingUser) {
                 return response.status(400).json({message: `User ${email} not found`})
             }
-            const validPassword = bcrypt.compareSync(password, user.password)
-            console.log(22222222222222, 'validPassword', validPassword)
 
+            const validPassword = bcrypt.compareSync(password, existingUser.password)
             if (!validPassword) {
                 return response.status(400).json({message: `Incorrect password entered`})
             }
 
-            const token = generateAccessToken(user.id, user.email)
+            const jti: any = uuidv4();
+            const {accessToken, refreshToken} = generateTokens(existingUser, jti);
+            await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
+            return response.status(201).json({
+                accessToken,
+                refreshToken
+            });
 
-            console.log(33333333, 'token', token)
-            return response.status(201).json({token})
-
-            // return response.status(201).json({user})
-
-            // const newUser = await UserHandler.createUserHandler(user);
-            // return response.status(201).json(newUser);
-
-
-            // const newCategory = await CategoryHandler.createCategoryHandler(request.body);
-            // const newCategory = await CategoryHandler.createCategoryHandler(request.body);
-            // return response.status(201).json(user);
+            // const token = generateAccessToken(existingUser.id, existingUser.email)
+            // return response.status(201).json({token})
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
     }
 );
 
+
 /**
- POST: Register
+ POST: RefreshToken
  */
 authRouter.post(
-    '/register',
+    '/refreshToken',
     async (request: Request, response: Response) => {
         try {
-            console.log(1111111, 'post register = ', request.body)
 
-            const {email, password} = request.body.registerUserData;
+            const {refreshToken} = request.body;
 
-            const user = request.body.registerUserData;
-            const hashPassword = bcrypt.hashSync(user.password, 7);
+            if (!refreshToken) {
+                return response.status(400).json({message: `Missing refresh token.`})
+            }
+            const payload: JwtPayload | any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
+            const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
 
-            if (!email || !password) {
-                return response.status(400).json({message: `You must provide an email and a password`})
+            if (!savedRefreshToken || savedRefreshToken.revoked === true) {
+                return response.status(401).json({message: `Unauthorized`})
             }
 
-
-            const existingUser = await AuthUserHandler.findUserByEmail(email);
-            console.log(2222222222222, 'existingUser', existingUser)
-
-            if (existingUser) {
-                return response.status(400).json({message: `Email already in use`})
+            const hashedToken = hashToken(refreshToken);
+            if (hashedToken !== savedRefreshToken.hashedToken) {
+                return response.status(401).json({message: `Unauthorized`})
             }
 
-            user.password = hashPassword;
-            const createdUser = await UserHandler.createUserHandler(user);
-            const userId = createdUser.newUser.id;
+            const user = await UserHandler.findUserById(payload.userId);
+            if (!user) {
+                return response.status(401).json({message: `Unauthorized`})
+            }
 
-            // const user = await createUserByEmailAndPassword({ email, password });
-            // return response.status(201).json(newUser);
-
+            await AuthUserHandler.deleteRefreshToken(savedRefreshToken.id);
             const jti: any = uuidv4();
-            const { accessToken, refreshToken } = generateTokens(createdUser.newUser, jti);
-
-            // const { accessToken, refreshToken } = await JWT.generateTokens(newUser, jti);
-            console.log(8888888, 'accessToken, refreshToken', accessToken, refreshToken)
-
-            console.log(4545454545, 'createdUser', createdUser.newUser)
-            console.log(5656565656, 'userId' , userId)
-
-            await AuthUserHandler.addRefreshTokenToWhitelist({ jti, refreshToken, userId  });
+            const {accessToken, refreshToken: newRefreshToken} = generateTokens(user, jti);
+            await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken: newRefreshToken, userId: user.id});
 
             return response.status(201).json({
                 accessToken,
-                refreshToken
+                refreshToken: newRefreshToken
             });
 
+
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+authRouter.post(
+    '/revokeRefreshTokens',
+    async (request: Request, response: Response) => {
+        try {
+            const {userId} = request.body;
+            await AuthUserHandler.revokeTokens(userId);
+            return response.status(201).json({message: `Tokens revoked for user with id #${userId}`});
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

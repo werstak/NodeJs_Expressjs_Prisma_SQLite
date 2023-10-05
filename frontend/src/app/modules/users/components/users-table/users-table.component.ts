@@ -51,7 +51,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
 
   /** Columns table*/
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'updatedAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
+  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
 
   users$ = this.usersService.users$;
 

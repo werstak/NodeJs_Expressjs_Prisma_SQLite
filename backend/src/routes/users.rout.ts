@@ -4,6 +4,7 @@ import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+import db from '../utils/db';
 const path = require('path');
 
 export const usersRouter = express.Router();

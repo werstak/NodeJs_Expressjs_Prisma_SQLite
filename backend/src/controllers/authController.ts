@@ -49,7 +49,7 @@ export const deleteRefreshToken = async (id: any): Promise<any | null> => {
 }
 
 
-export const revokeTokens= async (userId: any): Promise<any | null> => {
+export const revokeTokens = async (userId: any): Promise<any | null> => {
     return db.refreshToken.updateMany({
         where: {
             userId
