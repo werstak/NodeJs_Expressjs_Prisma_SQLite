@@ -101,6 +101,7 @@ authRouter.post(
             const {accessToken, refreshToken} = generateTokens(existingUser, jti);
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
             return response.status(201).json({
+                existingUser,
                 accessToken,
                 refreshToken
             });

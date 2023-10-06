@@ -31,10 +31,26 @@ export class AuthService {
   }
 
 
+//
+// {
+//   "id": 1,
+//   "title": "Mr",
+//   "firstName": "Andrey",
+//   "lastName": "Petr",
+//   "email": "webproger1@gmail.com",
+//   "role": "Admin",
+//   "dateCreated": "2023-10-06T14:00:59.004Z",
+//   "isVerified": true,
+//   "jwtToken": "fake-jwt-token.eyJleHAiOjE2OTY2MDcwNTMsImlkIjoxfQ=="
+// }
+//
+
   login(loginUserData: LoginUser) {
     console.log('AuthService = LOGIN()', loginUserData)
     return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
       .pipe(map(account => {
+        console.log('login RESP = ', account)
+
         // this.accountSubject.next(account);
         // this.startRefreshTokenTimer();
         return account;

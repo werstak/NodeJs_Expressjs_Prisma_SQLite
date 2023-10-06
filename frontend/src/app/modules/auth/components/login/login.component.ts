@@ -55,7 +55,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy))
         .subscribe(resp => {
           this.loginResp = resp;
-          console.log('loginResp', this.loginResp)
+          console.log('LoginComponent Resp', this.loginResp)
           if (resp) {
             this.dataLoading = false;
             this.authService.account$.next(true);
