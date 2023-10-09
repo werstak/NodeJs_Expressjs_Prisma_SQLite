@@ -2,37 +2,38 @@ import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
 
 
-export function notFound(req, res, next) {
-    res.status(404);
-    const error = new Error(`🔍 - Not Found - ${req.originalUrl}`);
+export function notFound(request: Request, response: Response, next: any) {
+    response.status(404);
+    const error = new Error(`🔍 - Not Found - ${request.originalUrl}`);
     next(error);
 }
 
 /* eslint-disable no-unused-vars */
-export function errorHandler(err, req, res, next) {
+export function errorHandler(err: any, request: Request, response: Response, next: any) {
     /* eslint-enable no-unused-vars */
-    const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
-    res.status(statusCode);
-    res.json({
+    const statusCode = response.statusCode !== 200 ? response.statusCode : 500;
+    response.status(statusCode);
+    response.json({
         message: err.message,
         stack: process.env.NODE_ENV === 'production' ? '🥞' : err.stack
     });
 }
 
-export function isAuthenticated(req, res, next) {
-    const { authorization } = req.headers;
+export function isAuthenticated(request: any, response: Response, next: any) {
+    const { authorization } = request.headers;
 
     if (!authorization) {
-        res.status(401);
+        response.status(401);
         throw new Error('🚫 Un-Authorized 🚫');
     }
 
     try {
         const token = authorization.split(' ')[1];
-        const payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-        req.payload = payload;
-    } catch (err) {
-        res.status(401);
+        request.payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string);
+        console.log(1, 'isAuthenticated')
+
+    } catch (err: any) {
+        response.status(401);
         if (err.name === 'TokenExpiredError') {
             throw new Error(err.name);
         }

@@ -15,6 +15,7 @@ import { SnackBarMessageComponent } from './shared/components/snack-bar-message/
 import { NotificationService } from './shared/notification.service';
 import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialog-confirm.component';
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
 
 @NgModule({
@@ -37,6 +38,7 @@ import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
   providers: [
     NotificationService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

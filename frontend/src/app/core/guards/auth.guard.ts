@@ -14,9 +14,7 @@ export class AuthGuard implements CanActivate {
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-
-    const account = this.authService.accountValue;
-    // let account;
+    const account = this.authService.accountValue1;
 
     // this.authService.account.pipe(
     //   takeUntil(this.destroy))
@@ -25,7 +23,7 @@ export class AuthGuard implements CanActivate {
     //   });
 
 
-    console.log(111111, 'AuthGuard', account)
+    // console.log(1, 'AuthGuard', account)
 
 
     if (account) {

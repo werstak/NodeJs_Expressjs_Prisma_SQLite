@@ -99,9 +99,16 @@ authRouter.post(
 
             const jti: any = uuidv4();
             const {accessToken, refreshToken} = generateTokens(existingUser, jti);
+            const userInfo = {
+                id: existingUser.id,
+                firstName: existingUser.firstName,
+                lastName: existingUser.lastName,
+                email: existingUser.email,
+                role: existingUser.role
+            };
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
             return response.status(201).json({
-                existingUser,
+                userInfo,
                 accessToken,
                 refreshToken
             });
@@ -122,6 +129,8 @@ authRouter.post(
     '/refreshToken',
     async (request: Request, response: Response) => {
         try {
+
+            console.log(111111, 'refreshToken')
 
             const {refreshToken} = request.body;
 
@@ -167,6 +176,7 @@ authRouter.post(
     '/revokeRefreshTokens',
     async (request: Request, response: Response) => {
         try {
+            console.log(222222, 'revokeRefreshTokens')
             const {userId} = request.body;
             await AuthUserHandler.revokeTokens(userId);
             return response.status(201).json({message: `Tokens revoked for user with id #${userId}`});

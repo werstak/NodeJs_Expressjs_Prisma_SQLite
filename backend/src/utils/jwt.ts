@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 export function generateAccessToken (user: any) {
     const accessSecret = process.env.JWT_ACCESS_SECRET as string;
     return jwt.sign({ userId: user.id }, accessSecret, {
-        expiresIn: '5m',
+        expiresIn: '20m',
     });
 }
 
@@ -20,6 +20,7 @@ export function generateRefreshToken (user: any, jti: any) {
 }
 
 export function generateTokens (user: any, jti: any){
+    console.log(555555, 'generateTokens')
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user, jti);
     return {

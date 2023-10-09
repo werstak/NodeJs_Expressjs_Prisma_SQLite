@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
       .subscribe(resp => {
 
         this.account = resp;
-        console.log(2222222, 'AppComponent', this.account)
+        // console.log(2222222, 'AppComponent', this.account)
       });
   }
 
@@ -51,7 +51,8 @@ export class AppComponent implements OnInit {
 
   logout(): void {
     this.authService.account$.next(false);
-    this.router.navigate(['/auth/login']);
+    this.authService.logout();
+    // this.router.navigate(['/auth/login']);
   }
 
   ngOnDestroy(): void {

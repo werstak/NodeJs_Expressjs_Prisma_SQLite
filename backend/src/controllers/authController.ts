@@ -14,7 +14,7 @@ export const findUserByEmail = async (email: string): Promise<any | null> => {
 
 
 export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: any): Promise<any | null> => {
-    console.log(101010100, 'jti', jti)
+    console.log(666666666, 'jti', jti)
     console.log(101010100, 'refreshToken', refreshToken)
     console.log(101010100, 'userId', userId)
     return db.refreshToken.create({
@@ -29,6 +29,7 @@ export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: 
 
 
 export const findRefreshTokenById = async (id: any): Promise<any | null> => {
+    console.log(2222, 'findRefreshTokenById', id)
     return db.refreshToken.findUnique({
         where: {
             id,
@@ -38,6 +39,7 @@ export const findRefreshTokenById = async (id: any): Promise<any | null> => {
 
 
 export const deleteRefreshToken = async (id: any): Promise<any | null> => {
+    console.log(44444444, 'deleteRefreshToken', id)
     return db.refreshToken.update({
         where: {
             id,
@@ -50,6 +52,7 @@ export const deleteRefreshToken = async (id: any): Promise<any | null> => {
 
 
 export const revokeTokens = async (userId: any): Promise<any | null> => {
+    console.log(22, 'revokeTokens()', userId)
     return db.refreshToken.updateMany({
         where: {
             userId
