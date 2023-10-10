@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, ReplaySubject, takeUntil } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
-import { Account } from './core/models/account';
 import { AuthService } from './modules/auth/auth.service';
 import { Router } from '@angular/router';
+import { Auth } from './core/models/auth';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  // title = 'frontend';
+  account?: Auth | null;
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
     .pipe(
@@ -25,39 +25,32 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
   ) {
-    // this.authService.account$.subscribe(x => this.account = x);
-    // const account = this.authService.accountValue;
-    // this.account = true;
+    // this.authService.account.subscribe(x => this.account = x);
   }
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  public account?: boolean;
 
   ngOnInit() {
-    this.getAccount();
+    this.isAth();
   }
 
-  private getAccount() {
-    this.authService.account$.pipe(
+  private isAth() {
+    this.authService.account.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
-
         this.account = resp;
-        // console.log(2222222, 'AppComponent', this.account)
+        if (!this.account) {
+          this.router.navigate(['auth/login']);
+        }
       });
   }
 
-
-
   logout(): void {
-    this.authService.account$.next(false);
     this.authService.logout();
-    // this.router.navigate(['/auth/login']);
   }
 
   ngOnDestroy(): void {
     this.destroy.next(null);
     this.destroy.complete();
   }
-
 }

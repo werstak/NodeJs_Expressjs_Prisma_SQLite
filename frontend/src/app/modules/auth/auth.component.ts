@@ -13,9 +13,6 @@ export class AuthComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService
   ) {
-    // if (this.authService.accountValue) {
-    //   this.router.navigate(['/']);
-    // }
   }
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
@@ -27,14 +24,10 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   private getAccount() {
-    this.authService.account$.pipe(
-      takeUntil(this.destroy))
-      .subscribe(resp => {
-        this.account = resp;
-        if (this.account) {
-          this.router.navigate(['/']);
-        }
-      });
+
+    if (this.authService.accountValue1) {
+      this.router.navigate(['/']);
+    }
   }
 
   ngOnDestroy(): void {

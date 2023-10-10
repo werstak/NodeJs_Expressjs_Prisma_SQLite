@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, ReplaySubject, startWith, Subscription, takeUntil } from 'rxjs';
 import { ROLES } from '../../../../shared/constants/roles';
@@ -8,6 +8,7 @@ import { CountriesModel } from '../../../../core/models/countriesModel';
 import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AuthService } from '../../auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -19,6 +20,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
+    private router: Router,
     private authService: AuthService
   ) {
   }
@@ -96,34 +98,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  // private initRegFormValue() {
-  //   this.dataLoading = true;
-  //
-  //   const id: number = this.data.id;
-  //   this.subUser = this.usersService.getUser(id).subscribe(data => {
-  //     if (data) {
-  //       this.dataLoading = false;
-  //     }
-  //     this.currentUser = data;
-  //     this.previousImageUrl = data.avatar;
-  //     this.avatarUrl = data.avatar;
-  //
-  //     console.log('getUser() = currentUser ', this.currentUser)
-  //
-  //     this.registerForm.setValue({
-  //       email: data.email,
-  //       firstName: data.firstName,
-  //       lastName: data.lastName,
-  //       role: data.role,
-  //       location: data.location,
-  //       status: data.status,
-  //       password: data.password,
-  //       birthAt: data.birthAt,
-  //     });
-  //     this.store.dispatch(new SetSelectedUser(data));
-  //   });
-  // }
-
   private autocompleteCountries() {
     this.filteredCountries = this.registerForm.controls['location'].valueChanges.pipe(
       startWith(''),
@@ -138,18 +112,17 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onSubmitNewUser(): void {
     this.dataLoading = true;
-
     if (this.registerForm.valid) {
       const registerUserData = this.registerForm.value;
-      console.log(1, 'registerUserData', registerUserData)
-
       this.authService.register(registerUserData).pipe(
         takeUntil(this.destroy))
         .subscribe(resp => {
           this.registerUserResp = resp;
-          console.log('registerUserResp', this.registerUserResp)
           if (resp) {
-            this.authService.account$.next(true);
+            setTimeout(() => {
+              this.router.navigate(['/auth/login']);
+            }, 1000);
+
             this.dataLoading = false;
           }
         });
@@ -160,10 +133,5 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.subUser?.unsubscribe();
     this.destroy.next(null);
     this.destroy.complete();
-  }
-
-
-  closeClick() {
-
   }
 }

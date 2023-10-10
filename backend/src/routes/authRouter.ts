@@ -11,7 +11,6 @@ import * as UserHandler from '../controllers/users.conroller';
 import { generateTokens } from '../utils/jwt';
 import { hashToken } from '../utils/hashToken';
 
-
 export interface RefreshToken {
     userId: number
     jti: string
@@ -49,12 +48,6 @@ authRouter.post(
 
             const jti: any = uuidv4();
             const {accessToken, refreshToken} = generateTokens(createdUser.newUser, jti);
-            // const { accessToken, refreshToken } = await GenerateJWT.generateTokens(newUser, jti);
-
-            // console.log(8888888, 'accessToken, refreshToken', accessToken, refreshToken)
-            // console.log(4545454545, 'createdUser', createdUser.newUser)
-            // console.log(5656565656, 'userId', userId)
-
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
 
             return response.status(201).json({
@@ -82,10 +75,11 @@ authRouter.post(
     async (request: Request, response: Response) => {
         try {
             const {email, password} = request.body.loginUserData;
+            // const {oldRefreshToken} = request.body.refreshToken;
+
             if (!email || !password) {
                 return response.status(400).json({message: `You must provide an email and a password`})
             }
-
             const existingUser = await AuthUserHandler.findUserByEmail(email);
             const userId = existingUser.id;
             if (!existingUser) {
@@ -96,6 +90,22 @@ authRouter.post(
             if (!validPassword) {
                 return response.status(400).json({message: `Incorrect password entered`})
             }
+
+
+
+
+            // if (!oldRefreshToken) {
+            //     return response.status(400).json({message: `Missing refresh token.`})
+            // }
+            // const payload: JwtPayload | any = jwt.verify(oldRefreshToken, process.env.JWT_REFRESH_SECRET as string);
+            // const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
+            //
+            // if (!savedRefreshToken) {
+            //     return response.status(401).json({message: `Unauthorized`})
+            // }
+            // await AuthUserHandler.revokeTokens(savedRefreshToken.id);
+
+
 
             const jti: any = uuidv4();
             const {accessToken, refreshToken} = generateTokens(existingUser, jti);
@@ -112,9 +122,6 @@ authRouter.post(
                 accessToken,
                 refreshToken
             });
-
-            // const token = generateAccessToken(existingUser.id, existingUser.email)
-            // return response.status(201).json({token})
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -129,9 +136,6 @@ authRouter.post(
     '/refreshToken',
     async (request: Request, response: Response) => {
         try {
-
-            console.log(111111, 'refreshToken')
-
             const {refreshToken} = request.body;
 
             if (!refreshToken) {
@@ -140,7 +144,7 @@ authRouter.post(
             const payload: JwtPayload | any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
             const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
 
-            if (!savedRefreshToken || savedRefreshToken.revoked === true) {
+            if (!savedRefreshToken) {
                 return response.status(401).json({message: `Unauthorized`})
             }
 
@@ -154,7 +158,8 @@ authRouter.post(
                 return response.status(401).json({message: `Unauthorized`})
             }
 
-            await AuthUserHandler.deleteRefreshToken(savedRefreshToken.id);
+            await AuthUserHandler.revokeTokens(savedRefreshToken.id);
+            // await AuthUserHandler.deleteRefreshToken(savedRefreshToken.id);
             const jti: any = uuidv4();
             const {accessToken, refreshToken: newRefreshToken} = generateTokens(user, jti);
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken: newRefreshToken, userId: user.id});
@@ -177,11 +182,37 @@ authRouter.post(
     async (request: Request, response: Response) => {
         try {
             console.log(222222, 'revokeRefreshTokens')
-            const {userId} = request.body;
-            await AuthUserHandler.revokeTokens(userId);
-            return response.status(201).json({message: `Tokens revoked for user with id #${userId}`});
+            const {refreshToken} = request.body;
+
+            if (!refreshToken) {
+                return response.status(400).json({message: `Missing refresh token.`})
+            }
+            const payload: JwtPayload | any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
+            const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
+
+            if (!savedRefreshToken) {
+                return response.status(401).json({message: `Unauthorized`})
+            }
+
+            await AuthUserHandler.revokeTokens(savedRefreshToken.id);
+            return response.status(201).json({message: `Tokens revoked for user`});
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
     }
 );
+
+
+// authRouter.post(
+//     '/revokeRefreshTokens',
+//     async (request: Request, response: Response) => {
+//         try {
+//             console.log(222222, 'revokeRefreshTokens')
+//             const {userId} = request.body;
+//             await AuthUserHandler.revokeTokens(userId);
+//             return response.status(201).json({message: `Tokens revoked for user with id #${userId}`});
+//         } catch (error: any) {
+//             return response.status(500).json(error.message);
+//         }
+//     }
+// );

@@ -7,5 +7,5 @@ export class RegisterUser {
   password: string;
   confirmPassword: string;
   birthAt: string
-  status: '';
+  status?: '';
 }

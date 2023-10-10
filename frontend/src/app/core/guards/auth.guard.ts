@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 import { AuthService } from '../../modules/auth/auth.service';
-import { ReplaySubject, takeUntil } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
@@ -15,17 +15,6 @@ export class AuthGuard implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     const account = this.authService.accountValue1;
-
-    // this.authService.account.pipe(
-    //   takeUntil(this.destroy))
-    //   .subscribe(resp => {
-    //     account = resp;
-    //   });
-
-
-    // console.log(1, 'AuthGuard', account)
-
-
     if (account) {
       // check if route is restricted by role
       // if (route.data.roles && !route.data.roles.includes(account.role)) {

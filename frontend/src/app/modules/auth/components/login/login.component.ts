@@ -2,7 +2,9 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ReplaySubject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../auth.service';
-import { LoginUser } from '../../../../core/models/login-user';
+import { NotificationService } from '../../../../shared/notification.service';
+import * as _ from 'lodash';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +14,10 @@ import { LoginUser } from '../../../../core/models/login-user';
 export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router,
+    private notificationService: NotificationService,
   ) {
   }
 
@@ -49,18 +54,29 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     if (this.authForm.valid) {
       const loginUserData = this.authForm.value;
-      // console.log(1, 'loginUserData', loginUserData)
 
       this.authService.login(loginUserData).pipe(
         takeUntil(this.destroy))
         .subscribe(resp => {
-          this.loginResp = resp;
-          // console.log('LoginComponent Resp', this.loginResp)
-          if (resp) {
+            this.loginResp = resp;
+            if (resp) {
+              this.dataLoading = false;
+              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+              this.router.navigateByUrl(returnUrl);
+
+              // this.authService.account$.next(true);
+            }
+          },
+          (error) => {
             this.dataLoading = false;
-            this.authService.account$.next(true);
-          }
-        });
+            console.error(error);
+            const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+            const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+            this.notificationService.showError(secondErrorAttempt);
+          });
+
+      // this.dataLoading = false;
+
     }
     // this.dataLoading = false;
     // this.authService.account$.next(true);

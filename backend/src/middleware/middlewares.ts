@@ -30,7 +30,7 @@ export function isAuthenticated(request: any, response: Response, next: any) {
     try {
         const token = authorization.split(' ')[1];
         request.payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET as string);
-        console.log(1, 'isAuthenticated')
+        console.log(1111111, 'isAuthenticated')
 
     } catch (err: any) {
         response.status(401);

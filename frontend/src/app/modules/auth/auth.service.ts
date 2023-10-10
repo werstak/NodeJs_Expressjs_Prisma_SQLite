@@ -22,7 +22,6 @@ export class AuthService {
   readonly ACCOUNT = 'account';
 
 
-
   constructor(
     private router: Router,
     private http: HttpClient
@@ -31,77 +30,50 @@ export class AuthService {
     this.account = this.accountSubject.asObservable();
   }
 
-  public account$ = new BehaviorSubject<boolean>(false);
-
-  public get accountValue() {
-    return this.account$.value;
-  }
-
   public get accountValue1() {
     return this.accountSubject.value;
   }
 
 
+  register(registerUserData: RegisterUser) {
+    console.log('AuthService = REGISTER()', registerUserData)
+    return this.http.post<any>(config.API_URL + `/auth/register/`, {registerUserData})
+      .pipe(map(account => {
+        const {accessToken, refreshToken} = account
+        this.setTokens(accessToken, refreshToken);
+        return account;
+      }));
+  }
 
-  /*
-    login(email: string, password: string)
-  */
-//
-// {
-//   "id": 1,
-//   "title": "Mr",
-//   "firstName": "Andrey",
-//   "lastName": "Petr",
-//   "email": "webproger1@gmail.com",
-//   "role": "Admin",
-//   "dateCreated": "2023-10-09T06:18:23.935Z",
-//   "isVerified": true,
-//   "jwtToken": "fake-jwt-token.eyJleHAiOjE2OTY4MzMzNTQsImlkIjoxfQ=="
-// }
-//
-
-
-/*
-  function authenticate()
-*/
-// {
-//   "title": "Mr",
-//   "firstName": "Andrey",
-//   "lastName": "Petr",
-//   "email": "webproger1@gmail.com",
-//   "password": "123456",
-//   "acceptTerms": true,
-//   "id": 1,
-//   "role": "Admin",
-//   "dateCreated": "2023-10-09T06:18:23.935Z",
-//   "verificationToken": "1696832303935",
-//   "isVerified": true,
-//   "refreshTokens": [
-//     "1696832454228"
-//   ]
-// }
 
   login(loginUserData: LoginUser) {
-    console.log('AuthService = LOGIN()', loginUserData)
+    console.log('AuthService = LOGIN()', loginUserData);
+    // const refreshToken = this.accountValue1;
+    // const refreshToken = localStorage.getItem('refresh_token');
+    // console.log(55555555555555, refreshToken)
+
     return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
       .pipe(map(account => {
 
         // console.log('login() RESP = ', account)
 
         const {accessToken, refreshToken, userInfo} = account
-        this.setTokens(accessToken, refreshToken, userInfo);
+        this.setTokens(accessToken, refreshToken);
+        this.setUser(userInfo);
 
         this.accountSubject.next(account);
-        this.startRefreshTokenTimer();
+        // this.startRefreshTokenTimer();
         return account;
       }));
   }
 
-  private setTokens(accessToken: string, refreshToken: string, userInfo: any): void {
-    localStorage.setItem(this.ACCOUNT, JSON.stringify(userInfo));
+  private setTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem(this.JWT_ACCESS_TOKEN_KEY, accessToken);
     localStorage.setItem(this.JWT_REFRESH_TOKEN_KEY, refreshToken);
+  }
 
+  private setUser(userInfo: any): void {
+    localStorage.setItem(this.ACCOUNT, JSON.stringify(userInfo));
   }
 
   refreshToken() {
@@ -111,7 +83,8 @@ export class AuthService {
       .pipe(map((account) => {
 
         const {accessToken, refreshToken, userInfo} = account
-        this.setTokens(accessToken, refreshToken, userInfo);
+        this.setTokens(accessToken, refreshToken);
+        this.setUser(userInfo);
 
         this.accountSubject.next(account);
         this.startRefreshTokenTimer();
@@ -119,62 +92,21 @@ export class AuthService {
       }));
   }
 
-  // login(loginUserData: LoginUser): Observable<any> {
-  //   return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
-  //     .pipe(
-  //       catchError(error => {
-  //         console.log('Error: ', error.message);
-  //         return throwError(error);
-  //       })
-  //     );
-  // }
-
-
-
-/*
-  localStorage.setItem
-*/
-// {
-//   "title": "Mr",
-//   "firstName": "webproger1@gmail.com",
-//   "lastName": "Petr",
-//   "email": "webproger1@gmail.com",
-//   "password": "123456",
-//   "acceptTerms": true,
-//   "id": 1,
-//   "role": "Admin",
-//   "dateCreated": "2023-10-09T07:56:43.691Z",
-//   "verificationToken": "1696838203691",
-//   "isVerified": false,
-//   "refreshTokens": []
-// }
-
-  register(registerUserData: RegisterUser) {
-    console.log('AuthService = REGISTER()', registerUserData)
-    return this.http.post<any>(config.API_URL + `/auth/register/`, {registerUserData})
-      .pipe(map(account => {
-        // this.accountSubject.next(account);
-        // this.startRefreshTokenTimer();
-        return account;
-      }));
-  }
 
   logout() {
-    const userId = this.accountValue1!.userInfo.id
-    this.http.post<any>(config.API_URL + `/auth/revokeRefreshTokens`, {userId}).subscribe();
-
-    // this.http.post<any>(`${baseUrl}/revoke-token`, {}, { withCredentials: true }).subscribe();
-    // this.stopRefreshTokenTimer();
+    // const userId = this.accountValue1!.userInfo.id
+    const refreshToken = this.accountValue1!.refreshToken;
+    this.http.post<any>(config.API_URL + `/auth/revokeRefreshTokens`, {refreshToken}).subscribe();
+    this.stopRefreshTokenTimer();
     this.accountSubject.next(null);
-    this.router.navigate(['/auth/login/']);
-    // this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    this.router.navigate(['/auth/login']);
   }
 
 
   private refreshTokenTimeout?: any;
 
   private startRefreshTokenTimer() {
-    console.log(11111, 'startRefreshTokenTimer')
+    // console.log(11111, 'startRefreshTokenTimer')
     // parse json object from base64 encoded jwt token
     const jwtBase64 = this.accountValue1!.accessToken!.split('.')[1];
     const jwtToken = JSON.parse(atob(jwtBase64));
