@@ -124,7 +124,7 @@ usersRouter.put(
             const user = JSON.parse(request.body.user_params);
             const imageOrUrl = JSON.parse(request.body.imageOrUrl);
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
-            const hashPassword = bcrypt.hashSync(user.password, 7);
+            // const hashPassword = bcrypt.hashSync(user.password, 7);
 
             let pathRemoveImage ='';
             if (previousImageUrl !== null) {
@@ -174,7 +174,7 @@ usersRouter.put(
             }
 
             user.avatar = fileUrl;
-            user.password = hashPassword;
+            // user.password = hashPassword;
             const updatedUser = await UserHandler.updateUserHandler(user, id);
             return response.status(200).json(updatedUser);
         } catch (error: any) {

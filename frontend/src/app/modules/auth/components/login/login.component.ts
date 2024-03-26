@@ -5,7 +5,7 @@ import { AuthService } from '../../auth.service';
 import { NotificationService } from '../../../../shared/notification.service';
 import * as _ from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
-
+import { AppRouteEnum } from '../../../../core/enums';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -21,6 +21,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
   authForm: FormGroup;

@@ -22,6 +22,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { AppRouteEnum } from '../../core/enums';
 
 
 const routes: Routes = [
@@ -29,7 +30,8 @@ const routes: Routes = [
     path: '', component: AuthComponent,
     children: [
       { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
+      // { path: 'register', component: RegisterComponent },
+      { path: AppRouteEnum.Registration, component: RegisterComponent },
       // { path: 'verify-email', component: VerifyEmailComponent },
       { path: 'forgot-password', component: ForgotPasswordComponent },
       { path: 'reset-password', component: ResetPasswordComponent }

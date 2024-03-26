@@ -10,6 +10,8 @@ import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { CountriesModel } from '../../../../core/models/countriesModel';
+import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { AppRouteEnum } from '../../../../core/enums';
 
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -31,6 +33,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   dataLoading: boolean = false;
+  AppRouteEnum = AppRouteEnum;
 
   private subUser: Subscription;
   roleList = ROLES;
@@ -53,6 +56,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.avatarImageDefault = defaultProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
+      this.addPasswordControls();
+      // this.userForm.addControl('new', new FormControl('', Validators.required));
+      // this.userForm.addControl('new', new FormControl<string | null>('', Validators.required));
+
       this.userForm.patchValue({
         status: true
       });
@@ -85,14 +92,32 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       ],
       location: [null, Validators.compose([
         Validators.required])],
+      // password: [null, Validators.compose([
+      //   Validators.required,
+      //   Validators.minLength(3),
+      //   Validators.maxLength(50)])
+      // ],
+      birthAt: [null, Validators.compose([
+        Validators.required])],
+      status: '',
+    });
+  }
+
+  addPasswordControls(): void {
+    this.userForm = this.fb.group({
+      ...this.userForm.controls,
       password: [null, Validators.compose([
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
-      birthAt: [null, Validators.compose([
-        Validators.required])],
-      status: '',
+      confirmPassword: [null, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)])
+      ]
+    }, {
+      validator: MustMatch('password', 'confirmPassword')
     });
   }
 
@@ -117,7 +142,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         role: data.role,
         location: data.location,
         status: data.status,
-        password: data.password,
+        // password: data.password,
         birthAt: data.birthAt,
       });
       this.store.dispatch(new SetSelectedUser(data));
@@ -222,7 +247,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const params: any = {
       id: id,
       email: this.userForm.value.email,
-      password: this.userForm.value.password,
+      // password: this.userForm.value.password,
       firstName: this.userForm.value.firstName,
       lastName: this.userForm.value.lastName,
       role: Number(this.userForm.value.role),

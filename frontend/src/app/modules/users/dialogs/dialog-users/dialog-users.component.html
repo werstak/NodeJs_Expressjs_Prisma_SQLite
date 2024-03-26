@@ -97,21 +97,64 @@
       </mat-form-field>
 
 
-      <mat-form-field color="accent" class="example-full-width">
-        <mat-label>Password</mat-label>
-        <input type="password" matInput #password class="form-control" placeholder="Password"
-               formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
-               name="password"
-               maxlength="50" required>
-        <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
-                [attr.aria-pressed]="hide">
-          <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
-        </button>
-        <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
-        <mat-error *ngIf="userForm.controls['password'].hasError('required')">
-          Password <strong>required</strong>
-        </mat-error>
-      </mat-form-field>
+<!--      <mat-form-field color="accent" class="example-full-width">-->
+<!--        <mat-label>Password</mat-label>-->
+<!--        <input type="password" matInput #password class="form-control" placeholder="Password"-->
+<!--               formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"-->
+<!--               name="password"-->
+<!--               maxlength="50" required>-->
+<!--        <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"-->
+<!--                [attr.aria-pressed]="hide">-->
+<!--          <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>-->
+<!--        </button>-->
+<!--        <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>-->
+<!--        <mat-error *ngIf="userForm.controls['password'].hasError('required')">-->
+<!--          Password <strong>required</strong>-->
+<!--        </mat-error>-->
+<!--      </mat-form-field>-->
+
+
+      <ng-container *ngIf="data.newUser">
+
+        <mat-form-field color="accent" class="example-full-width">
+          <mat-label>Password</mat-label>
+          <input type="password" matInput #password class="form-control" placeholder="Password"
+                 formControlName="password" autocomplete="off" [type]="hide ? 'password' : 'text'"
+                 name="password"
+                 maxlength="50" required>
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hide">
+            <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-hint align="end">{{password.value.length || 0}}/50</mat-hint>
+          <mat-error *ngIf="userForm.controls['password'].hasError('required')">
+            Password <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field
+          color="accent" class="example-full-width">
+          <mat-label>Confirm Password</mat-label>
+          <input type="password" matInput #confirmPassword class="form-control" placeholder="Password"
+                 formControlName="confirmPassword" autocomplete="off" [type]="hide ? 'password' : 'text'"
+                 name="confirmPassword"
+                 maxlength="50" required>
+          <button mat-icon-button matSuffix type="button" (click)="hide = !hide" [attr.aria-label]="'Hide password'"
+                  [attr.aria-pressed]="hide">
+            <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+
+          <mat-hint align="end">{{confirmPassword.value.length || 0}}/50</mat-hint>
+          <mat-error *ngIf="userForm.controls['confirmPassword'].hasError('required')">
+            Confirm Password <strong>required</strong>
+          </mat-error>
+
+          <mat-error *ngIf="userForm.controls['confirmPassword'].hasError('mustMatch')">
+            Passwords must match <strong>required</strong>
+          </mat-error>
+        </mat-form-field>
+
+      </ng-container>
 
 
       <mat-form-field color="accent" class="example-full-width">
@@ -125,10 +168,15 @@
         </mat-error>
       </mat-form-field>
 
-      <p>
+      <p class="dialog__actions">
         <mat-checkbox formControlName="status">Status
           - {{ userForm.value.status == true ? 'Active' : 'Deactivated' }}
         </mat-checkbox>
+
+        <a *ngIf="!data.newUser" class="login__link"
+           [routerLink]="[AppRouteEnum.Auth + '/' + AppRouteEnum.ResetPassword]">
+          <span>Change password</span>
+        </a>
       </p>
 
     </div>

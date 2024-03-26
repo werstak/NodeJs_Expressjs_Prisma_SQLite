@@ -130,7 +130,7 @@ export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
+    const {firstName, lastName, email, role, avatar, status, birthAt, location} = user;
 
     return db.user.update({
         where: {
@@ -140,7 +140,6 @@ export const updateUserHandler = async (
             firstName,
             lastName,
             email,
-            password,
             role,
             avatar,
             status,
@@ -163,6 +162,46 @@ export const updateUserHandler = async (
         },
     });
 };
+
+
+
+// export const updateUserHandler = async (
+//     user: Omit<any, 'id'>,
+//     id: number
+// ): Promise<any> => {
+//     const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
+//
+//     return db.user.update({
+//         where: {
+//             id,
+//         },
+//         data: {
+//             firstName,
+//             lastName,
+//             email,
+//             password,
+//             role,
+//             avatar,
+//             status,
+//             birthAt,
+//             location
+//         },
+//         select: {
+//             id: true,
+//             firstName: true,
+//             lastName: true,
+//             email: true,
+//             createdAt: true,
+//             updatedAt: true,
+//             role: true,
+//             avatar: true,
+//             posts: true,
+//             status: true,
+//             birthAt: true,
+//             location: true
+//         },
+//     });
+// };
 
 export const deleteUserHandler = async (id: number): Promise<void> => {
     await db.user.delete({

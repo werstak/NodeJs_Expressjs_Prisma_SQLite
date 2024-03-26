@@ -85,6 +85,7 @@
                   [attr.aria-pressed]="hide">
             <mat-icon class="password-icon">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
+
           <mat-hint align="end">{{confirmPassword.value.length || 0}}/50</mat-hint>
           <mat-error *ngIf="registerForm.controls['confirmPassword'].hasError('required')">
             Confirm Password <strong>required</strong>
