@@ -1,17 +1,20 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
+import { AddUser, DeleteUser, SetSelectedUser, UpdateUser, UpdateUserPassword } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { CountriesModel } from '../../../../core/models/countriesModel';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AppRouteEnum } from '../../../../core/enums';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
+import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
+import { UpdateCategory } from '../../../posts/store-posts/posts.action';
 
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -28,7 +31,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     public dialogRef: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public usersService: UsersService
+    public usersService: UsersService,
+    public dialog: MatDialog
   ) {
   }
 
@@ -259,6 +263,51 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
+  openDialogChangePassword(currentUser: UserModel) {
+    console.log('openDialogChangePassword - currentUser', currentUser)
+    let {id} = currentUser;
+
+    let password = '111222333';
+
+    // const params = {
+    //   password
+    // }
+
+    const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
+      data: {
+        // subtitle: firstName,
+        userId: id,
+        title: 'Change Password',
+        okText: '1 Submit',
+        cancelText: '1 Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Change Password - afterClosed', result)
+
+      if (result === true) {
+
+        console.log('afterClosed', id, password)
+
+        // this.store.dispatch(new UpdateUserPassword(id, password));
+
+        // const {id} = this.selectedCategory;
+        // const params = {
+        //   name: this.categoryName
+        // }
+        // this.store.dispatch(new UpdateCategory(id, params));
+        // this.visibilityFields = false;
+        // return this.category.patchValue('');
+
+      } else {
+        return
+      }
+    });
+  }
+
+
+
   closeClick(): void {
     this.dialogRef.close();
   }
@@ -267,5 +316,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.subUser?.unsubscribe();
     this.dialogRef.close();
   }
+
+
 }
 

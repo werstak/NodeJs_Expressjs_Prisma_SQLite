@@ -203,6 +203,32 @@ export const updateUserHandler = async (
 //     });
 // };
 
+
+
+export const updateUserPasswordHandler = async (
+    userPassword: Omit<any, 'id'>,
+    id: number
+): Promise<any> => {
+    const {password} = userPassword;
+    return db.user.update({
+        where: {
+            id,
+        },
+        data: {
+            password,
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            status: true,
+            password: true,
+        },
+    });
+};
+
 export const deleteUserHandler = async (id: number): Promise<void> => {
     await db.user.delete({
         where: {

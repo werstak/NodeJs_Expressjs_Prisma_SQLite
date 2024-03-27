@@ -174,7 +174,7 @@
         </mat-checkbox>
 
         <a *ngIf="!data.newUser" class="login__link"
-           [routerLink]="[AppRouteEnum.Auth + '/' + AppRouteEnum.ResetPassword]">
+           (click)="openDialogChangePassword(currentUser)">
           <span>Change password</span>
         </a>
       </p>

@@ -6,6 +6,7 @@ import fs from 'fs';
 import bcrypt from 'bcrypt';
 import db from '../utils/db';
 import { isAuthenticated } from '../middleware/middlewares';
+
 const path = require('path');
 
 export const usersRouter = express.Router();
@@ -126,11 +127,11 @@ usersRouter.put(
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
             // const hashPassword = bcrypt.hashSync(user.password, 7);
 
-            let pathRemoveImage ='';
+            let pathRemoveImage = '';
             if (previousImageUrl !== null) {
                 pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
             } else {
-                pathRemoveImage ='';
+                pathRemoveImage = '';
             }
             // const pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
 
@@ -177,6 +178,35 @@ usersRouter.put(
             // user.password = hashPassword;
             const updatedUser = await UserHandler.updateUserHandler(user, id);
             return response.status(200).json(updatedUser);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ PUT: Updating Password USER
+ */
+usersRouter.put(
+    '/update_password/:id',
+    // body("firstName").isString(),
+    // body("lastName").isString(),
+    // body("email").isString(),
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+
+        if (!errors.isEmpty()) {
+            return response.status(400).json({errors: errors.array()});
+        }
+        const id: number = parseInt(request.params.id, 10);
+        try {
+            console.log('Root PUT - Updating Password USER = ', request.body);
+
+            const hashPassword = bcrypt.hashSync(request.body.password, 7);
+            const newUserPassword: any = {password: hashPassword};
+            const updatedUserPassword = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
+            return response.status(200).json(updatedUserPassword);
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

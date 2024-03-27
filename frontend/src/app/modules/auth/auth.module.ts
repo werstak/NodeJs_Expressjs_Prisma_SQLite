@@ -23,6 +23,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 import { AppRouteEnum } from '../../core/enums';
+import { SharedModule } from '../../shared/shared.module';
 
 
 const routes: Routes = [
@@ -56,7 +57,6 @@ const routes: Routes = [
     MatIconModule,
     ReactiveFormsModule,
     MatFormFieldModule,
-    MatCardModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
     MatAutocompleteModule,
@@ -66,7 +66,8 @@ const routes: Routes = [
     MatNativeDateModule,
     MatTooltipModule,
     MatSnackBarModule,
-    RouterModule.forChild(routes),
+    SharedModule,
+    RouterModule.forChild(routes)
     // NgxsModule.forFeature([AuthState])
   ]
 })

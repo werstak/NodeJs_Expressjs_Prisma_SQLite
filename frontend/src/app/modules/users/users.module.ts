@@ -28,6 +28,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { DialogNewPasswordComponent } from './dialogs/dialog-new-password/dialog-new-password.component';
 
 const routes: Routes = [
   {
@@ -41,7 +42,8 @@ const routes: Routes = [
     UsersComponent,
     UsersTableComponent,
     DialogUsersComponent,
-    UsersFilterPanelComponent
+    UsersFilterPanelComponent,
+    DialogNewPasswordComponent
   ],
   imports: [
     CommonModule,

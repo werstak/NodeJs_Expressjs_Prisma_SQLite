@@ -5,6 +5,7 @@ import { UserModel } from '../../core/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as config from '../../../app-config';
 import { UserParamsModel } from '../../core/models/user-params.model';
+import { CategoriesModel } from '../../core/models/categories.model';
 
 
 @Injectable({
@@ -61,6 +62,20 @@ export class UsersService {
     uploadData.append('previousImageUrl', JSON.stringify(previousImageUrl));
     return this.http.put(config.API_URL + `/users/` + id, uploadData);
   }
+
+  updateUserPassword(id: number, params: any): Observable<any> {
+    return this.http.put(config.API_URL + `/users/update_password/` + id, params);
+  }
+
+  // updatePasswordUser(id: number, password: string): Observable<any> {
+  //   return this.http.put(config.API_URL + `/users/update_password`);
+  //     .pipe(
+  //       catchError(error => {
+  //         console.log('Error: ', error.message);
+  //         return throwError(error);
+  //       })
+  //     );
+  // }
 
   addUser(params: UserModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
