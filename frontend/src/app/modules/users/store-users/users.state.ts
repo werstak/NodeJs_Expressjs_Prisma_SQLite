@@ -109,14 +109,7 @@ export class UsersState {
   }: UpdateUserPassword) {
     return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
         this.notificationService.showSuccess('User password updated successfully');
-        // const state = getState();
-        // const usersList = [...state.users];
-        // const postIndex = usersList.findIndex(item => item.id === id);
-        // usersList[postIndex] = result;
-        // setState({
-        //   ...state,
-        //   users: usersList,
-        // });
+        console.log(result);
       },
       (error) => {
         console.error(error);

@@ -173,7 +173,7 @@
           - {{ userForm.value.status == true ? 'Active' : 'Deactivated' }}
         </mat-checkbox>
 
-        <a *ngIf="!data.newUser" class="login__link"
+        <a *ngIf="!data.newUser" class="dialog__link"
            (click)="openDialogChangePassword(currentUser)">
           <span>Change password</span>
         </a>

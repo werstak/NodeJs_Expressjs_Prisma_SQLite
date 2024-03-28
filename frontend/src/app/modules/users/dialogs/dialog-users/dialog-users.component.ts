@@ -28,7 +28,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   constructor(
     public store: Store,
-    public dialogRef: MatDialogRef<DialogUsersComponent>,
+    public dialogRefUsersComponent: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public usersService: UsersService,
@@ -265,21 +265,13 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   openDialogChangePassword(currentUser: UserModel) {
     console.log('openDialogChangePassword - currentUser', currentUser)
-    let {id} = currentUser;
-
-    let password = '111222333';
-
-    // const params = {
-    //   password
-    // }
-
+    const {id} = currentUser;
     const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
       data: {
-        // subtitle: firstName,
         userId: id,
         title: 'Change Password',
-        okText: '1 Submit',
-        cancelText: '1 Cancel'
+        okText: 'Submit',
+        cancelText: 'Cancel'
       }
     });
 
@@ -288,10 +280,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
       if (result === true) {
 
-        console.log('afterClosed', id, password)
-
         // this.store.dispatch(new UpdateUserPassword(id, password));
-
         // const {id} = this.selectedCategory;
         // const params = {
         //   name: this.categoryName
@@ -304,17 +293,18 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         return
       }
     });
+
   }
 
 
 
   closeClick(): void {
-    this.dialogRef.close();
+    this.dialogRefUsersComponent.close();
   }
 
   ngOnDestroy(): void {
     this.subUser?.unsubscribe();
-    this.dialogRef.close();
+    this.dialogRefUsersComponent.close();
   }
 
 

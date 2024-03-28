@@ -223,8 +223,7 @@ export const updateUserPasswordHandler = async (
             lastName: true,
             email: true,
             role: true,
-            status: true,
-            password: true,
+            status: true
         },
     });
 };

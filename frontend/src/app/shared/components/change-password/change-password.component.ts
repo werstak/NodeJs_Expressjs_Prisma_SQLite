@@ -1,25 +1,30 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../modules/auth/auth.service';
 import { ReplaySubject } from 'rxjs';
 import { MustMatch } from '../../../core/helpers/must-match.validator';
 import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
 import { Store } from '@ngxs/store';
+import { MatDialogRef } from '@angular/material/dialog';
+import { DialogNewPasswordComponent } from '../../../modules/users/dialogs/dialog-new-password/dialog-new-password.component';
 
 @Component({
   selector: 'app-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.scss']
 })
-export class ChangePasswordComponent implements OnInit, OnDestroy{
+export class ChangePasswordComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     public store: Store,
-    private authService: AuthService
+    private authService: AuthService,
+    // public dialogRefNewPasswordComponent: MatDialogRef<DialogNewPasswordComponent>,
   ) {
   }
 
-  @Input() userId: string;
+
+  @Input() userId: number | undefined;
+  @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
@@ -51,25 +56,30 @@ export class ChangePasswordComponent implements OnInit, OnDestroy{
 
   onSubmitChangePassword(): void {
     if (this.changePasswordForm.valid) {
+
       this.dataLoading = true;
-      console.log('onSubmitChangePassword password', this.changePasswordForm.value.password)
-      console.log('onSubmitChangePassword userId', this.userId)
+      // console.log('onSubmitChangePassword password', this.changePasswordForm.value.password)
+      // console.log('onSubmitChangePassword userId', this.userId)
       const id = this.userId;
-      // let password = this.changePasswordForm.value.password;
       const params = {
         password: this.changePasswordForm.value.password
       }
-
       this.store.dispatch(new UpdateUserPassword(id, params));
-
-      // this.someFunction();
       this.dataLoading = false;
+      this.closeClick();
+    } else {
+      return;
     }
+  }
+
+  closeClick(): void {
+    this.closeDialogDialogNewPassword.emit();
   }
 
   ngOnDestroy(): void {
     this.destroy.next(null);
     this.destroy.complete();
   }
+
 
 }
