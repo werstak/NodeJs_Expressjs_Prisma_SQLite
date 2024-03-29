@@ -6,6 +6,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import * as config from '../../../app-config';
 import { UserParamsModel } from '../../core/models/user-params.model';
 import { CategoriesModel } from '../../core/models/categories.model';
+import { LoginUser } from '../../core/models/login-user';
+import { map } from 'rxjs/operators';
 
 
 @Injectable({
@@ -62,6 +64,7 @@ export class UsersService {
     uploadData.append('previousImageUrl', JSON.stringify(previousImageUrl));
     return this.http.put(config.API_URL + `/users/` + id, uploadData);
   }
+
 
   updateUserPassword(id: number, params: any): Observable<any> {
     return this.http.put(config.API_URL + `/users/update_password/` + id, params);

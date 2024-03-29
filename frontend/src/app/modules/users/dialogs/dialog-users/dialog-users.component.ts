@@ -56,7 +56,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.buildForm();
-    console.log('DIALOG  data', this.data)
+    console.log('ngOnInit DialogUsers data', this.data)
     this.avatarImageDefault = defaultProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
@@ -263,12 +263,13 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
-  openDialogChangePassword(currentUser: UserModel) {
-    console.log('openDialogChangePassword - currentUser', currentUser)
-    const {id} = currentUser;
+  openDialogNewPassword(currentUser: UserModel) {
+    console.log('openDialogNewPassword - currentUser', currentUser)
+    const {id, email} = currentUser;
     const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
       data: {
         userId: id,
+        email,
         title: 'Change Password',
         okText: 'Submit',
         cancelText: 'Cancel'
@@ -276,26 +277,15 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('Change Password - afterClosed', result)
+      console.log('Change Password - afterClosed', result);
 
       if (result === true) {
-
-        // this.store.dispatch(new UpdateUserPassword(id, password));
-        // const {id} = this.selectedCategory;
-        // const params = {
-        //   name: this.categoryName
-        // }
-        // this.store.dispatch(new UpdateCategory(id, params));
-        // this.visibilityFields = false;
-        // return this.category.patchValue('');
-
       } else {
         return
       }
     });
 
   }
-
 
 
   closeClick(): void {

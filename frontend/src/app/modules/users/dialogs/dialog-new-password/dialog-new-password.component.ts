@@ -13,11 +13,9 @@ export class DialogNewPasswordComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: DialogNewPasswordModel
   ) {
   }
-  // userId: string;
 
   ngOnInit() {
-    // this.userId = this.data.userId;
-    // console.log('DialogNewPasswordComponent - ngOnInit - userId = ', this.data.userId)
+    console.log('ngOnInit DialogNewPasswordComponent - data = ', this.data)
   }
 
   closeClick() {

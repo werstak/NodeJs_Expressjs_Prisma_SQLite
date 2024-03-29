@@ -92,8 +92,6 @@ authRouter.post(
             }
 
 
-
-
             // if (!oldRefreshToken) {
             //     return response.status(400).json({message: `Missing refresh token.`})
             // }
@@ -104,7 +102,6 @@ authRouter.post(
             //     return response.status(401).json({message: `Unauthorized`})
             // }
             // await AuthUserHandler.revokeTokens(savedRefreshToken.id);
-
 
 
             const jti: any = uuidv4();
@@ -122,6 +119,42 @@ authRouter.post(
                 accessToken,
                 refreshToken
             });
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ GET: Valid Password
+ */
+authRouter.post(
+    '/valid_password',
+    async (request: Request, response: Response) => {
+
+        try {
+            const {email, password} = request.body.validPasswordData;
+
+            if (!email || !password) {
+                return response.status(400).json({message: `You must provide an email and a password`})
+            }
+
+            const existingUser = await AuthUserHandler.findUserByEmail(email);
+            if (!existingUser) {
+                return response.status(400).json({message: `User ${email} not found`})
+            }
+
+            const validPassword = bcrypt.compareSync(password, existingUser.password)
+            if (!validPassword) {
+                return response.status(201).json({
+                    validPassword
+                });
+            } else if (validPassword) {
+                return response.status(201).json({
+                    validPassword
+                });
+            }
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

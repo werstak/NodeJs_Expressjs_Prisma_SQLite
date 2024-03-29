@@ -121,5 +121,19 @@ export class AuthService {
     clearTimeout(this.refreshTokenTimeout);
   }
 
+  /**
+   this request is executed to check whether the user has such a password before launching the password replacement function
+   */
+  getValidPassword(validPasswordData: LoginUser) {
+    console.log('UsersService = getValidPassword()', validPasswordData);
+    return this.http.post(config.API_URL + `/auth/valid_password/`, {validPasswordData})
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
 
 }

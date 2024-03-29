@@ -1,12 +1,17 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../modules/auth/auth.service';
-import { ReplaySubject } from 'rxjs';
+import { debounceTime, ReplaySubject, takeUntil } from 'rxjs';
 import { MustMatch } from '../../../core/helpers/must-match.validator';
 import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
 import { Store } from '@ngxs/store';
-import { MatDialogRef } from '@angular/material/dialog';
-import { DialogNewPasswordComponent } from '../../../modules/users/dialogs/dialog-new-password/dialog-new-password.component';
+import { DialogNewPasswordModel } from '../../../core/models/dialog-new-password.model';
+import { UsersService } from '../../../modules/users/users.service';
+
+
+interface ValidPassword {
+  validPassword: boolean;
+}
 
 @Component({
   selector: 'app-change-password',
@@ -17,29 +22,40 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     public store: Store,
+    public usersService: UsersService,
     private authService: AuthService,
     // public dialogRefNewPasswordComponent: MatDialogRef<DialogNewPasswordComponent>,
   ) {
   }
 
 
-  @Input() userId: number | undefined;
+  @Input() userData: DialogNewPasswordModel;
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
+  validCurrentPassword: any;
   changePasswordForm: FormGroup;
-  hide = true;
+
+  hideCurrentPassword = true;
+  hideNewPassword = true;
+  hideConfirmPassword = true;
 
 
   ngOnInit() {
     this.buildChangePasswordForm();
-    // console.log('ChangePasswordComponent - userId', this.userId)
+    this.changesControlCurrentPassword();
+    // console.log('ChangePasswordComponent - userData', this.userData)
   }
 
   private buildChangePasswordForm() {
     this.changePasswordForm = this.fb.group({
-      password: [null, Validators.compose([
+      currentPassword: [null, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)])
+      ],
+      newPassword: [null, Validators.compose([
         Validators.required,
         Validators.minLength(3),
         Validators.maxLength(50)])
@@ -50,19 +66,43 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ]
     }, {
-      validator: MustMatch('password', 'confirmPassword')
+      validator: MustMatch('newPassword', 'confirmPassword')
     });
+  }
+
+  private changesControlCurrentPassword() {
+    this.changePasswordForm.controls['currentPassword'].valueChanges
+      .pipe(
+        debounceTime(500),
+        takeUntil(this.destroy))
+      .subscribe((val) => {
+        this.checkValidCurrentPassword(val);
+      });
+  }
+
+  private checkValidCurrentPassword(val: any) {
+    const userData = {
+      email: this.userData.email,
+      password: val
+    }
+
+    this.authService.getValidPassword(userData).pipe(
+      takeUntil(this.destroy))
+      .subscribe((resp) => {
+        console.log(444, resp)
+        if (resp) {
+          this.validCurrentPassword = resp;
+        }
+      });
   }
 
   onSubmitChangePassword(): void {
     if (this.changePasswordForm.valid) {
 
       this.dataLoading = true;
-      // console.log('onSubmitChangePassword password', this.changePasswordForm.value.password)
-      // console.log('onSubmitChangePassword userId', this.userId)
-      const id = this.userId;
+      const id = this.userData.userId;
       const params = {
-        password: this.changePasswordForm.value.password
+        password: this.changePasswordForm.value.newPassword
       }
       this.store.dispatch(new UpdateUserPassword(id, params));
       this.dataLoading = false;
