@@ -31,7 +31,12 @@ export class AppComponent implements OnInit {
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   ngOnInit() {
+    this.getAccount();
     this.isAth();
+  }
+
+  private getAccount() {
+    // this.authService.getAccountLocalStorage();
   }
 
   private isAth() {

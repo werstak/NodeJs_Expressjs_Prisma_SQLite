@@ -7,7 +7,7 @@ import { UpdateUserPassword } from '../../../modules/users/store-users/users.act
 import { Store } from '@ngxs/store';
 import { DialogNewPasswordModel } from '../../../core/models/dialog-new-password.model';
 import { UsersService } from '../../../modules/users/users.service';
-
+import { AppRouteEnum } from '../../../core/enums';
 
 interface ValidPassword {
   validPassword: boolean;
@@ -24,7 +24,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     public store: Store,
     public usersService: UsersService,
     private authService: AuthService,
-    // public dialogRefNewPasswordComponent: MatDialogRef<DialogNewPasswordComponent>,
   ) {
   }
 
@@ -32,6 +31,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   @Input() userData: DialogNewPasswordModel;
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
+  AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
   validCurrentPassword: any;
@@ -43,9 +43,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
+    console.log('userData', this.userData)
     this.buildChangePasswordForm();
     this.changesControlCurrentPassword();
-    // console.log('ChangePasswordComponent - userData', this.userData)
+    this.toggleStateControls();
   }
 
   private buildChangePasswordForm() {
@@ -89,11 +90,25 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.authService.getValidPassword(userData).pipe(
       takeUntil(this.destroy))
       .subscribe((resp) => {
-        console.log(444, resp)
         if (resp) {
           this.validCurrentPassword = resp;
+          this.toggleStateControls();
+        } else {
+          this.validCurrentPassword = resp;
+          this.toggleStateControls();
         }
       });
+  }
+
+  private toggleStateControls() {
+    console.log(555, this.validCurrentPassword)
+    if(this.validCurrentPassword?.validPassword) {
+      this.changePasswordForm.controls['newPassword'].enable();
+      this.changePasswordForm.controls['confirmPassword'].enable();
+    } else {
+      this.changePasswordForm.controls['newPassword'].disable();
+      this.changePasswordForm.controls['confirmPassword'].disable();
+    }
   }
 
   onSubmitChangePassword(): void {

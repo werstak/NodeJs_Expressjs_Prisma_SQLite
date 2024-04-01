@@ -4,17 +4,19 @@ import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from
 import { AuthService } from '../../modules/auth/auth.service';
 import { ReplaySubject } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class AuthGuard implements CanActivate {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) { }
+  ) {
+  }
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     const account = this.authService.accountValue1;
+
     if (account) {
       // check if route is restricted by role
       // if (route.data.roles && !route.data.roles.includes(account.role)) {
@@ -25,10 +27,10 @@ export class AuthGuard implements CanActivate {
 
       // authorized so return true
       return true;
+    } else {
+      // not logged in so redirect to login page with the return url
+      this.router.navigate(['/auth/login'], {queryParams: {returnUrl: state.url}});
+      return false;
     }
-
-    // not logged in so redirect to login page with the return url
-    this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
-    return false;
   }
 }

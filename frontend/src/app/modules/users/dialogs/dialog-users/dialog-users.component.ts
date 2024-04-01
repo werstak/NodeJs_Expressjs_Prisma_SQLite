@@ -267,6 +267,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     console.log('openDialogNewPassword - currentUser', currentUser)
     const {id, email} = currentUser;
     const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
+      width: '375px',
+      panelClass: 'dialog-new-password',
       data: {
         userId: id,
         email,

@@ -40,6 +40,10 @@
   &__link {
     text-decoration: none;
     color: gray;
+    background: #00ffff38;
+    display: block;
+    padding: 3px 15px;
+    border-radius: 20px;
 
     :hover {
       cursor: pointer;

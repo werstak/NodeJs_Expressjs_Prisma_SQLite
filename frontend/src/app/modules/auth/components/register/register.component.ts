@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
+import { AppRouteEnum } from '../../../../core/enums';
 
 @Component({
   selector: 'app-register',
@@ -25,7 +26,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   ) {
   }
 
-
+  AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
 

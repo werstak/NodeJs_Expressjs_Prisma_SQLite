@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ReplaySubject } from 'rxjs';
 import { AuthService } from '../../auth.service';
+import { AppRouteEnum } from '../../../../core/enums';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,6 +16,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy{
   ) {
   }
 
+  AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
   recoveryForm: FormGroup;
