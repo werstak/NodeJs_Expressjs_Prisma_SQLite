@@ -101,7 +101,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   private toggleStateControls() {
-    console.log(555, this.validCurrentPassword)
     if(this.validCurrentPassword?.validPassword) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();

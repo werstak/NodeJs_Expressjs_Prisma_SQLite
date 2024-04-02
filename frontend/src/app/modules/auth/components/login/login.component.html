@@ -6,6 +6,7 @@
       <div>
         <mat-form-field color="accent" class="field-full-width">
           <input matInput #email class="form-control" placeholder="Email" formControlName="email"
+                 type="email"
                  name="email"
                  maxlength="50" required>
           <mat-hint align="end">{{email.value.length || 0}}/50</mat-hint>
@@ -43,9 +44,6 @@
           <span>Register</span>
         </a>
 
-<!--        <a class="login__link" routerLink='../register'>-->
-<!--          <span>Register</span>-->
-<!--        </a>-->
         <a class="login__link"
            [routerLink]="['../' + AppRouteEnum.ResetPassword]">
           <span>Reset</span>

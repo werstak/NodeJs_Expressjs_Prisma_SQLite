@@ -25,7 +25,6 @@ export class AppComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
   ) {
-    // this.authService.account.subscribe(x => this.account = x);
   }
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
@@ -36,11 +35,12 @@ export class AppComponent implements OnInit {
   }
 
   private getAccount() {
-    // this.authService.getAccountLocalStorage();
+    this.authService.getAccountLocalStorage();
   }
 
+
   private isAth() {
-    this.authService.account.pipe(
+    this.authService.accountSubject$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.account = resp;

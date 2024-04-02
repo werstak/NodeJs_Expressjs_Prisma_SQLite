@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import { Account } from '../../core/models/account';
+import { BehaviorSubject, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as config from '../../../app-config';
@@ -14,27 +13,26 @@ import { Auth } from '../../core/models/auth';
 })
 export class AuthService {
 
-  private accountSubject: BehaviorSubject<Auth | null>;
-  public account: Observable<Auth | null>;
-
+  public accountSubject$ = new BehaviorSubject<Auth | null>(null);
   readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
   readonly JWT_REFRESH_TOKEN_KEY = 'refresh_token';
   readonly ACCOUNT = 'account';
 
+  private refreshTokenTimeout?: number;
 
   constructor(
     private router: Router,
     private http: HttpClient
   ) {
-    this.accountSubject = new BehaviorSubject<Auth | null>(null);
-    this.account = this.accountSubject.asObservable();
   }
 
-  public get accountValue1() {
-    return this.accountSubject.value;
+  public get accountValue() {
+    return this.accountSubject$.value;
   }
 
-
+  /**
+   New User Registration
+   */
   register(registerUserData: RegisterUser) {
     console.log('AuthService = REGISTER()', registerUserData)
     return this.http.post<any>(config.API_URL + `/auth/register/`, {registerUserData})
@@ -45,27 +43,24 @@ export class AuthService {
       }));
   }
 
-
+  /**
+   User authorization
+   */
   login(loginUserData: LoginUser) {
     // console.log('LOGIN() AuthService', loginUserData);
-    // const refreshToken = this.accountValue1;
-    // const refreshToken = localStorage.getItem('refresh_token');
-    // console.log(55555555555555, refreshToken)
     return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
       .pipe(map(account => {
-
-        console.log('login() RESP = ', account)
         const {accessToken, refreshToken, userInfo} = account
-
         this.setTokens(accessToken, refreshToken);
         this.setUser(userInfo);
-
-        this.accountSubject.next(account);
         this.startRefreshTokenTimer();
         return account;
       }));
   }
 
+  /**
+   saving user data and tokens in Localstorage
+   */
   private setTokens(accessToken: string, refreshToken: string): void {
     localStorage.setItem(this.JWT_ACCESS_TOKEN_KEY, accessToken);
     localStorage.setItem(this.JWT_REFRESH_TOKEN_KEY, refreshToken);
@@ -73,101 +68,86 @@ export class AuthService {
 
   private setUser(userInfo: any): void {
     localStorage.setItem(this.ACCOUNT, JSON.stringify(userInfo));
-    // this.getAccountLocalStorage();
+    this.getAccountLocalStorage();
   }
 
-
-  getAccountLocalStorage() {
+  /**
+   Get user account data from Localstorage and write to Stream - this.accountSubject$
+   */
+  public getAccountLocalStorage() {
     const userInfo = localStorage.getItem('account');
     const refreshToken = localStorage.getItem('refresh_token');
     const accessToken = localStorage.getItem('access_token');
 
-    if (userInfo != null && refreshToken != null && accessToken != null ) {
+    if (userInfo != null && refreshToken != null && accessToken != null) {
       const userInfoPars = JSON.parse(userInfo);
       const account = {
         userInfo: userInfoPars,
         refreshToken: refreshToken,
         accessToken: accessToken
       }
-
-      console.log(456, account)
-      this.accountSubject.next(account);
-      this.account = this.accountSubject.asObservable();
+      this.accountSubject$.next(account);
     } else {
-      console.log('Not authorized - getAccountLocalStorage()');
+      console.log('NOT AUTHORIZED');
       return;
     }
   }
 
-  // getAccountLocalStorage() {
-  //   const account = localStorage.getItem('account');
-  //   console.log(333, 'getAccountLocalStorage', account)
-  //   if (account != null) {
-  //     const accountPars = JSON.parse(account);
-  //
-  //     console.log(333, 'accountPars', accountPars)
-  //
-  //     this.accountSubject.next(accountPars);
-  //     this.account = this.accountSubject.asObservable();
-  //   }
-  // }
-
-
-
-
-  refreshToken() {
-    const refreshToken = this.accountValue1!.refreshToken
-    console.log(22222, 'refreshToken()')
+  /**
+   Token refresh request (accessToken, refreshToken)
+   */
+  private refreshToken() {
+    const refreshToken = this.accountValue!.refreshToken
     return this.http.post<any>(config.API_URL + `/auth/refreshToken`, {refreshToken})
-      .pipe(map((account) => {
+      .pipe(map((tokens) => {
 
-        const {accessToken, refreshToken, userInfo} = account
+        console.log('RESPONSE refreshToken');
+        const {accessToken, refreshToken} = tokens
         this.setTokens(accessToken, refreshToken);
-        this.setUser(userInfo);
-
-        this.accountSubject.next(account);
+        this.getAccountLocalStorage();
         this.startRefreshTokenTimer();
-        return account;
+        return tokens;
       }));
   }
 
-
+  /**
+   User logout
+   */
   logout() {
-    const refreshToken = this.accountValue1!.refreshToken;
+    const refreshToken = this.accountValue!.refreshToken;
     this.http.post<any>(config.API_URL + `/auth/revokeRefreshTokens`, {refreshToken}).subscribe();
     this.stopRefreshTokenTimer();
-    this.accountSubject.next(null);
+    this.accountSubject$.next(null);
     this.router.navigate(['/auth/login']);
     localStorage.removeItem('account');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('access_token');
     // localStorage.clear();
-    console.log('!!! Logout')
+    console.log('!!! LOGOUT')
   }
 
-
-  private refreshTokenTimeout?: any;
-
+  /**
+   Start refresh tokens Timer (accessToken, refreshToken)
+   */
   private startRefreshTokenTimer() {
-    // console.log(11111, 'startRefreshTokenTimer')
-    // parse json object from base64 encoded jwt token
-    const jwtBase64 = this.accountValue1!.accessToken!.split('.')[1];
+    const jwtBase64 = this.accountValue!.accessToken!.split('.')[1];
     const jwtToken = JSON.parse(atob(jwtBase64));
-    // set a timeout to refresh the token a minute before it expires
-    const expires = new Date(jwtToken.exp * 1000);
-    console.log(555, expires)
-    const timeout = expires.getTime() - Date.now() - (60 * 1000);
-    console.log(555, timeout)
 
+    // SET A TIMEOUT TO REFRESH THE TOKEN A MINUTE BEFORE IT EXPIRES
+    const expires = new Date(jwtToken.exp * 1000);
+    const timeout = expires.getTime() - Date.now() - (60 * 1000);
     this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
   }
 
+  /**
+   Stop RefreshTokenTimer
+   */
   private stopRefreshTokenTimer() {
     clearTimeout(this.refreshTokenTimeout);
   }
 
   /**
-   this request is executed to check whether the user has such a password before launching the password replacement function
+   This request is executed to check whether the user has such a password before launching the password replacement function
    */
   getValidPassword(validPasswordData: LoginUser) {
     console.log('UsersService = getValidPassword()', validPasswordData);
@@ -181,4 +161,14 @@ export class AuthService {
   }
 
 
+  getVerifyEmail(verifyEmail: string) {
+    console.log('UsersService = verifyEmail()', verifyEmail);
+    return this.http.post(config.API_URL + `/auth/verify_email/`, {verifyEmail})
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
 }

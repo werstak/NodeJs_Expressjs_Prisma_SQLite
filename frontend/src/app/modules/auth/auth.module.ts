@@ -12,7 +12,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { RegisterComponent } from './components/register/register.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSortModule } from '@angular/material/sort';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
@@ -31,11 +30,10 @@ const routes: Routes = [
     path: '', component: AuthComponent,
     children: [
       { path: 'login', component: LoginComponent },
-      // { path: 'register', component: RegisterComponent },
       { path: AppRouteEnum.Registration, component: RegisterComponent },
+      { path: AppRouteEnum.ForgotPassword, component: ForgotPasswordComponent },
+      { path: AppRouteEnum.ResetPassword, component: ResetPasswordComponent }
       // { path: 'verify-email', component: VerifyEmailComponent },
-      { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
     ]
   }
 ];

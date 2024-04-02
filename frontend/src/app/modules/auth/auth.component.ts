@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { ReplaySubject, takeUntil } from 'rxjs';
+import { ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'app-auth',
@@ -24,9 +24,9 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   private getAccount() {
-
-    if (this.authService.accountValue1) {
-      this.router.navigate(['/']);
+    if (this.authService.accountValue) {
+      // ANY ACTION AFTER AUTHORIZATION
+      // this.router.navigate(['/users']);
     }
   }
 

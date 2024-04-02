@@ -6,6 +6,8 @@ import { NotificationService } from '../../../../shared/notification.service';
 import * as _ from 'lodash';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AppRouteEnum } from '../../../../core/enums';
+import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -40,6 +42,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
+        Validators.pattern(EMAIL_VALIDATION_PATTERN),
         Validators.maxLength(100)])
       ],
       password: [null, Validators.compose([
@@ -50,6 +53,10 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
+
+  /**
+   Routing to the first page after logging in
+   */
   onSubmitAuth(): void {
     this.dataLoading = true;
 
@@ -62,10 +69,9 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.loginResp = resp;
             if (resp) {
               this.dataLoading = false;
-              const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-              this.router.navigateByUrl(returnUrl);
-
-              // this.authService.account$.next(true);
+              // const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+              // this.router.navigateByUrl(returnUrl);
+              this.router.navigate(['/' + AppRouteEnum.Users]);
             }
           },
           (error) => {
@@ -76,13 +82,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
             this.notificationService.showError(error);
           });
-
-      // this.dataLoading = false;
-
     }
-    // this.dataLoading = false;
-    // this.authService.account$.next(true);
-
   }
 
   ngOnDestroy(): void {

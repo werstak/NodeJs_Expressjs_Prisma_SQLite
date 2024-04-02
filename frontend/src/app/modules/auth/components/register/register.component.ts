@@ -10,6 +10,7 @@ import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
 import { AppRouteEnum } from '../../../../core/enums';
+import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 
 @Component({
   selector: 'app-register',
@@ -62,6 +63,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
+        Validators.pattern(EMAIL_VALIDATION_PATTERN),
         Validators.maxLength(100)])
       ],
       firstName: [null, Validators.compose([

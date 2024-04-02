@@ -5,16 +5,15 @@ import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subscription } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, DeleteUser, SetSelectedUser, UpdateUser, UpdateUserPassword } from '../../store-users/users.action';
+import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { CountriesModel } from '../../../../core/models/countriesModel';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AppRouteEnum } from '../../../../core/enums';
-import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
-import { UpdateCategory } from '../../../posts/store-posts/posts.action';
+import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -78,6 +77,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
+        Validators.pattern(EMAIL_VALIDATION_PATTERN),
         Validators.maxLength(100)])
       ],
       firstName: [null, Validators.compose([
@@ -107,7 +107,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  addPasswordControls(): void {
+  /**
+   Dynamic add PasswordControls
+   */
+  private addPasswordControls(): void {
     this.userForm = this.fb.group({
       ...this.userForm.controls,
       password: [null, Validators.compose([
@@ -125,9 +128,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
+
   private initFormValue() {
     this.dataLoading = true;
-
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
       if (data) {
@@ -137,8 +140,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
 
-      console.log('getUser() = currentUser ', this.currentUser)
-
       this.userForm.setValue({
         email: data.email,
         firstName: data.firstName,
@@ -146,13 +147,16 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         role: data.role,
         location: data.location,
         status: data.status,
-        // password: data.password,
         birthAt: data.birthAt,
       });
       this.store.dispatch(new SetSelectedUser(data));
     });
   }
 
+
+  /**
+   Autocomplete for Countries
+   */
   private autocompleteCountries() {
     this.filteredCountries = this.userForm.controls['location'].valueChanges.pipe(
       startWith(''),
@@ -263,6 +267,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
+  /**
+   Open Dialog NewPassword
+   */
   openDialogNewPassword(currentUser: UserModel) {
     console.log('openDialogNewPassword - currentUser', currentUser)
     const {id, email} = currentUser;
@@ -280,13 +287,11 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('Change Password - afterClosed', result);
-
       if (result === true) {
       } else {
         return
       }
     });
-
   }
 
 

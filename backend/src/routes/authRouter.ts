@@ -81,9 +81,12 @@ authRouter.post(
                 return response.status(400).json({message: `You must provide an email and a password`})
             }
             const existingUser = await AuthUserHandler.findUserByEmail(email);
-            const userId = existingUser.id;
+            let userId = null;
+
             if (!existingUser) {
                 return response.status(400).json({message: `User ${email} not found`})
+            } else {
+                userId = existingUser.id;
             }
 
             const validPassword = bcrypt.compareSync(password, existingUser.password)
@@ -155,6 +158,33 @@ authRouter.post(
                     validPassword
                 });
             }
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ GET: Checking whether the Email exists in the database
+ */
+authRouter.post(
+    '/verify_email',
+    async (request: Request, response: Response) => {
+
+        try {
+            const {email} = request.body.verifyEmail;
+            if (!email) {
+                return response.status(400).json({message: `You must provide an email`})
+            }
+            const existingEmail = await AuthUserHandler.findUserByEmail(email);
+            if (!existingEmail) {
+                return response.status(400).json({message: `User ${email} not found`})
+            } else {
+                return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
+            }
+
+
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
