@@ -1,5 +1,7 @@
 import db from '../utils/db';
 import { hashToken } from '../utils/hashToken'
+
+
 /**
  * will be realized through the prisma
  * */
@@ -8,6 +10,18 @@ export const findUserByEmail = async (email: string): Promise<any | null> => {
     return db.user.findUnique({
         where: {
             email: email,
+        },
+    });
+};
+
+
+export const findUserIdByEmail = async (email: string): Promise<any | null> => {
+    return db.user.findUnique({
+        where: {
+            email: email,
+        },
+        select: {
+            id: true,
         },
     });
 };
@@ -55,6 +69,20 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
         },
     });
 }
+
+
+
+export const addPasswordResetToken = async ({ convertTokenToHexString }: any): Promise<any | null> => {
+    return 111;
+    // return db.refreshToken.create({
+    //     data: {
+    //         id: jti,
+    //         hashedToken: hashToken(refreshToken),
+    //         userId: userId
+    //     },
+    // });
+}
+
 
 
 // export const revokeTokens = async (userId: any): Promise<any | null> => {

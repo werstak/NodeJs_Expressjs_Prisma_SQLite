@@ -5,11 +5,13 @@ import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { check } from 'express-validator';
+import crypto from 'crypto';
 
 import * as UserHandler from '../controllers/users.conroller';
 // import * as GenerateJWT  from '../utils/jwt';
 import { generateTokens } from '../utils/jwt';
 import { hashToken } from '../utils/hashToken';
+import { config } from 'dotenv';
 
 export interface RefreshToken {
     userId: number
@@ -177,12 +179,91 @@ authRouter.post(
             if (!email) {
                 return response.status(400).json({message: `You must provide an email`})
             }
-            const existingEmail = await AuthUserHandler.findUserByEmail(email);
+            const existingEmail = await AuthUserHandler.findUserIdByEmail(email);
             if (!existingEmail) {
                 return response.status(400).json({message: `User ${email} not found`})
             } else {
+
+
+
+                // TODO generateToken()
+                // function which will generate a unique token with the help of the crypto package
+
+                //   generate a random token for the client
+                const generatedPasswordResetToken = crypto.randomBytes(32);
+
+                //   check for error
+                if (!generatedPasswordResetToken) {
+                    return response.status(500).json({
+                        message: "An error occured. Please try again later.",
+                        status: "error",
+                    });
+                }
+                //   converting the token to a hexstring
+
+                console.log('generatedPasswordResetToken', generatedPasswordResetToken);
+                const convertTokenToHexString = generatedPasswordResetToken.toString("hex");
+
+                const expireTimeToken = Date.now() + 1800000;
+                // 5 MINUTES
+                // const passwordResetAt = Date.now() + 5 * 60 * 1000;
+                const passwordResetAt = new Date(Date.now() + 5 * 60 * 1000);
+
+                console.log('convertTokenToHexString =', convertTokenToHexString);
+                console.log('expireTimeToken =', expireTimeToken);
+
+                console.log('existingEmail =', existingEmail);
+                console.log('passwordResetAt =', passwordResetAt);
+
+                // WRITE THE TOKEN TO THE DATABASE
+                await AuthUserHandler.addPasswordResetToken({convertTokenToHexString});
+
+                // GENERATE A LINK TO RESET THE TOKEN
+                // const url = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
+
+
+                // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
+                // await new Email(user, url).sendPasswordResetToken();
+
+
+
                 return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
             }
+
+
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ POST: Reset Password link
+ */
+authRouter.post(
+    '/reset_password_link',
+    async (request: Request, response: Response) => {
+
+        try {
+            // TODO isValidToken()
+            console.log('request.body', request.body)
+
+            // const {validToken} = request.body.isValidToken;
+            // if (!validToken) {
+            //     return response.status(400).json({message: `You must provide an validToken`})
+            // }
+            // const existingValidToken = await AuthUserHandler.findValidTokenById(validToken);
+            // if (!existingValidToken) {
+            //     return response.status(400).json({message: `User ${validToken} not found`})
+            // } else {
+            //
+            //     // isValidToken()
+            //     // function which will take token and id and compare it with saved token and userID
+            //
+            //
+            //     return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
+            // }
 
 
         } catch (error: any) {
