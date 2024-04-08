@@ -8,6 +8,7 @@ import { Store } from '@ngxs/store';
 import { DialogNewPasswordModel } from '../../../core/models/dialog-new-password.model';
 import { UsersService } from '../../../modules/users/users.service';
 import { AppRouteEnum } from '../../../core/enums';
+import { ActivatedRoute } from '@angular/router';
 
 interface ValidPassword {
   validPassword: boolean;
@@ -24,6 +25,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     public store: Store,
     public usersService: UsersService,
     private authService: AuthService,
+    private activatedRoute: ActivatedRoute
   ) {
   }
 
@@ -47,6 +49,25 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.buildChangePasswordForm();
     this.changesControlCurrentPassword();
     this.toggleStateControls();
+    this.getUrlParams();
+  }
+
+  private getUrlParams() {
+
+    const firstParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('firstParamKey');
+    const secondParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('secondParamKey');
+
+    console.log(333, firstParam, secondParam)
+
+
+    const urlParams = this.activatedRoute.snapshot;
+    // console.log(222, urlParams)
+
+    // const selectedId = 'userId_' + urlParams[1].path;
+    this.activatedRoute.queryParams.subscribe(params => {
+      // console.log(111, 'params', params)
+
+    });
   }
 
   private buildChangePasswordForm() {
@@ -114,7 +135,14 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     if (this.changePasswordForm.valid) {
 
       this.dataLoading = true;
+
+      // TODO - redo the method for obtaining User ID depending on whether the user is logged in or not
+      // Take information from the URL if the user came to the site using a link
+      // this.getUrlParams()
+
       const id = this.userData.userId;
+      // const id = this.userData.userId ? this.userData.userId : ;
+
       const params = {
         password: this.changePasswordForm.value.newPassword
       }

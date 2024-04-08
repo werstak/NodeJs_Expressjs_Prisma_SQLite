@@ -22,6 +22,7 @@ export const findUserIdByEmail = async (email: string): Promise<any | null> => {
         },
         select: {
             id: true,
+            password: true
         },
     });
 };
@@ -72,13 +73,14 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
 
 
 
-export const addPasswordResetToken = async ({ convertTokenToHexString }: any): Promise<any | null> => {
+export const addPasswordResetToken = async ({ convertTokenToHexString, existingUserId, expireTimeResetToken }: any): Promise<any | null> => {
+    console.log('addPasswordResetToken()', convertTokenToHexString, existingUserId.id, existingUserId.password, expireTimeResetToken)
     return 111;
     // return db.refreshToken.create({
     //     data: {
     //         id: jti,
     //         hashedToken: hashToken(refreshToken),
-    //         userId: userId
+    //         userId: existingUserId
     //     },
     // });
 }

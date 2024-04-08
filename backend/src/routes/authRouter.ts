@@ -179,8 +179,8 @@ authRouter.post(
             if (!email) {
                 return response.status(400).json({message: `You must provide an email`})
             }
-            const existingEmail = await AuthUserHandler.findUserIdByEmail(email);
-            if (!existingEmail) {
+            const existingUserId = await AuthUserHandler.findUserIdByEmail(email);
+            if (!existingUserId) {
                 return response.status(400).json({message: `User ${email} not found`})
             } else {
 
@@ -206,20 +206,24 @@ authRouter.post(
 
                 const expireTimeToken = Date.now() + 1800000;
                 // 5 MINUTES
-                // const passwordResetAt = Date.now() + 5 * 60 * 1000;
-                const passwordResetAt = new Date(Date.now() + 5 * 60 * 1000);
+                // const expireTimeResetToken = Date.now() + 5 * 60 * 1000;
+                const expireTimeResetToken = new Date(Date.now() + 5 * 60 * 1000);
+
+                // const validPassword = bcrypt.compareSync(password, existingUser.password)
 
                 console.log('convertTokenToHexString =', convertTokenToHexString);
                 console.log('expireTimeToken =', expireTimeToken);
 
-                console.log('existingEmail =', existingEmail);
-                console.log('passwordResetAt =', passwordResetAt);
+                console.log('existingUserId =', existingUserId);
+                console.log('expireTimeResetToken =', expireTimeResetToken);
 
                 // WRITE THE TOKEN TO THE DATABASE
-                await AuthUserHandler.addPasswordResetToken({convertTokenToHexString});
+                await AuthUserHandler.addPasswordResetToken({convertTokenToHexString, existingUserId, expireTimeResetToken});
 
                 // GENERATE A LINK TO RESET THE TOKEN
-                // const url = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
+                // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
+                // const resetLink = `http://localhost:5000/reset?email=${user.email}?&hash=${hash}`
+
 
 
                 // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
@@ -263,6 +267,37 @@ authRouter.post(
             //
             //
             //     return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
+            // }
+
+
+
+
+
+            //check for email and hash in query parameter
+            // if (req.query && req.query.email && req.query.hash) {
+            //     //find user with suh email address
+            //     const user = await User.findOne({ email: req.query.email })
+            //     //check if user object is not empty
+            //     if (user) {
+            //         //now check if hash is valid
+            //         if (new User(user).verifyPasswordResetHash(req.query.hash)) {
+            //             //save email to session
+            //             req.session.email = req.query.email;
+            //             //issue a password reset form
+            //             return res.sendFile(__dirname + '/views/new_pass.html')
+            //         } else {
+            //             return res.status(400).json({
+            //                 message: "You have provided an invalid reset link"
+            //             })
+            //         }
+            //     } else {
+            //         return res.status(400).json({
+            //             message: "You have provided an invalid reset link"
+            //         })
+            //     }
+            // } else {
+            //     //if there are no query parameters, serve the normal request form
+            //     return res.sendFile(__dirname + '/views/reset.html')
             // }
 
 

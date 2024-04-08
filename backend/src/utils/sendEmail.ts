@@ -1,8 +1,23 @@
 import process from 'process';
 import * as nodemailer from 'nodemailer';
 import * as dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
+
+
+export function emailService(user: any, jti: any) {
+    const refreshSecret = process.env.JWT_REFRESH_SECRET as string;
+    return jwt.sign({
+        userId: user.id,
+        jti
+    }, refreshSecret, {
+        expiresIn: '30d',
+        // expiresIn: '5h',
+    });
+}
+
+
 
 export class EmailService {
     private static transporter: nodemailer.Transporter;
@@ -14,7 +29,10 @@ export class EmailService {
     public static initialize() {
         try {
             EmailService.transporter = nodemailer.createTransport({
-                service: 'gmail',
+                service: process.env.SERVICE,
+                host: process.env.HOST,
+                port: 456,
+                secure: false,
                 auth: {
                     user: this.env.user,
                     pass: this.env.pass,
@@ -38,8 +56,8 @@ const sendEmail = async (email, subject, text) => {
         const transporter = nodemailer.createTransport({
             host: process.env.HOST,
             service: process.env.SERVICE,
-            port: 587,
-            secure: true,
+            port: 456,
+            secure: false,
             auth: {
                 user: process.env.USER,
                 pass: process.env.PASS,
