@@ -15,14 +15,17 @@ export const findUserByEmail = async (email: string): Promise<any | null> => {
 };
 
 
-export const findUserIdByEmail = async (email: string): Promise<any | null> => {
+export const findUserInfoByEmail = async (email: string): Promise<any | null> => {
     return db.user.findUnique({
         where: {
             email: email,
         },
         select: {
             id: true,
-            password: true
+            password: true,
+            firstName: true,
+            lastName: true
+
         },
     });
 };
@@ -73,8 +76,8 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
 
 
 
-export const addPasswordResetToken = async ({ convertTokenToHexString, existingUserId, expireTimeResetToken }: any): Promise<any | null> => {
-    console.log('addPasswordResetToken()', convertTokenToHexString, existingUserId.id, existingUserId.password, expireTimeResetToken)
+export const addPasswordResetToken = async ({ convertTokenToHexString, existingUser, expireTimeReset }: any): Promise<any | null> => {
+    console.log(1, 'addPasswordResetToken()', convertTokenToHexString, existingUser.id, existingUser.password, expireTimeReset)
     return 111;
     // return db.refreshToken.create({
     //     data: {

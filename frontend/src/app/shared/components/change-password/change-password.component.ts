@@ -61,7 +61,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
     const urlParams = this.activatedRoute.snapshot;
-    // console.log(222, urlParams)
+    console.log(222, urlParams)
 
     // const selectedId = 'userId_' + urlParams[1].path;
     this.activatedRoute.queryParams.subscribe(params => {

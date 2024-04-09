@@ -8,10 +8,10 @@ import { check } from 'express-validator';
 import crypto from 'crypto';
 
 import * as UserHandler from '../controllers/users.conroller';
-// import * as GenerateJWT  from '../utils/jwt';
+
 import { generateTokens } from '../utils/jwt';
+import { handlerEmailSending } from '../utils/sendEmail';
 import { hashToken } from '../utils/hashToken';
-import { config } from 'dotenv';
 
 export interface RefreshToken {
     userId: number
@@ -179,11 +179,10 @@ authRouter.post(
             if (!email) {
                 return response.status(400).json({message: `You must provide an email`})
             }
-            const existingUserId = await AuthUserHandler.findUserIdByEmail(email);
-            if (!existingUserId) {
+            const existingUser = await AuthUserHandler.findUserInfoByEmail(email);
+            if (!existingUser) {
                 return response.status(400).json({message: `User ${email} not found`})
             } else {
-
 
 
                 // TODO generateToken()
@@ -195,46 +194,47 @@ authRouter.post(
                 //   check for error
                 if (!generatedPasswordResetToken) {
                     return response.status(500).json({
-                        message: "An error occured. Please try again later.",
-                        status: "error",
+                        message: 'An error occured. Please try again later.',
+                        status: 'error',
                     });
                 }
-                //   converting the token to a hexstring
 
-                console.log('generatedPasswordResetToken', generatedPasswordResetToken);
-                const convertTokenToHexString = generatedPasswordResetToken.toString("hex");
-
+                const convertTokenToHexString = generatedPasswordResetToken.toString('hex');
                 const expireTimeToken = Date.now() + 1800000;
                 // 5 MINUTES
-                // const expireTimeResetToken = Date.now() + 5 * 60 * 1000;
-                const expireTimeResetToken = new Date(Date.now() + 5 * 60 * 1000);
+                // const expireTimeReset = Date.now() + 5 * 60 * 1000;
+                const expireTimeReset = new Date(Date.now() + 5 * 60 * 1000);
 
                 // const validPassword = bcrypt.compareSync(password, existingUser.password)
 
+                console.log('existingUser =', existingUser);
                 console.log('convertTokenToHexString =', convertTokenToHexString);
                 console.log('expireTimeToken =', expireTimeToken);
-
-                console.log('existingUserId =', existingUserId);
-                console.log('expireTimeResetToken =', expireTimeResetToken);
+                console.log('expireTimeReset =', expireTimeReset);
 
                 // WRITE THE TOKEN TO THE DATABASE
-                await AuthUserHandler.addPasswordResetToken({convertTokenToHexString, existingUserId, expireTimeResetToken});
+                await AuthUserHandler.addPasswordResetToken({
+                    convertTokenToHexString,
+                    existingUser,
+                    expireTimeReset
+                });
+
 
                 // GENERATE A LINK TO RESET THE TOKEN
                 // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
                 // const resetLink = `http://localhost:5000/reset?email=${user.email}?&hash=${hash}`
-
+                const resetLink = `http://localhost:4200/auth/reset-password?id=${existingUser.id}?&hash=${convertTokenToHexString}`
 
 
                 // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
-                // await new Email(user, url).sendPasswordResetToken();
+                const subject = 'Reset password!'
+                const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
+                const text = `To set a new password, follow this link ${resetLink}`
 
-
+                await handlerEmailSending(existingUser, email, subject, htmlContent, text);
 
                 return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
             }
-
-
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -251,7 +251,7 @@ authRouter.post(
 
         try {
             // TODO isValidToken()
-            console.log('request.body', request.body)
+            console.log(7777, 'request.body', request.body)
 
             // const {validToken} = request.body.isValidToken;
             // if (!validToken) {
@@ -268,9 +268,6 @@ authRouter.post(
             //
             //     return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
             // }
-
-
-
 
 
             //check for email and hash in query parameter
