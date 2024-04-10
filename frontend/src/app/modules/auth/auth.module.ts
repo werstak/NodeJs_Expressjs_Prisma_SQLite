@@ -29,7 +29,7 @@ const routes: Routes = [
   {
     path: '', component: AuthComponent,
     children: [
-      { path: 'login', component: LoginComponent },
+      { path: AppRouteEnum.Login, component: LoginComponent },
       { path: AppRouteEnum.Registration, component: RegisterComponent },
       { path: AppRouteEnum.ForgotPassword, component: ForgotPasswordComponent },
       { path: AppRouteEnum.ResetPassword, component: ResetPasswordComponent }

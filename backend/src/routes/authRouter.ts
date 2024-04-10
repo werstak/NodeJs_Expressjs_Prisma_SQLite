@@ -12,6 +12,8 @@ import * as UserHandler from '../controllers/users.conroller';
 import { generateTokens } from '../utils/jwt';
 import { handlerEmailSending } from '../utils/sendEmail';
 import { hashToken } from '../utils/hashToken';
+import { findPasswordResetToken } from '../controllers/authController';
+
 
 export interface RefreshToken {
     userId: number
@@ -23,6 +25,7 @@ export interface RefreshToken {
 
 export const authRouter = express.Router();
 
+const urlClient = process.env.BASE_URL_CLIENT as string;
 
 /**
  POST: Register
@@ -179,62 +182,69 @@ authRouter.post(
             if (!email) {
                 return response.status(400).json({message: `You must provide an email`})
             }
+
+            // User existence check
             const existingUser = await AuthUserHandler.findUserInfoByEmail(email);
             if (!existingUser) {
                 return response.status(400).json({message: `User ${email} not found`})
-            } else {
-
-
-                // TODO generateToken()
-                // function which will generate a unique token with the help of the crypto package
-
-                //   generate a random token for the client
-                const generatedPasswordResetToken = crypto.randomBytes(32);
-
-                //   check for error
-                if (!generatedPasswordResetToken) {
-                    return response.status(500).json({
-                        message: 'An error occured. Please try again later.',
-                        status: 'error',
-                    });
-                }
-
-                const convertTokenToHexString = generatedPasswordResetToken.toString('hex');
-                const expireTimeToken = Date.now() + 1800000;
-                // 5 MINUTES
-                // const expireTimeReset = Date.now() + 5 * 60 * 1000;
-                const expireTimeReset = new Date(Date.now() + 5 * 60 * 1000);
-
-                // const validPassword = bcrypt.compareSync(password, existingUser.password)
-
-                console.log('existingUser =', existingUser);
-                console.log('convertTokenToHexString =', convertTokenToHexString);
-                console.log('expireTimeToken =', expireTimeToken);
-                console.log('expireTimeReset =', expireTimeReset);
-
-                // WRITE THE TOKEN TO THE DATABASE
-                await AuthUserHandler.addPasswordResetToken({
-                    convertTokenToHexString,
-                    existingUser,
-                    expireTimeReset
-                });
-
-
-                // GENERATE A LINK TO RESET THE TOKEN
-                // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
-                // const resetLink = `http://localhost:5000/reset?email=${user.email}?&hash=${hash}`
-                const resetLink = `http://localhost:4200/auth/reset-password?id=${existingUser.id}?&hash=${convertTokenToHexString}`
-
-
-                // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
-                const subject = 'Reset password!'
-                const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
-                const text = `To set a new password, follow this link ${resetLink}`
-
-                await handlerEmailSending(existingUser, email, subject, htmlContent, text);
-
-                return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
             }
+            console.log(1, '/verify_email  - existingUser', existingUser)
+
+            const userId: number = existingUser.id;
+            // TODO generate PasswordResetToke()
+            // Search and remove previous token
+            const existingResetToken = await AuthUserHandler.findPasswordResetToken(existingUser.id);
+            console.log(2, 'existingResetToken', existingResetToken);
+            console.log(22, 'existingResetToken', existingResetToken.id);
+
+            // Delete existing PasswordResetTokens
+            if (existingResetToken.length) {
+                await AuthUserHandler.deletePreviousPasswordResetTokens(existingResetToken.id);
+            }
+
+            // Generate a unique token with the help of the crypto package , generate a random token for the client
+            const generatedPasswordResetToken = crypto.randomBytes(32);
+            if (!generatedPasswordResetToken) {
+                return response.status(500).json({
+                    message: 'An error occured. Please try again later.',
+                    status: 'error',
+                });
+            }
+
+            const convertPasswordResetToken = generatedPasswordResetToken.toString('hex');
+            // const expireTimeToken = Date.now() + 1800000;
+            // 5 MINUTES
+            // const expireTimeReset = Date.now() + 5 * 60 * 1000;
+            const expireTimeReset = new Date(Date.now() + 5 * 60 * 1000);
+
+            // const validPassword = bcrypt.compareSync(password, existingUser.password)
+
+            console.log(3, 'convertPasswordResetToken =', convertPasswordResetToken);
+            // console.log(4, 'expireTimeToken =', expireTimeToken);
+            console.log(4, 'expireTimeReset =', expireTimeReset);
+
+            // WRITE THE TOKEN TO THE DATABASE
+            await AuthUserHandler.addPasswordResetToken(convertPasswordResetToken, existingUser.id, expireTimeReset.getTime());
+
+            // GENERATE A LINK TO RESET THE TOKEN
+            // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
+            // const resetLink = `http://localhost:5000/reset?email=${user.email}?&hash=${hash}`
+            // const link = `${urlClient}/password-reset/${user._id}/${token.token}`;
+            const resetLink = `${urlClient}/auth/reset-password?id=${existingUser.id}?&token=${convertPasswordResetToken}`
+
+
+            // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
+
+            // Set transporter options:
+            const subject = 'Reset password!'
+            const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
+            const text = `To set a new password, follow this link ${resetLink}`
+
+            // Start send E-MAIL
+            await handlerEmailSending(existingUser, email, subject, htmlContent, text);
+
+            return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
+
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

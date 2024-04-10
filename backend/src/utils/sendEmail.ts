@@ -34,31 +34,8 @@ export async function handlerEmailSending(existingUser: any, email: string, subj
             html: htmlContent,
             // text: text
         });
-        console.log('Message sent: %s', infoSendMail);
+        console.log('Message sent successfully: %s', infoSendMail);
     } catch (error) {
         console.error('Error sending email: ', error);
     }
-
-
-    // const transporter = nodemailer.createTransport({
-    //     host: process.env.HOST,
-    //     service: process.env.SERVICE,
-    //     port: 465,
-    //     secure: true,
-    //     tls: {
-    //         rejectUnauthorized: false
-    //     },
-    //     auth: {
-    //         user: process.env.MAIL_USER,
-    //         pass: process.env.MAIL_PASSWORD,
-    //     },
-    // });
-    //
-    // return transporter.sendMail({
-    //     from: process.env.MAIL_USER,
-    //     to: email,
-    //     subject: subject,
-    //     html: htmlContent,
-    //     // text: text
-    // });
 }

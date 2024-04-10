@@ -24,7 +24,8 @@ export const findUserInfoByEmail = async (email: string): Promise<any | null> =>
             id: true,
             password: true,
             firstName: true,
-            lastName: true
+            lastName: true,
+            passwordResetToken: true
 
         },
     });
@@ -43,7 +44,7 @@ export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: 
 
 
 export const findRefreshTokenById = async (id: any): Promise<any | null> => {
-    console.log(2222, 'findRefreshTokenById', id)
+    console.log(555, 'authController', 'findRefreshTokenById()', id)
     return db.refreshToken.findUnique({
         where: {
             id,
@@ -53,7 +54,7 @@ export const findRefreshTokenById = async (id: any): Promise<any | null> => {
 
 
 export const deleteRefreshToken = async (id: any): Promise<any | null> => {
-    console.log(44444444, 'deleteRefreshToken', id)
+    console.log(555, 'authController', 'deleteRefreshToken()', id)
     return db.refreshToken.update({
         where: {
             id,
@@ -66,7 +67,7 @@ export const deleteRefreshToken = async (id: any): Promise<any | null> => {
 
 
 export const revokeTokens = async (id: any): Promise<any | null> => {
-    console.log(2222222222, 'revokeTokens()', id)
+    console.log(555, 'authController', 'revokeTokens()', id)
     await db.refreshToken.delete({
         where: {
             id,
@@ -74,18 +75,59 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
     });
 }
 
+export const findPasswordResetToken = async (id: number): Promise<any | null> => {
+    return db.user.findUnique({
+        where: {
+            id,
+        },
+        select: {
+            passwordResetToken: true
+        },
+    });
+};
 
 
-export const addPasswordResetToken = async ({ convertTokenToHexString, existingUser, expireTimeReset }: any): Promise<any | null> => {
-    console.log(1, 'addPasswordResetToken()', convertTokenToHexString, existingUser.id, existingUser.password, expireTimeReset)
-    return 111;
-    // return db.refreshToken.create({
-    //     data: {
-    //         id: jti,
-    //         hashedToken: hashToken(refreshToken),
-    //         userId: existingUserId
+
+export const deletePreviousPasswordResetTokens = async (id: number): Promise<any | null> => {
+    console.log(555, 'authController', 'deletePasswordResetTokens()', id);
+
+    // await db.passwordResetToken.delete({
+    //     where: {
+    //         userId: 165
     //     },
     // });
+
+    // await db.passwordResetToken.deleteMany ({
+    //     where: {
+    //         userId: {
+    //             contains: id,
+    //         },
+    //     },
+    // });
+
+    // await db.passwordResetToken.deleteMany ({
+    //     where: {
+    //         userId: id
+    //     },
+    // });
+
+    await db.passwordResetToken.deleteMany ({
+        where: {
+            userId: id
+        },
+    });
+}
+
+
+export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: any, expireTimeReset: any): Promise<any | null> => {
+    console.log(555, 'authController', 'addPasswordResetToken()', convertPasswordResetToken, userId, "expireTimeReset", expireTimeReset)
+    return db.passwordResetToken.create({
+        data: {
+            resetToken: convertPasswordResetToken,
+            userId,
+            expireTime: expireTimeReset
+        },
+    });
 }
 
 
