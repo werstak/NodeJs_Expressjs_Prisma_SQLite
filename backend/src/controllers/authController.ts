@@ -90,10 +90,11 @@ export const findPasswordResetToken = async (id: number): Promise<any | null> =>
 
 export const deletePreviousPasswordResetTokens = async (id: number): Promise<any | null> => {
     console.log(555, 'authController', 'deletePasswordResetTokens()', id);
+    await db.passwordResetToken.deleteMany({});
 
     // await db.passwordResetToken.delete({
     //     where: {
-    //         userId: 165
+    //         id: id
     //     },
     // });
 
@@ -110,12 +111,6 @@ export const deletePreviousPasswordResetTokens = async (id: number): Promise<any
     //         userId: id
     //     },
     // });
-
-    await db.passwordResetToken.deleteMany ({
-        where: {
-            userId: id
-        },
-    });
 }
 
 

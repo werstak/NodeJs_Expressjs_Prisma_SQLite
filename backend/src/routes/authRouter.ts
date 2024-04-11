@@ -190,16 +190,24 @@ authRouter.post(
             }
             console.log(1, '/verify_email  - existingUser', existingUser)
 
-            const userId: number = existingUser.id;
+            const existingUserId: number = existingUser.id;
+            const existingResetTokens = existingUser.passwordResetToken;
+
+            console.log(11, 'existingUserId', existingUserId);
+            console.log(111, 'existingResetTokens', existingResetTokens);
+
             // TODO generate PasswordResetToke()
             // Search and remove previous token
-            const existingResetToken = await AuthUserHandler.findPasswordResetToken(existingUser.id);
-            console.log(2, 'existingResetToken', existingResetToken);
-            console.log(22, 'existingResetToken', existingResetToken.id);
+            // const existingResetTokenId = await AuthUserHandler.findPasswordResetToken(existingUser.id);
+            // console.log(2, 'existingResetTokenId', existingResetTokenId);
+            // console.log(22, 'existingResetTokenId ID', existingResetTokenId.id);
 
             // Delete existing PasswordResetTokens
-            if (existingResetToken.length) {
-                await AuthUserHandler.deletePreviousPasswordResetTokens(existingResetToken.id);
+            if (existingResetTokens.length) {
+                const existingResetTokenId: number = existingUser.passwordResetToken[0].id;
+                console.log(1111, 'existingResetTokenId', existingResetTokenId);
+
+                await AuthUserHandler.deletePreviousPasswordResetTokens(existingResetTokenId);
             }
 
             // Generate a unique token with the help of the crypto package , generate a random token for the client
@@ -222,9 +230,11 @@ authRouter.post(
             console.log(3, 'convertPasswordResetToken =', convertPasswordResetToken);
             // console.log(4, 'expireTimeToken =', expireTimeToken);
             console.log(4, 'expireTimeReset =', expireTimeReset);
+            console.log(4, 'expireTimeReset =', expireTimeReset.getTime());
+            console.log(4, 'expireTimeReset =', expireTimeReset.toISOString());
 
             // WRITE THE TOKEN TO THE DATABASE
-            await AuthUserHandler.addPasswordResetToken(convertPasswordResetToken, existingUser.id, expireTimeReset.getTime());
+            await AuthUserHandler.addPasswordResetToken(convertPasswordResetToken, existingUserId, expireTimeReset.toISOString());
 
             // GENERATE A LINK TO RESET THE TOKEN
             // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;

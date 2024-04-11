@@ -39,10 +39,10 @@ model RefreshToken {
 }
 
 model PasswordResetToken {
-  id         String @id @unique @default(uuid())
+  id         Int    @id @default(autoincrement())
   resetToken String
   userId     Int
-  expireTime Int
+  expireTime DateTime
   user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
