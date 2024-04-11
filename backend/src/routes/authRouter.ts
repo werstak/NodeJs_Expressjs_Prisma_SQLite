@@ -12,7 +12,6 @@ import * as UserHandler from '../controllers/users.conroller';
 import { generateTokens } from '../utils/jwt';
 import { handlerEmailSending } from '../utils/sendEmail';
 import { hashToken } from '../utils/hashToken';
-import { findPasswordResetToken } from '../controllers/authController';
 
 
 export interface RefreshToken {
@@ -183,7 +182,7 @@ authRouter.post(
                 return response.status(400).json({message: `You must provide an email`})
             }
 
-            // User existence check
+            /** Chek existence User */
             const existingUser = await AuthUserHandler.findUserInfoByEmail(email);
             if (!existingUser) {
                 return response.status(400).json({message: `User ${email} not found`})
@@ -193,24 +192,18 @@ authRouter.post(
             const existingUserId: number = existingUser.id;
             const existingResetTokens = existingUser.passwordResetToken;
 
-            console.log(11, 'existingUserId', existingUserId);
-            console.log(111, 'existingResetTokens', existingResetTokens);
+            // console.log(11, 'existingUserId', existingUserId);
+            // console.log(111, 'existingResetTokens', existingResetTokens);
 
-            // TODO generate PasswordResetToke()
-            // Search and remove previous token
-            // const existingResetTokenId = await AuthUserHandler.findPasswordResetToken(existingUser.id);
-            // console.log(2, 'existingResetTokenId', existingResetTokenId);
-            // console.log(22, 'existingResetTokenId ID', existingResetTokenId.id);
-
-            // Delete existing PasswordResetTokens
+            /** Delete existing PasswordResetTokens */
             if (existingResetTokens.length) {
-                const existingResetTokenId: number = existingUser.passwordResetToken[0].id;
-                console.log(1111, 'existingResetTokenId', existingResetTokenId);
-
-                await AuthUserHandler.deletePreviousPasswordResetTokens(existingResetTokenId);
+                // const existingResetTokenId: number = existingUser.passwordResetToken[0].id;
+                // console.log(1111, 'existingResetTokenId', existingResetTokenId);
+                await AuthUserHandler.deletePreviousPasswordResetTokens();
             }
 
-            // Generate a unique token with the help of the crypto package , generate a random token for the client
+
+            /** Generate PasswordResetToke */
             const generatedPasswordResetToken = crypto.randomBytes(32);
             if (!generatedPasswordResetToken) {
                 return response.status(500).json({
@@ -218,33 +211,33 @@ authRouter.post(
                     status: 'error',
                 });
             }
-
             const convertPasswordResetToken = generatedPasswordResetToken.toString('hex');
+
+            /** Setting the token expire (5 MINUTES) */
+            const expireTimeReset = new Date(Date.now() + 2 * 60 * 1000);
+
             // const expireTimeToken = Date.now() + 1800000;
-            // 5 MINUTES
             // const expireTimeReset = Date.now() + 5 * 60 * 1000;
-            const expireTimeReset = new Date(Date.now() + 5 * 60 * 1000);
 
             // const validPassword = bcrypt.compareSync(password, existingUser.password)
+            // console.log(4, 'expireTimeToken =', expireTimeToken);
 
             console.log(3, 'convertPasswordResetToken =', convertPasswordResetToken);
-            // console.log(4, 'expireTimeToken =', expireTimeToken);
             console.log(4, 'expireTimeReset =', expireTimeReset);
             console.log(4, 'expireTimeReset =', expireTimeReset.getTime());
             console.log(4, 'expireTimeReset =', expireTimeReset.toISOString());
 
-            // WRITE THE TOKEN TO THE DATABASE
+            /** Write the token to the database */
             await AuthUserHandler.addPasswordResetToken(convertPasswordResetToken, existingUserId, expireTimeReset.toISOString());
 
-            // GENERATE A LINK TO RESET THE TOKEN
+            /** Generate a link to reset the token */
+            const resetLink = `${urlClient}/auth/reset-password?id=${existingUser.id}&token=${convertPasswordResetToken}`
+
             // const resetUrl = `${config.get<string>('http://localhost:4200')}/auth/reset-password/${resetToken}`;
             // const resetLink = `http://localhost:5000/reset?email=${user.email}?&hash=${hash}`
             // const link = `${urlClient}/password-reset/${user._id}/${token.token}`;
-            const resetLink = `${urlClient}/auth/reset-password?id=${existingUser.id}?&token=${convertPasswordResetToken}`
 
-
-            // SEND A LINK TO RESET YOUR PASSWORD BY E-MAIL
-
+            /** SEND a link to reset your password by e-mail */
             // Set transporter options:
             const subject = 'Reset password!'
             const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
@@ -273,12 +266,48 @@ authRouter.post(
             // TODO isValidToken()
             console.log(7777, 'request.body', request.body)
 
-            // const {validToken} = request.body.isValidToken;
-            // if (!validToken) {
-            //     return response.status(400).json({message: `You must provide an validToken`})
+            const {passwordResetToken} = request.body;
+            if (!passwordResetToken) {
+                return response.status(400).json({message: `You must provide a token to reset your password.`})
+            }
+
+            console.log(888, 'passwordResetToken', passwordResetToken)
+
+            const userId: number = passwordResetToken.id;
+            const currentPasswordResetToken = passwordResetToken.token;
+
+            console.log(333, 'userId', userId)
+
+            // 888 passwordResetToken {
+            //     id: '165',
+            //         token: '816c127f396f60ee5abc31604d4a1c080300c729c37ba7e0050b74e35f1cbe60'
             // }
-            // const existingValidToken = await AuthUserHandler.findValidTokenById(validToken);
-            // if (!existingValidToken) {
+
+            const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
+            console.log(444, 'existingValidPasswordResetToken', existingPasswordResetToken)
+
+            // if (!expireTimePasswordResetToken.length) {
+            //     return response.status(400).json({message: `User  not found`});
+            // }
+
+            const currentTime = new Date();
+            const expireTimePasswordResetToken = existingPasswordResetToken[0].expireTime;
+
+            console.log(123, 'currentTime', currentTime)
+            console.log(456, 'expireTimePasswordResetToken', expireTimePasswordResetToken)
+
+            if (expireTimePasswordResetToken.getTime() > currentTime.getTime()) {
+                console.log('Available change password');
+            } else {
+                console.log('Not available change password');
+            }
+
+
+
+
+
+
+            // if (!expireTimePasswordResetToken.length) {
             //     return response.status(400).json({message: `User ${validToken} not found`})
             // } else {
             //
@@ -288,6 +317,7 @@ authRouter.post(
             //
             //     return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
             // }
+
 
 
             //check for email and hash in query parameter
@@ -317,7 +347,7 @@ authRouter.post(
             //     return res.sendFile(__dirname + '/views/reset.html')
             // }
 
-
+            return response.status(201).json({message: `Password reset page is available for another - ${10} minutes`});
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

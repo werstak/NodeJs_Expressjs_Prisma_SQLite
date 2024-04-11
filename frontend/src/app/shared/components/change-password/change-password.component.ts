@@ -9,6 +9,7 @@ import { DialogNewPasswordModel } from '../../../core/models/dialog-new-password
 import { UsersService } from '../../../modules/users/users.service';
 import { AppRouteEnum } from '../../../core/enums';
 import { ActivatedRoute } from '@angular/router';
+import { PasswordResetTokenModel } from '../../../core/models/password-reset-token.model';
 
 interface ValidPassword {
   validPassword: boolean;
@@ -25,12 +26,13 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     public store: Store,
     public usersService: UsersService,
     private authService: AuthService,
-    private activatedRoute: ActivatedRoute
+    // private activatedRoute: ActivatedRoute
   ) {
   }
 
 
   @Input() userData: DialogNewPasswordModel;
+  @Input() passwordResetToken: PasswordResetTokenModel;
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
   AppRouteEnum = AppRouteEnum;
@@ -46,29 +48,30 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('userData', this.userData)
+    console.log('ChangePasswordComponent = passwordResetToken', this.passwordResetToken)
     this.buildChangePasswordForm();
     this.changesControlCurrentPassword();
     this.toggleStateControls();
-    this.getUrlParams();
+    // this.getUrlParams();
   }
 
-  private getUrlParams() {
-
-    const firstParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('firstParamKey');
-    const secondParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('secondParamKey');
-
-    console.log(333, firstParam, secondParam)
-
-
-    const urlParams = this.activatedRoute.snapshot;
-    console.log(222, urlParams)
-
-    // const selectedId = 'userId_' + urlParams[1].path;
-    this.activatedRoute.queryParams.subscribe(params => {
-      // console.log(111, 'params', params)
-
-    });
-  }
+  // private getUrlParams() {
+  //
+  //   const firstParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('firstParamKey');
+  //   const secondParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('secondParamKey');
+  //
+  //   console.log(333, firstParam, secondParam)
+  //
+  //
+  //   const urlParams = this.activatedRoute.snapshot;
+  //   console.log(222, urlParams)
+  //
+  //   // const selectedId = 'userId_' + urlParams[1].path;
+  //   this.activatedRoute.queryParams.subscribe(params => {
+  //     // console.log(111, 'params', params)
+  //
+  //   });
+  // }
 
   private buildChangePasswordForm() {
     this.changePasswordForm = this.fb.group({

@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
       .subscribe(resp => {
         this.account = resp;
         if (!this.account) {
-          this.router.navigate(['auth/login']);
+          // this.router.navigate(['auth/login']);
         }
       });
   }

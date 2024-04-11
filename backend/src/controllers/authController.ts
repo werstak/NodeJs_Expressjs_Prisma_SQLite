@@ -32,7 +32,7 @@ export const findUserInfoByEmail = async (email: string): Promise<any | null> =>
 };
 
 
-export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: any): Promise<any | null> => {
+export const addRefreshTokenToWhitelist = async ({jti, refreshToken, userId}: any): Promise<any | null> => {
     return db.refreshToken.create({
         data: {
             id: jti,
@@ -75,47 +75,26 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
     });
 }
 
-export const findPasswordResetToken = async (id: number): Promise<any | null> => {
-    return db.user.findUnique({
+
+export const findPasswordResetToken = async (userId: number): Promise<any | null> => {
+    console.log(555, 'authController', 'findPasswordResetToken()', userId)
+
+    return db.passwordResetToken.findMany({
         where: {
-            id,
-        },
-        select: {
-            passwordResetToken: true
+            userId: + userId,
         },
     });
-};
+}
 
 
-
-export const deletePreviousPasswordResetTokens = async (id: number): Promise<any | null> => {
-    console.log(555, 'authController', 'deletePasswordResetTokens()', id);
+export const deletePreviousPasswordResetTokens = async (): Promise<any | null> => {
+    console.log(555, 'authController', 'deletePasswordResetTokens()');
     await db.passwordResetToken.deleteMany({});
-
-    // await db.passwordResetToken.delete({
-    //     where: {
-    //         id: id
-    //     },
-    // });
-
-    // await db.passwordResetToken.deleteMany ({
-    //     where: {
-    //         userId: {
-    //             contains: id,
-    //         },
-    //     },
-    // });
-
-    // await db.passwordResetToken.deleteMany ({
-    //     where: {
-    //         userId: id
-    //     },
-    // });
 }
 
 
 export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: any, expireTimeReset: any): Promise<any | null> => {
-    console.log(555, 'authController', 'addPasswordResetToken()', convertPasswordResetToken, userId, "expireTimeReset", expireTimeReset)
+    console.log(555, 'authController', 'addPasswordResetToken()', convertPasswordResetToken, userId, 'expireTimeReset', expireTimeReset)
     return db.passwordResetToken.create({
         data: {
             resetToken: convertPasswordResetToken,
@@ -124,7 +103,6 @@ export const addPasswordResetToken = async (convertPasswordResetToken: any, user
         },
     });
 }
-
 
 
 // export const revokeTokens = async (userId: any): Promise<any | null> => {

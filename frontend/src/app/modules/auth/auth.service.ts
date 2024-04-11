@@ -7,6 +7,7 @@ import { map } from 'rxjs/operators';
 import { LoginUser } from '../../core/models/login-user';
 import { RegisterUser } from '../../core/models/register-user';
 import { Auth } from '../../core/models/auth';
+import { PasswordResetTokenModel } from '../../core/models/password-reset-token.model';
 
 @Injectable({
   providedIn: 'root'
@@ -171,4 +172,18 @@ export class AuthService {
         })
       );
   }
+
+
+  getValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel) {
+    console.log('UsersService = getValidPasswordResetToken()', passwordResetToken);
+    return this.http.post(config.API_URL + `/auth/reset_password_link/`, {passwordResetToken})
+      .pipe(
+        catchError(error => {
+          console.log('Error: ', error.message);
+          return throwError(error);
+        })
+      );
+  }
+
+
 }
