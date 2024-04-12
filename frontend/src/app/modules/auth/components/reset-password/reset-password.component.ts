@@ -27,7 +27,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   dataLoading: boolean = false;
   resetForm: FormGroup;
   hide = true;
-  resetToken: PasswordResetTokenModel;
+  resetTokenFromQueryParams: PasswordResetTokenModel;
   private urlParams: ActivatedRouteSnapshot;
 
   ngOnInit() {
@@ -37,37 +37,28 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   private getUrlParams() {
     this.urlParams = this.activatedRoute.snapshot;
     console.log(222, this.urlParams)
-    this.handlerAccessCurrentPage();
+    this.accessCurrentPageHandler();
   }
 
-  // private saveResetToken() {
-  //
-  // }
 
-
-
-  private handlerAccessCurrentPage() {
+  private accessCurrentPageHandler() {
     const {id, token} = this.urlParams.queryParams;
-    this.resetToken = {id, token}
-    console.log(1, 'this.resetToken', this.resetToken)
+    this.resetTokenFromQueryParams = {id, token}
+    console.log(1, 'INPUT this.resetTokenFromQueryParams', this.resetTokenFromQueryParams)
 
-    this.authService.getValidPasswordResetToken(this.resetToken).pipe(
+    this.authService.getValidPasswordResetToken(this.resetTokenFromQueryParams).pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
-
-
-        //
-        // if (!this.accessPageAllowed) {
-        //   // this.router.navigate(['auth/login']);
-        // }
-
           if (resp) {
+            console.log(12, 'getValidPasswordResetToken()', resp)
             this.accessPageAllowed = resp;
-            console.log(1, 'getValidPasswordResetToken', resp)
+            this.authService.validResetToken$.next(true);
+
             this.notificationService.showSuccess(this.accessPageAllowed.message);
           }
         },
         (error) => {
+          this.authService.validResetToken$.next(false);
           console.error(error);
           this.notificationService.showError(error);
           this.router.navigate(['auth/forgot-password']);

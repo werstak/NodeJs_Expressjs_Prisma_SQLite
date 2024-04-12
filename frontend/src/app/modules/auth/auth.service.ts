@@ -15,6 +15,9 @@ import { PasswordResetTokenModel } from '../../core/models/password-reset-token.
 export class AuthService {
 
   public accountSubject$ = new BehaviorSubject<Auth | null>(null);
+  public validResetToken$ = new BehaviorSubject<boolean>(false);
+  // public validResetToken$ =  new BehaviorSubject<any>({});
+
   readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
   readonly JWT_REFRESH_TOKEN_KEY = 'refresh_token';
   readonly ACCOUNT = 'account';
@@ -175,7 +178,6 @@ export class AuthService {
 
 
   getValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel) {
-    console.log('UsersService = getValidPasswordResetToken()', passwordResetToken);
     return this.http.post(config.API_URL + `/auth/reset_password_link/`, {passwordResetToken})
       .pipe(
         catchError(error => {

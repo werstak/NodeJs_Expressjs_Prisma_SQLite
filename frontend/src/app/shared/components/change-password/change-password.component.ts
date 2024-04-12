@@ -32,13 +32,14 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
   @Input() userData: DialogNewPasswordModel;
-  @Input() passwordResetToken: PasswordResetTokenModel;
+  // @Input() passwordResetToken: PasswordResetTokenModel;
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
   AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
   validCurrentPassword: any;
+  validResetToken: boolean = false;
   changePasswordForm: FormGroup;
 
   hideCurrentPassword = true;
@@ -48,7 +49,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     console.log('userData', this.userData)
-    console.log('ChangePasswordComponent = passwordResetToken', this.passwordResetToken)
+    // console.log(33, 'ChangePasswordComponent = passwordResetToken', this.passwordResetToken)
+    this.stateValidResetToken();
     this.buildChangePasswordForm();
     this.changesControlCurrentPassword();
     this.toggleStateControls();
@@ -72,6 +74,18 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   //
   //   });
   // }
+
+  private stateValidResetToken() {
+    this.authService.validResetToken$.pipe(
+      takeUntil(this.destroy))
+      .subscribe(resp => {
+
+        this.validResetToken = resp;
+        console.log(11111, 'this.validResetToken', this.validResetToken);
+
+        // this.toggleStateControls();
+      });
+  }
 
   private buildChangePasswordForm() {
     this.changePasswordForm = this.fb.group({
@@ -125,7 +139,9 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   private toggleStateControls() {
-    if(this.validCurrentPassword?.validPassword) {
+    console.log(2222, 'toggleStateControls()')
+
+    if (this.validCurrentPassword?.validPassword || this.validResetToken) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();
     } else {

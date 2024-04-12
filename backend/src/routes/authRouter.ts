@@ -213,8 +213,9 @@ authRouter.post(
             }
             const convertPasswordResetToken = generatedPasswordResetToken.toString('hex');
 
-            /** Setting the token expire (5 MINUTES) */
-            const expireTimeReset = new Date(Date.now() + 2 * 60 * 1000);
+            /** Setting the token expire (10 MINUTES) */
+            const lifeTime: number = 20;
+            const expireTimeReset = new Date(Date.now() + lifeTime * 60 * 1000);
 
             // const expireTimeToken = Date.now() + 1800000;
             // const expireTimeReset = Date.now() + 5 * 60 * 1000;
@@ -288,14 +289,14 @@ authRouter.post(
             // console.log(111, 'responseResetToken', responseResetToken)
 
             if (responseResetToken !== expireResetToken) {
-                return response.status(400).json({message: `Invalid Token`});
+                return response.status(400).json({message: `Invalid or Expired Token!`});
             }
 
             console.log(123, 'currentTime', currentTime)
             console.log(456, 'expireResetTokenTime', expireResetTokenTime)
 
             if (expireResetTokenTime.getTime() < currentTime.getTime()) {
-                return response.status(400).json({message: `Time to change password has expired!`});
+                return response.status(400).json({message: `Time to change password has expired. Submit a new password change request!`});
             }
 
             /** Calculating the remaining lifetime of a PasswordResetToken */
