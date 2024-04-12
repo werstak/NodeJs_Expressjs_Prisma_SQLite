@@ -54,7 +54,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       this.authService.getVerifyEmail(verifyEmail).pipe(
         takeUntil(this.destroy))
         .subscribe((resp) => {
-            console.log('resp', resp)
+            console.log('resp', resp);
+            this.dataLoading = false;
           let test: ResponseMessageModel;
             if (resp) {
               this.verifyCurrentEmail = resp;
@@ -78,7 +79,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
             this.notificationService.showError(error);
           });
 
-      this.dataLoading = false;
+      // this.dataLoading = false;
     } else {
       return;
     }

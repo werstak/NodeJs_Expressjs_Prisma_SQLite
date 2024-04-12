@@ -238,7 +238,7 @@ authRouter.post(
             // const link = `${urlClient}/password-reset/${user._id}/${token.token}`;
 
             /** SEND a link to reset your password by e-mail */
-            // Set transporter options:
+                // Set transporter options:
             const subject = 'Reset password!'
             const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
             const text = `To set a new password, follow this link ${resetLink}`
@@ -263,91 +263,51 @@ authRouter.post(
     async (request: Request, response: Response) => {
 
         try {
-            // TODO isValidToken()
-            console.log(7777, 'request.body', request.body)
-
+            console.log(1, 'request.body', request.body)
             const {passwordResetToken} = request.body;
             if (!passwordResetToken) {
-                return response.status(400).json({message: `You must provide a token to reset your password.`})
+                return response.status(400).json({message: `Missing password reset token.`})
             }
 
-            console.log(888, 'passwordResetToken', passwordResetToken)
-
+            /** Chek existence PasswordResetToken */
             const userId: number = passwordResetToken.id;
-            const currentPasswordResetToken = passwordResetToken.token;
-
-            console.log(333, 'userId', userId)
-
-            // 888 passwordResetToken {
-            //     id: '165',
-            //         token: '816c127f396f60ee5abc31604d4a1c080300c729c37ba7e0050b74e35f1cbe60'
-            // }
-
+            const responseResetToken = passwordResetToken.token;
             const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
-            console.log(444, 'existingValidPasswordResetToken', existingPasswordResetToken)
+            console.log(2, 'existingValidPasswordResetToken', existingPasswordResetToken)
 
-            // if (!expireTimePasswordResetToken.length) {
-            //     return response.status(400).json({message: `User  not found`});
-            // }
+            if (!existingPasswordResetToken.length) {
+                return response.status(400).json({message: `Token not found`});
+            }
 
+            /** Checking the validity and expiration time of the PasswordResetToken */
             const currentTime = new Date();
-            const expireTimePasswordResetToken = existingPasswordResetToken[0].expireTime;
+            const expireResetToken = existingPasswordResetToken[0].resetToken;
+            const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+
+            // console.log(111, 'expireResetToken', expireResetToken)
+            // console.log(111, 'responseResetToken', responseResetToken)
+
+            if (responseResetToken !== expireResetToken) {
+                return response.status(400).json({message: `Invalid Token`});
+            }
 
             console.log(123, 'currentTime', currentTime)
-            console.log(456, 'expireTimePasswordResetToken', expireTimePasswordResetToken)
+            console.log(456, 'expireResetTokenTime', expireResetTokenTime)
 
-            if (expireTimePasswordResetToken.getTime() > currentTime.getTime()) {
-                console.log('Available change password');
-            } else {
-                console.log('Not available change password');
+            if (expireResetTokenTime.getTime() < currentTime.getTime()) {
+                return response.status(400).json({message: `Time to change password has expired!`});
             }
 
+            /** Calculating the remaining lifetime of a PasswordResetToken */
+            const currentTimeMin = new Date(currentTime).getTime();
+            const expireResetTokenTimeMin = new Date(expireResetTokenTime).getTime();
+            const lifetimePasswordResetToken = Math.round((expireResetTokenTimeMin - currentTimeMin) / 60 / 1000);
 
+            // console.log(987, 'currentTimeMin', currentTimeMin)
+            // console.log(987, 'expireResetTokenTimeMin', expireResetTokenTimeMin)
+            // console.log(987, 'lifetimePasswordResetToken', lifetimePasswordResetToken)
 
-
-
-
-            // if (!expireTimePasswordResetToken.length) {
-            //     return response.status(400).json({message: `User ${validToken} not found`})
-            // } else {
-            //
-            //     // isValidToken()
-            //     // function which will take token and id and compare it with saved token and userID
-            //
-            //
-            //     return response.status(201).json({message: `Password reset link sent to your email account - ${email}`});
-            // }
-
-
-
-            //check for email and hash in query parameter
-            // if (req.query && req.query.email && req.query.hash) {
-            //     //find user with suh email address
-            //     const user = await User.findOne({ email: req.query.email })
-            //     //check if user object is not empty
-            //     if (user) {
-            //         //now check if hash is valid
-            //         if (new User(user).verifyPasswordResetHash(req.query.hash)) {
-            //             //save email to session
-            //             req.session.email = req.query.email;
-            //             //issue a password reset form
-            //             return res.sendFile(__dirname + '/views/new_pass.html')
-            //         } else {
-            //             return res.status(400).json({
-            //                 message: "You have provided an invalid reset link"
-            //             })
-            //         }
-            //     } else {
-            //         return res.status(400).json({
-            //             message: "You have provided an invalid reset link"
-            //         })
-            //     }
-            // } else {
-            //     //if there are no query parameters, serve the normal request form
-            //     return res.sendFile(__dirname + '/views/reset.html')
-            // }
-
-            return response.status(201).json({message: `Password reset page is available for another - ${10} minutes`});
+            return response.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
