@@ -296,7 +296,7 @@ authRouter.post(
             console.log(456, 'expireResetTokenTime', expireResetTokenTime)
 
             if (expireResetTokenTime.getTime() < currentTime.getTime()) {
-                return response.status(400).json({message: `Time to change password has expired. Submit a new password change request!`});
+                return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
             }
 
             /** Calculating the remaining lifetime of a PasswordResetToken */
@@ -309,6 +309,78 @@ authRouter.post(
             // console.log(987, 'lifetimePasswordResetToken', lifetimePasswordResetToken)
 
             return response.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ POST: Change Password
+ */
+authRouter.put(
+    '/change_password',
+    async (request: Request, response: Response) => {
+
+        try {
+            console.log(1, 'request.body', request.body)
+            const {password, passwordResetToken} = request.body;
+
+            console.log(2, ' POST: Change Password', password, passwordResetToken);
+
+            if (!passwordResetToken || !password) {
+                return response.status(400).json({message: `Missing password or password reset token.`})
+            }
+
+            /** Chek existence PasswordResetToken */
+            const userId: number = Number(passwordResetToken.id);
+            const responseResetToken = passwordResetToken.token;
+            const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
+            console.log(2, 'existingValidPasswordResetToken', existingPasswordResetToken)
+
+            if (!existingPasswordResetToken.length) {
+                return response.status(400).json({message: `Token not found`});
+            }
+
+            /** Checking the validity and expiration time of the PasswordResetToken */
+            const currentTime = new Date();
+            const expireResetToken = existingPasswordResetToken[0].resetToken;
+            const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+
+            // console.log(111, 'expireResetToken', expireResetToken)
+            // console.log(111, 'responseResetToken', responseResetToken)
+
+            if (responseResetToken !== expireResetToken) {
+                return response.status(400).json({message: `Invalid or Expired Token!`});
+            }
+
+            // console.log(123, 'currentTime', currentTime)
+            // console.log(456, 'expireResetTokenTime', expireResetTokenTime)
+
+            if (expireResetTokenTime.getTime() < currentTime.getTime()) {
+                return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
+            }
+
+            // /** Calculating the remaining lifetime of a PasswordResetToken */
+            // const currentTimeMin = new Date(currentTime).getTime();
+            // const expireResetTokenTimeMin = new Date(expireResetTokenTime).getTime();
+            // const lifetimePasswordResetToken = Math.round((expireResetTokenTimeMin - currentTimeMin) / 60 / 1000);
+            console.log(2323, 'request.body.password', request.body.password);
+
+            const hashNewPassword = bcrypt.hashSync(request.body.password, 7);
+
+            console.log(4545, 'hashPassword', hashNewPassword
+            )
+            const newUserPassword: any = {password: hashNewPassword};
+
+            console.log(5656, newUserPassword)
+            await AuthUserHandler.changePasswordHandler(newUserPassword, userId);
+
+            // return response.status(200).json(updatedUserPassword);
+            return response.status(201).json({message: `Password changed successfully!`});
+
+
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

@@ -104,6 +104,20 @@ export const addPasswordResetToken = async (convertPasswordResetToken: any, user
     });
 }
 
+export const changePasswordHandler = async (newPassword: any, userId: number): Promise<any> => {
+    const {password} = newPassword;
+    console.log(555, 'authController', 'changePasswordHandler()', password, userId)
+
+    return db.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            password,
+        }
+    });
+};
+
 
 // export const revokeTokens = async (userId: any): Promise<any | null> => {
 //     console.log(22, 'revokeTokens()', userId)

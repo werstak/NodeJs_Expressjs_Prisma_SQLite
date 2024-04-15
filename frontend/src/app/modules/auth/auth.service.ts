@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as config from '../../../app-config';
@@ -8,6 +8,7 @@ import { LoginUser } from '../../core/models/login-user';
 import { RegisterUser } from '../../core/models/register-user';
 import { Auth } from '../../core/models/auth';
 import { PasswordResetTokenModel } from '../../core/models/password-reset-token.model';
+import { ValidResetTokenModel } from '../../core/models/valid-reset-token.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,8 @@ import { PasswordResetTokenModel } from '../../core/models/password-reset-token.
 export class AuthService {
 
   public accountSubject$ = new BehaviorSubject<Auth | null>(null);
-  public validResetToken$ = new BehaviorSubject<boolean>(false);
+  public validResetToken$ = new BehaviorSubject<any>({})
+  // public validResetToken$ = new BehaviorSubject<boolean>(false);
   // public validResetToken$ =  new BehaviorSubject<any>({});
 
   readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
@@ -178,6 +180,7 @@ export class AuthService {
 
 
   getValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel) {
+    // console.log(1, 'getValidPasswordResetToken()', passwordResetToken)
     return this.http.post(config.API_URL + `/auth/reset_password_link/`, {passwordResetToken})
       .pipe(
         catchError(error => {
@@ -187,5 +190,10 @@ export class AuthService {
       );
   }
 
+
+  changePassword(password: any, passwordResetToken: ValidResetTokenModel): Observable<any> {
+    console.log('updateUserPassword()', password, passwordResetToken)
+    return this.http.put(config.API_URL + `/auth/change_password/`, {password, passwordResetToken});
+  }
 
 }

@@ -203,8 +203,14 @@ usersRouter.put(
         try {
             console.log('Root PUT - Updating Password USER = ', request.body);
 
+
+            console.log(444, 'request.body.password', request.body.password);
+
             const hashPassword = bcrypt.hashSync(request.body.password, 7);
+            console.log(555, 'hashPassword', hashPassword)
             const newUserPassword: any = {password: hashPassword};
+            console.log(777, 'newUserPassword', newUserPassword)
+
             const updatedUserPassword = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
             return response.status(200).json(updatedUserPassword);
         } catch (error: any) {
