@@ -11,6 +11,7 @@ import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
 import { AppRouteEnum } from '../../../../core/enums';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
+import { NotificationService } from '../../../../shared/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -23,7 +24,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationService,
   ) {
   }
 
@@ -120,15 +122,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
       this.authService.register(registerUserData).pipe(
         takeUntil(this.destroy))
         .subscribe(resp => {
-          this.registerUserResp = resp;
-          if (resp) {
-            setTimeout(() => {
-              this.router.navigate(['/auth/login']);
-            }, 1000);
+            this.registerUserResp = resp;
+            if (resp) {
+              setTimeout(() => {
+                this.notificationService.showSuccess(resp.message);
+                this.router.navigate(['/auth/login']);
+              }, 1000);
 
+              this.dataLoading = false;
+            }
+
+          },
+          (error) => {
+            console.error(error);
             this.dataLoading = false;
-          }
-        });
+            this.notificationService.showError(error);
+          });
     }
   }
 

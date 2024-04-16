@@ -43,7 +43,7 @@ authRouter.post(
 
             const existingUser = await AuthUserHandler.findUserByEmail(email);
             if (existingUser) {
-                return response.status(400).json({message: `Email already in use`})
+                return response.status(409).json({message: `Email already in use`})
             }
 
             user.password = hashPassword;
@@ -55,6 +55,7 @@ authRouter.post(
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
 
             return response.status(201).json({
+                message: `Registration successful!`,
                 accessToken,
                 refreshToken
             });

@@ -24,7 +24,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   }
 
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  dataLoading: boolean = false;
   resetForm: FormGroup;
   hide = true;
   resetTokenFromQueryParams: PasswordResetTokenModel;
