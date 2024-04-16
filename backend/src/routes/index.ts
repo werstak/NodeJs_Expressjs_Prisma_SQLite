@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { authRouter } from './authRouter';
+import { authRouter } from './auth.rout';
 import { rootRouter } from './root.rout'
 import { usersRouter } from './users.rout';
 import { postsRouter } from './posts.rout';

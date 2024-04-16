@@ -5,7 +5,6 @@ import { AuthService } from '../../auth.service';
 import { AppRouteEnum } from '../../../../core/enums';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { NotificationService } from '../../../../shared/notification.service';
-import { ResponseMessageModel } from '../../../../core/models/response-message.model';
 import { Router } from '@angular/router';
 
 @Component({
@@ -51,19 +50,13 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       this.dataLoading = true;
       const verifyEmail = this.recoveryForm.value;
 
-      console.log('verifyEmail', verifyEmail)
-
-      this.authService.getVerifyEmail(verifyEmail).pipe(
+      this.authService.fetchVerifyEmail(verifyEmail).pipe(
         takeUntil(this.destroy))
         .subscribe((resp) => {
-            console.log('resp', resp);
             this.dataLoading = false;
-          let test: ResponseMessageModel;
+
             if (resp) {
               this.verifyCurrentEmail = resp;
-
-              test = this.verifyCurrentEmail.message;
-
             } else {
               this.verifyCurrentEmail = resp;
             }
@@ -74,13 +67,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
           (error) => {
             this.dataLoading = false;
             console.error(error);
-            // const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-            // const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-
             this.notificationService.showError(error);
           });
 
-      // this.dataLoading = false;
+      this.dataLoading = false;
     } else {
       return;
     }

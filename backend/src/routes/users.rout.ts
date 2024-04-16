@@ -4,19 +4,16 @@ import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
-import db from '../utils/db';
-import { isAuthenticated } from '../middleware/middlewares';
+
 
 const path = require('path');
 
 export const usersRouter = express.Router();
 
-
 /**
  GET: all USERS
  */
 usersRouter.get('/', async (request: Request, response: Response) => {
-
     console.log('Root GET - All USERS')
     const params = (request.query);
     console.log('USERS', 'paginator', params)
@@ -52,8 +49,8 @@ usersRouter.get('/list_all_users', async (request: Request, response: Response) 
  */
 usersRouter.get('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
-
     console.log('Root GET - single USER')
+
     try {
         const user = await UserHandler.getUserHandler(id);
         if (user) {
@@ -95,7 +92,6 @@ usersRouter.post(
             user.password = hashPassword;
             user.avatar = filename;
 
-            console.log(111111111, user)
             const newUser = await UserHandler.createUserHandler(user);
             return response.status(201).json(newUser);
         } catch (error: any) {
@@ -171,7 +167,6 @@ usersRouter.put(
 
                 console.log('first image upload or replacement')
                 fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
-
             }
 
             user.avatar = fileUrl;
@@ -202,15 +197,8 @@ usersRouter.put(
         const id: number = parseInt(request.params.id, 10);
         try {
             console.log('Root PUT - Updating Password USER = ', request.body);
-
-
-            console.log(444, 'request.body.password', request.body.password);
-
             const hashPassword = bcrypt.hashSync(request.body.password, 7);
-            console.log(555, 'hashPassword', hashPassword)
             const newUserPassword: any = {password: hashPassword};
-            console.log(777, 'newUserPassword', newUserPassword)
-
             const updatedUserPassword = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
             return response.status(200).json(updatedUserPassword);
         } catch (error: any) {
@@ -226,7 +214,7 @@ usersRouter.put(
 usersRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
-        console.log('DELETE', 'request.query', request.query)
+        console.log('DELETE USER', 'request.query', request.query)
 
         const previousAvatarUrl = String(request.query.avatar);
         const pathRemovePicture = previousAvatarUrl.replace('http://localhost:5000/', '');

@@ -52,8 +52,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.buildRegForm();
-    // this.initRegFormValue();
-
     this.registerForm.patchValue({
       status: true
     });
@@ -78,7 +76,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
-      role: 4,
+      role: 4, //Role - 'Client'
+
       // role: [null, Validators.compose([
       //   Validators.required,
       //   Validators.maxLength(50)])

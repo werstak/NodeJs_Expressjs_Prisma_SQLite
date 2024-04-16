@@ -44,7 +44,6 @@ export const addRefreshTokenToWhitelist = async ({jti, refreshToken, userId}: an
 
 
 export const findRefreshTokenById = async (id: any): Promise<any | null> => {
-    console.log(555, 'authController', 'findRefreshTokenById()', id)
     return db.refreshToken.findUnique({
         where: {
             id,
@@ -54,7 +53,6 @@ export const findRefreshTokenById = async (id: any): Promise<any | null> => {
 
 
 export const deleteRefreshToken = async (id: any): Promise<any | null> => {
-    console.log(555, 'authController', 'deleteRefreshToken()', id)
     return db.refreshToken.update({
         where: {
             id,
@@ -67,7 +65,6 @@ export const deleteRefreshToken = async (id: any): Promise<any | null> => {
 
 
 export const revokeTokens = async (id: any): Promise<any | null> => {
-    console.log(555, 'authController', 'revokeTokens()', id)
     await db.refreshToken.delete({
         where: {
             id,
@@ -77,24 +74,20 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
 
 
 export const findPasswordResetToken = async (userId: number): Promise<any | null> => {
-    console.log(555, 'authController', 'findPasswordResetToken()', userId)
-
     return db.passwordResetToken.findMany({
         where: {
-            userId: + userId,
+            userId: +userId,
         },
     });
 }
 
 
 export const deletePreviousPasswordResetTokens = async (): Promise<any | null> => {
-    console.log(555, 'authController', 'deletePasswordResetTokens()');
     await db.passwordResetToken.deleteMany({});
 }
 
 
 export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: any, expireTimeReset: any): Promise<any | null> => {
-    console.log(555, 'authController', 'addPasswordResetToken()', convertPasswordResetToken, userId, 'expireTimeReset', expireTimeReset)
     return db.passwordResetToken.create({
         data: {
             resetToken: convertPasswordResetToken,
@@ -106,8 +99,6 @@ export const addPasswordResetToken = async (convertPasswordResetToken: any, user
 
 export const changePasswordHandler = async (newPassword: any, userId: number): Promise<any> => {
     const {password} = newPassword;
-    console.log(555, 'authController', 'changePasswordHandler()', password, userId)
-
     return db.user.update({
         where: {
             id: userId,
@@ -117,16 +108,3 @@ export const changePasswordHandler = async (newPassword: any, userId: number): P
         }
     });
 };
-
-
-// export const revokeTokens = async (userId: any): Promise<any | null> => {
-//     console.log(22, 'revokeTokens()', userId)
-//     return db.refreshToken.updateMany({
-//         where: {
-//             userId
-//         },
-//         data: {
-//             revoked: true
-//         }
-//     });
-// }

@@ -30,7 +30,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     public usersService: UsersService,
     private authService: AuthService,
     private notificationService: NotificationService,
-    // private activatedRoute: ActivatedRoute
   ) {
   }
 
@@ -54,13 +53,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.buildChangePasswordForm();
 
     if (this.userData) {
-
       this.changesControlCurrentPassword();
       this.toggleStateControls();
-
     } else {
       this.stateValidResetToken();
-
     }
   }
 
@@ -70,7 +66,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       .subscribe(resp => {
         this.validResetToken = resp;
 
-        console.log(2, 'this.validResetToken', this.validResetToken);
         this.toggleStateControls();
       });
   }
@@ -108,13 +103,12 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   private checkValidCurrentPassword(val: string) {
-
     const userData = {
       email: this.userData.email,
       password: val
     }
 
-    this.authService.getValidPassword(userData).pipe(
+    this.authService.fetchValidPassword(userData).pipe(
       takeUntil(this.destroy))
       .subscribe((resp) => {
         if (resp) {
@@ -127,9 +121,6 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   private toggleStateControls() {
-    console.log(3, 'toggleStateControls() - ', 'validCurrentPassword =', this.validCurrentPassword?.validPassword)
-    console.log(3, 'toggleStateControls() - ', 'validResetToken =', this.validResetToken.valid)
-
     if (this.validCurrentPassword?.validPassword || this.validResetToken.valid) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();
@@ -148,13 +139,9 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   onSubmitChangePassword(): void {
-
     if (this.userData) {
-      console.log(11111111)
       if (this.changePasswordForm.valid) {
-
         this.dataLoading = true;
-
         const id = this.userData.userId;
         const params = {
           password: this.changePasswordForm.value.newPassword
@@ -166,21 +153,12 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
         return;
       }
     } else {
-      console.log(2222222)
-
       if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
-        console.log(3333333)
         this.dataLoading = true;
-        // const id = Number(this.validResetToken.id);
-        // const passwordParams = {
-        //   password: this.changePasswordForm.value.newPassword
-        // }
-
-        this.authService.changePassword(this.changePasswordForm.value.newPassword, this.validResetToken).pipe(
+        this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken).pipe(
           takeUntil(this.destroy))
           .subscribe(resp => {
               if (resp) {
-                console.log(13, 'changePassword()', resp);
                 this.notificationService.showSuccess(resp.message);
                 this.router.navigate(['auth/login']);
               }
@@ -191,41 +169,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
             });
         this.dataLoading = false;
       } else {
-        console.log(4444444)
         return;
       }
-
-
     }
-
-
   }
-
-
-  //
-  // onSubmitChangePassword(): void {
-  //   console.log(333, this.changePasswordForm)
-  //   if (this.changePasswordForm.valid) {
-  //
-  //     this.dataLoading = true;
-  //
-  //     // TODO - redo the method for obtaining User ID depending on whether the user is logged in or not
-  //     // Take information from the URL if the user came to the site using a link
-  //     // this.getUrlParams()
-  //
-  //     const id = this.userData.userId;
-  //     // const id = this.userData.userId ? this.userData.userId : ;
-  //
-  //     const params = {
-  //       password: this.changePasswordForm.value.newPassword
-  //     }
-  //     this.store.dispatch(new UpdateUserPassword(id, params));
-  //     this.dataLoading = false;
-  //     this.closeClick();
-  //   } else {
-  //     return;
-  //   }
-  // }
 
   closeClick(): void {
     this.closeDialogDialogNewPassword.emit();
@@ -237,6 +184,4 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.authService.validResetToken$.next(undefined);
     this.validResetToken = {};
   }
-
-
 }

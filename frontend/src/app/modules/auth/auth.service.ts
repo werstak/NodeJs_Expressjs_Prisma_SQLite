@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import * as config from '../../../app-config';
 import { map } from 'rxjs/operators';
 import { LoginUser } from '../../core/models/login-user';
 import { RegisterUser } from '../../core/models/register-user';
 import { Auth } from '../../core/models/auth';
 import { PasswordResetTokenModel } from '../../core/models/password-reset-token.model';
 import { ValidResetTokenModel } from '../../core/models/valid-reset-token.model';
+import * as config from '../../../app-config';
 
 @Injectable({
   providedIn: 'root'
@@ -17,8 +17,6 @@ export class AuthService {
 
   public accountSubject$ = new BehaviorSubject<Auth | null>(null);
   public validResetToken$ = new BehaviorSubject<any>({})
-  // public validResetToken$ = new BehaviorSubject<boolean>(false);
-  // public validResetToken$ =  new BehaviorSubject<any>({});
 
   readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
   readonly JWT_REFRESH_TOKEN_KEY = 'refresh_token';
@@ -53,7 +51,6 @@ export class AuthService {
    User authorization
    */
   login(loginUserData: LoginUser) {
-    // console.log('LOGIN() AuthService', loginUserData);
     return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
       .pipe(map(account => {
         const {accessToken, refreshToken, userInfo} = account
@@ -146,7 +143,7 @@ export class AuthService {
   }
 
   /**
-   Stop RefreshTokenTimer
+   Stop Refresh Token Timer
    */
   private stopRefreshTokenTimer() {
     clearTimeout(this.refreshTokenTimeout);
@@ -155,8 +152,7 @@ export class AuthService {
   /**
    This request is executed to check whether the user has such a password before launching the password replacement function
    */
-  getValidPassword(validPasswordData: LoginUser) {
-    console.log('UsersService = getValidPassword()', validPasswordData);
+  fetchValidPassword(validPasswordData: LoginUser) {
     return this.http.post(config.API_URL + `/auth/valid_password/`, {validPasswordData})
       .pipe(
         catchError(error => {
@@ -166,9 +162,10 @@ export class AuthService {
       );
   }
 
-
-  getVerifyEmail(verifyEmail: string) {
-    console.log('UsersService = verifyEmail()', verifyEmail);
+  /**
+   Checking whether the Email exists in the database
+   */
+  fetchVerifyEmail(verifyEmail: string) {
     return this.http.post(config.API_URL + `/auth/verify_email/`, {verifyEmail})
       .pipe(
         catchError(error => {
@@ -178,9 +175,10 @@ export class AuthService {
       );
   }
 
-
-  getValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel) {
-    // console.log(1, 'getValidPasswordResetToken()', passwordResetToken)
+  /**
+   Check - Password Reset Token
+   */
+  checkValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel) {
     return this.http.post(config.API_URL + `/auth/reset_password_link/`, {passwordResetToken})
       .pipe(
         catchError(error => {
@@ -190,10 +188,10 @@ export class AuthService {
       );
   }
 
-
-  changePassword(password: any, passwordResetToken: ValidResetTokenModel): Observable<any> {
-    console.log('updateUserPassword()', password, passwordResetToken)
+  /**
+   Change Password
+   */
+  onChangePassword(password: any, passwordResetToken: ValidResetTokenModel): Observable<any> {
     return this.http.put(config.API_URL + `/auth/change_password/`, {password, passwordResetToken});
   }
-
 }

@@ -44,14 +44,13 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.resetTokenFromQueryParams = {id, token}
     // console.log(1, 'INPUT this.resetTokenFromQueryParams', this.resetTokenFromQueryParams)
 
-    this.authService.getValidPasswordResetToken(this.resetTokenFromQueryParams).pipe(
+    this.authService.checkValidPasswordResetToken(this.resetTokenFromQueryParams).pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
           if (resp) {
             this.accessPageAllowed = resp;
             const resetToken = {id, token, valid: true}
             this.authService.validResetToken$.next(resetToken);
-            console.log(1, 'validResetToken$.next()', resetToken)
 
             this.notificationService.showSuccess(this.accessPageAllowed.message);
           }
