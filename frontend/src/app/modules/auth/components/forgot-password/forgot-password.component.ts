@@ -6,6 +6,7 @@ import { AppRouteEnum } from '../../../../core/enums';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { NotificationService } from '../../../../shared/notification.service';
 import { ResponseMessageModel } from '../../../../core/models/response-message.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
@@ -15,6 +16,7 @@ import { ResponseMessageModel } from '../../../../core/models/response-message.m
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
+    private router: Router,
     private authService: AuthService,
     private notificationService: NotificationService,
   ) {
@@ -66,9 +68,8 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
               this.verifyCurrentEmail = resp;
             }
 
-            // test = this.verifyCurrentEmail;
             this.notificationService.showSuccess(this.verifyCurrentEmail.message);
-            // this.notificationService.showSuccess('Password reset link sent to your email account');
+            this.router.navigate(['auth/login']);
           },
           (error) => {
             this.dataLoading = false;

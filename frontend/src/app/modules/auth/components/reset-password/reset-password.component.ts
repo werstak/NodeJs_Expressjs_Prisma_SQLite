@@ -36,7 +36,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
 
   private getUrlParams() {
     this.urlParams = this.activatedRoute.snapshot;
-    console.log(222, this.urlParams)
     this.accessCurrentPageHandler();
   }
 
@@ -44,16 +43,16 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   private accessCurrentPageHandler() {
     const {id, token} = this.urlParams.queryParams;
     this.resetTokenFromQueryParams = {id, token}
-    console.log(1, 'INPUT this.resetTokenFromQueryParams', this.resetTokenFromQueryParams)
+    // console.log(1, 'INPUT this.resetTokenFromQueryParams', this.resetTokenFromQueryParams)
 
     this.authService.getValidPasswordResetToken(this.resetTokenFromQueryParams).pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
           if (resp) {
-            console.log(12, 'getValidPasswordResetToken()', resp)
             this.accessPageAllowed = resp;
             const resetToken = {id, token, valid: true}
             this.authService.validResetToken$.next(resetToken);
+            console.log(1, 'validResetToken$.next()', resetToken)
 
             this.notificationService.showSuccess(this.accessPageAllowed.message);
           }

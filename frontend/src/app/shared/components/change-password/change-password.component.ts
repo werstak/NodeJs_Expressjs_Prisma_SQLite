@@ -36,15 +36,13 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
   @Input() userData: DialogNewPasswordModel;
-  // @Input() passwordResetToken: PasswordResetTokenModel;
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter();
 
   AppRouteEnum = AppRouteEnum;
   destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
   dataLoading: boolean = false;
   validCurrentPassword: any;
-  validResetToken: ValidResetTokenModel;
-  // validResetToken: boolean = false;
+  validResetToken: ValidResetTokenModel = {valid: false};
   changePasswordForm: FormGroup;
 
   hideCurrentPassword = true;
@@ -53,40 +51,26 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    console.log('userData', this.userData)
-    // console.log(33, 'ChangePasswordComponent = passwordResetToken', this.passwordResetToken)
     this.buildChangePasswordForm();
-    this.changesControlCurrentPassword();
-    // this.toggleStateControls();
-    this.stateValidResetToken();
 
-    // this.getUrlParams();
+    if (this.userData) {
+
+      this.changesControlCurrentPassword();
+      this.toggleStateControls();
+
+    } else {
+      this.stateValidResetToken();
+
+    }
   }
-
-  // private getUrlParams() {
-  //
-  //   const firstParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('firstParamKey');
-  //   const secondParam: string | null = this.activatedRoute.snapshot.queryParamMap.get('secondParamKey');
-  //
-  //   console.log(333, firstParam, secondParam)
-  //
-  //
-  //   const urlParams = this.activatedRoute.snapshot;
-  //   console.log(222, urlParams)
-  //
-  //   // const selectedId = 'userId_' + urlParams[1].path;
-  //   this.activatedRoute.queryParams.subscribe(params => {
-  //     // console.log(111, 'params', params)
-  //
-  //   });
-  // }
 
   private stateValidResetToken() {
     this.authService.validResetToken$.pipe(
       takeUntil(this.destroy))
       .subscribe(resp => {
         this.validResetToken = resp;
-        console.log(11111, 'this.validResetToken', this.validResetToken);
+
+        console.log(2, 'this.validResetToken', this.validResetToken);
         this.toggleStateControls();
       });
   }
@@ -123,7 +107,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       });
   }
 
-  private checkValidCurrentPassword(val: any) {
+  private checkValidCurrentPassword(val: string) {
+
     const userData = {
       email: this.userData.email,
       password: val
@@ -142,7 +127,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
   private toggleStateControls() {
-    console.log(2222, 'toggleStateControls()')
+    console.log(3, 'toggleStateControls() - ', 'validCurrentPassword =', this.validCurrentPassword?.validPassword)
+    console.log(3, 'toggleStateControls() - ', 'validResetToken =', this.validResetToken.valid)
 
     if (this.validCurrentPassword?.validPassword || this.validResetToken.valid) {
       this.changePasswordForm.controls['newPassword'].enable();
@@ -248,6 +234,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy.next(null);
     this.destroy.complete();
+    this.authService.validResetToken$.next(undefined);
+    this.validResetToken = {};
   }
 
 
