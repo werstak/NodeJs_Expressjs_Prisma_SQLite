@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Select, Store } from '@ngxs/store';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
+import { debounceTime, Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { CategoriesModel } from '../../../../core/models/categories.model';
 import {
   AddCategory,
@@ -32,7 +32,8 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
   dataLoading: boolean = false;
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
   listAllCategories: CategoriesModel[] = [];
   category = new FormControl('', [Validators.required]);
@@ -50,7 +51,7 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   private onChangesCategory() {
     this.category.valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)
+      takeUntil(this.destroy$)
     ).subscribe(val => {
         console.log('form value', val)
         this.categoryName = val;
@@ -62,7 +63,7 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
     this.dataLoading = true;
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.listAllCategories = resp;
         if (resp) {
@@ -140,8 +141,8 @@ export class DialogCategoriesPostComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
     this.dialogRef.close();
   }
 }

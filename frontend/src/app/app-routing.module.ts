@@ -12,26 +12,13 @@ const postsModule = () => import('./modules/posts/posts.module').then(m => m.Pos
 
 
 const appRoutes: Routes = [
-  // {path: '', component: HomeComponent, canActivate: [AuthGuard]},
   {path: '', loadChildren: homeModule, canActivate: [AuthGuard]},
   {path: AppRouteEnum.Auth, loadChildren: authModule},
   {path: AppRouteEnum.Users, loadChildren: usersModule, canActivate: [AuthGuard]},
   {path: AppRouteEnum.Posts, loadChildren: postsModule, canActivate: [AuthGuard]},
   {path: AppRouteEnum.NotFound, component: ErrorPageComponent},
   {path: '**', redirectTo: '/not-found', pathMatch: 'full'},
-  // otherwise redirect to home
-  // { path: '**', redirectTo: '' }
 ];
-
-
-// const appRoutes: Routes = [
-//   {path: '', loadChildren: homeModule},
-//   {path: 'auth', loadChildren: authModule},
-//   {path: 'users', loadChildren: usersModule},
-//   {path: 'posts', loadChildren: postsModule},
-//   {path: 'not-found', component: ErrorPageComponent},
-//   {path: '**', redirectTo: '/not-found', pathMatch: 'full'}
-// ];
 
 @NgModule({
   imports: [RouterModule.forRoot(appRoutes)],

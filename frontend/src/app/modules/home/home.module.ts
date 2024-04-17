@@ -8,15 +8,7 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent
-  },
-  // {
-  //   path: 'auth',
-  //   component: AuthComponent
-  // },
-  // {
-  //   path: 'documents/:pageId',
-  //   component: DocumentsComponent
-  // }
+  }
 ];
 
 @NgModule({

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, ReplaySubject, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay } from 'rxjs/operators';
 import { AuthService } from './modules/auth/auth.service';
@@ -27,7 +27,8 @@ export class AppComponent implements OnInit {
   ) {
   }
 
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
   ngOnInit() {
     this.getAccount();
@@ -41,7 +42,7 @@ export class AppComponent implements OnInit {
 
   private isAth() {
     this.authService.accountSubject$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.account = resp;
         if (!this.account) {
@@ -55,7 +56,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

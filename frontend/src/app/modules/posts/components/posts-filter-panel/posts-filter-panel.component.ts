@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PostsService } from '../../posts.service';
-import { debounceTime, Observable, ReplaySubject, startWith, takeUntil } from 'rxjs';
+import { debounceTime, Observable, ReplaySubject, startWith, Subject, takeUntil } from 'rxjs';
 import { Select, Store } from '@ngxs/store';
 import { UsersService } from '../../../users/users.service';
 import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
@@ -35,7 +35,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
 
   private filterData: any = {authors: [], categories: []};
   public postFilterForm: FormGroup
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
 
   /** Searchable Multiselect Filters*/
@@ -66,7 +67,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   private fetchUsers() {
     this.store.dispatch(new GetListAllUsers());
     this.listAllUsers$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.listAllUsers = resp;
         if (this.listAllUsers.length) {
@@ -93,7 +94,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   private onChangesControlAuthors(): void {
     this.postFilterForm.controls['authors'].valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)
+      takeUntil(this.destroy$)
     ).subscribe(val => {
 
       let arrAuthors = [];
@@ -163,7 +164,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   private fetchCategories() {
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.listAllCategories = resp;
         if (this.listAllUsers.length) {
@@ -193,7 +194,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   private onChangesControlCategories(): void {
     this.postFilterForm.controls['categories'].valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)
+      takeUntil(this.destroy$)
     ).subscribe(val => {
       let arrCategories = [];
         if (val.length) {
@@ -268,7 +269,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

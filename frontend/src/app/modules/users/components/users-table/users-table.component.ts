@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { Observable, ReplaySubject, takeUntil } from 'rxjs';
+import { Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
@@ -56,7 +56,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   users$ = this.usersService.users$;
 
   dataLoading: boolean = false;
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
   /** Sorting the table */
   orderByColumn = 'id' as SortDirection;
@@ -90,7 +91,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers(params));
 
     this.users.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.usersService.users$.next(resp);
         if (resp) {
@@ -99,7 +100,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
 
     this.usersCounter.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.length = resp;
       });
@@ -113,7 +114,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   private getUsersFilter() {
     this.usersService.usersFilters$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         if (!Object.keys(resp).length) {
           this.usersFilters = this.defaultUsersFilters;
@@ -190,8 +191,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
 }

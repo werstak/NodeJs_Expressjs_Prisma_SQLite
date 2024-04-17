@@ -36,6 +36,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   dataLoading: boolean = false;
+  // Enum to access route names
   AppRouteEnum = AppRouteEnum;
 
   private subUser: Subscription;
