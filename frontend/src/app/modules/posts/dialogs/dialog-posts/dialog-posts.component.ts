@@ -12,7 +12,9 @@ import * as _ from 'lodash';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
-
+/**
+ * Interface for food options in select dropdown
+ */
 export interface Food {
   value: string;
   viewValue: string;
@@ -23,8 +25,6 @@ export interface Food {
   templateUrl: './dialog-posts.component.html',
   styleUrls: ['./dialog-posts.component.scss']
 })
-
-
 export class DialogPostsComponent implements OnInit, OnDestroy {
 
   constructor(
@@ -33,14 +33,14 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     public postsService: PostsService,
-  ) {
-  }
+  ) {}
 
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
   listAllCategories: any = [];
 
   dataLoading: boolean = false;
+
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
   postForm: FormGroup;
@@ -60,15 +60,19 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   includedCategories: CategoriesModel[] = [];
   excludedCategories: CategoriesModel[] = [];
 
+  /**
+   * Determines if two category objects are the same
+   * @param categoryA First category object
+   * @param categoryB Second category object
+   * @returns True if the two categories are the same, false otherwise
+   */
   public isSameCategory(categoryA?: CategoriesModel, categoryB?: CategoriesModel): boolean {
-    return categoryA?.id === categoryB?.id
+    return categoryA?.id === categoryB?.id;
   }
-
 
   ngOnInit() {
     this.fetchCategories();
     this.buildForm();
-    console.log('Open DIALOG data = ', this.data)
     this.pictureDefault = pictureDefault;
     if (this.data.newPost) {
       this.postForm.reset();
@@ -81,6 +85,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.calculationSelectedCategories();
   }
 
+  /**
+   * Fetches all categories from the store
+   */
   private fetchCategories() {
     this.dataLoading = true;
     this.store.dispatch(new GetCategories());
@@ -94,6 +101,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Fetches the current post from the service
+   */
   private fetchCurrentPost() {
     const id: number = this.data.id;
     this.postsService.getPost(id).pipe(
@@ -101,7 +111,6 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       .subscribe(data => {
         this.currentPost = data;
         this.initCategories = data.categories;
-        console.log('CurrentPos', this.currentPost)
         if (this.currentPost) {
           this.initPostFormValue();
         }
@@ -111,6 +120,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Builds the form for the post
+   */
   private buildForm() {
     this.postForm = this.fb.group({
       title: ['', [Validators.required]],
@@ -121,6 +133,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Initializes the form with values from the current post
+   */
   private initPostFormValue() {
     this.postForm.patchValue({
       title: this.currentPost.title,
@@ -131,7 +146,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  /**
+   * Observes changes in the selected categories and calculates included and excluded categories
+   */
   private calculationSelectedCategories() {
     this.postForm.controls['categories'].valueChanges.pipe(
       debounceTime(250),
@@ -143,32 +160,39 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
         const newArray = [...this.selectedCategories];
 
         const changed = newArray.filter(newitem => {
-          const olditem = oldArray.find(o => o.id == newitem.id)
-          return !_.isEqual(newitem, olditem)
-        })
+          const olditem = oldArray.find(o => o.id == newitem.id);
+          return !_.isEqual(newitem, olditem);
+        });
         this.includedCategories = [...changed];
-        console.log(1, 'changed', this.includedCategories)
 
         const deleted = oldArray.filter(olditem => {
-          const newitem = newArray.find(n => n.id == olditem.id)
-          return !_.isEqual(newitem, olditem)
+          const newitem = newArray.find(n => n.id == olditem.id);
+          return !_.isEqual(newitem, olditem);
         }).filter(items => {
           const item = changed.find(cd => cd.id == items.id);
-          return !item
-        })
+          return !item;
+        });
         this.excludedCategories = [...deleted];
-        console.log(1, 'deleted', this.excludedCategories)
       }
     );
   }
 
+  /**
+   * Removes a category from the selected categories
+   * @param topping The category to be removed
+   */
   onToppingRemoved(topping: CategoriesModel) {
     this.excludedCategories.push(topping);
     const toppings = this.postForm.controls['categories'].value;
     this.removeFirst(toppings, topping);
-    this.postForm.controls['categories'].patchValue(toppings)
+    this.postForm.controls['categories'].patchValue(toppings);
   }
 
+  /**
+   * Removes the first occurrence of an item from an array
+   * @param array The array from which to remove the item
+   * @param toRemove The item to be removed
+   */
   private removeFirst(array: any, toRemove: any): void {
     const index = array.indexOf(toRemove);
     if (index !== -1) {
@@ -176,12 +200,19 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Tracks the index of an item in an iterable
+   * @param index The index of the item
+   * @param item The item being iterated over
+   * @returns The unique identifier of the item
+   */
   trackByFn(index: any, item: any) {
     return item.id;
   }
 
   /**
-   Picture upload
+   * Handles the event when an image is loaded
+   * @param event The event containing information about the loaded image
    */
   handleImageLoaded(event: any) {
     if (event.target.files && event.target.files[0]) {
@@ -198,17 +229,21 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
   }
 
+  /**
+   * Displays a preview of the uploaded image
+   * @param files The image files to be previewed
+   */
   private handleImagePreview(files: any): void {
     const reader = new FileReader();
     reader.onload = (event: any) => {
       this.pictureUrl = event.target.result;
-    }
+    };
     this.pictureFile = files[0];
     reader.readAsDataURL(files[0]);
   }
 
   /**
-   Delete picture
+   * Deletes the uploaded picture
    */
   public deletePicture() {
     this.pictureUrl = '';
@@ -216,7 +251,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Sending the Form
+   * Submits the post form
    */
   onSubmitPost(): void {
     if (this.data.newPost) {
@@ -227,7 +262,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Adding a new post
+   * Adds a new post
    */
   private addPost(): void {
     if (this.postForm.invalid) {
@@ -246,7 +281,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Update current post
+   * Updates the current post
    */
   private updatePost(): void {
     if (this.postForm.invalid) {
@@ -271,6 +306,9 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdatePost(id, params, picture, pictureOrUrl, previousPictureUrl));
   }
 
+  /**
+   * Closes the dialog
+   */
   onNoClick(): void {
     this.dialogRef.close();
   }
@@ -281,4 +319,3 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.dialogRef.close();
   }
 }
-

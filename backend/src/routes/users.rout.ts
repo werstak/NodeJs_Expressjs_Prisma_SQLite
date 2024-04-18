@@ -4,6 +4,7 @@ import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+import * as AuthUserHandler from '../controllers/auth.controller';
 
 
 const path = require('path');
@@ -79,6 +80,12 @@ usersRouter.post(
             console.log('Root POST - Create USER = ', request.body)
 
             const user = JSON.parse(request.body.user_params);
+
+            const existingUser = await AuthUserHandler.findUserByEmail(user.email);
+            if (existingUser) {
+                return response.status(409).json({message: `Email already in use`})
+            }
+
             const hashPassword = bcrypt.hashSync(user.password, 7);
 
             let filename = '';

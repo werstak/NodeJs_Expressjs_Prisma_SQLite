@@ -1,5 +1,7 @@
 <div class="users-table">
+  <!-- Container for users table -->
   <section class="users-table__container mat-elevation-z8" tabindex="0">
+    <!-- Table for displaying user data -->
     <table
       mat-table
       matSort
@@ -7,7 +9,6 @@
       (matSortChange)="sortData($event)"
       [matSortActive]="orderByColumn" [matSortDirection]="orderByDirection"
     >
-
       <!-- ID Column -->
       <ng-container matColumnDef="id">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> ID.</th>
@@ -18,6 +19,7 @@
       <ng-container matColumnDef="avatar">
         <th mat-header-cell *matHeaderCellDef> Avatar</th>
         <td mat-cell *matCellDef="let element">
+          <!-- Display user avatar if available -->
           <div class="users-table__avatar">
             <img *ngIf="element.avatar" [src]="element.avatar">
           </div>
@@ -42,19 +44,13 @@
         <td mat-cell *matCellDef="let element"> {{element.lastName}} </td>
       </ng-container>
 
-      <!-- createdAt Column -->
+      <!-- Created At Column -->
       <ng-container matColumnDef="createdAt">
-        <th mat-header-cell *matHeaderCellDef mat-sort-header> createdAt</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Created At</th>
         <td mat-cell *matCellDef="let element"> {{element.createdAt | date: 'dd/MM/yyyy'}} </td>
       </ng-container>
 
-      <!-- updatedAt Column -->
-<!--      <ng-container matColumnDef="updatedAt">-->
-<!--        <th mat-header-cell *matHeaderCellDef mat-sort-header> Updated At</th>-->
-<!--        <td mat-cell *matCellDef="let element"> {{element.updatedAt | date: 'dd/MM/yyyy'}} </td>-->
-<!--      </ng-container>-->
-
-      <!-- role Column -->
+      <!-- Role Column -->
       <ng-container matColumnDef="role">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Role</th>
         <td mat-cell *matCellDef="let element"> {{+element.role | roles}} </td>
@@ -63,22 +59,22 @@
       <!-- Posts Column -->
       <ng-container matColumnDef="posts">
         <th mat-header-cell *matHeaderCellDef> Posts</th>
-        <td mat-cell *matCellDef="let element"> {{element.posts.length > 0 ? element.posts.length : 0}} </td>
+        <td mat-cell *matCellDef="let element"> {{element.posts.length || 0}} </td>
       </ng-container>
 
-      <!-- status Column -->
+      <!-- Status Column -->
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Status</th>
         <td mat-cell *matCellDef="let element">
-          <mat-icon
-            class="users-table__status"
-            [ngClass]="{'users-table__status-active': element.status, 'users-table__status-inactive': !element.status}">
-            {{ element.status == true ? 'check_circle' : 'cancel' }}
+          <!-- Display status icon based on status -->
+          <mat-icon class="users-table__status"
+                    [ngClass]="{'users-table__status-active': element.status, 'users-table__status-inactive': !element.status}">
+            {{ element.status ? 'check_circle' : 'cancel' }}
           </mat-icon>
         </td>
       </ng-container>
 
-      <!-- country Column -->
+      <!-- Country Column -->
       <ng-container matColumnDef="location">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Country</th>
         <td mat-cell *matCellDef="let element"> {{element.location}} </td>
@@ -90,17 +86,16 @@
         <td mat-cell *matCellDef="let element"> {{element.birthAt | age}} </td>
       </ng-container>
 
-      <!-- actions -->
+      <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell class="header-btn" *matHeaderCellDef>
-          <button mat-icon-button
-                  color="primary"
-                  matTooltip="Add new user"
-                  (click)="addUser()">
+          <!-- Button to add a new user -->
+          <button mat-icon-button color="primary" matTooltip="Add new user" (click)="addUser()">
             <mat-icon aria-label="Add">add</mat-icon>
           </button>
         </th>
         <td mat-cell class="body-btn" *matCellDef="let element">
+          <!-- Buttons for editing and deleting a user -->
           <button mat-icon-button color="primary" (click)="editUser(element.id)">
             <mat-icon aria-label="Edit">edit</mat-icon>
           </button>
@@ -110,9 +105,12 @@
         </td>
       </ng-container>
 
+      <!-- Define header and row -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+
+    <!-- Paginator for navigating through pages -->
     <mat-paginator class="demo-paginator"
                    (page)="handlePageEvent($event)"
                    [length]="length"
@@ -126,6 +124,7 @@
     </mat-paginator>
   </section>
 
+  <!-- Spinner to indicate loading -->
   <mat-progress-spinner
     color="primary"
     diameter="70"
@@ -136,4 +135,3 @@
   </mat-progress-spinner>
 
 </div>
-

@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
 import { UserModel } from '../../../../core/models/user.model';
-import { Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
@@ -28,74 +28,78 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  // Selectors for accessing state
   @Select(UsersSelectors.getUsersList) users: Observable<UserModel[]>;
   @Select(UsersSelectors.getUsersCounter) usersCounter: Observable<any>;
 
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
   @ViewChild(MatSort) sort: MatSort;
 
-
-  /**
-   Pagination variables
-   */
+  // Pagination variables
   length = 0;
   pageSize = 5;
   pageIndex = 0;
   pageSizeOptions = [3, 5, 10, 15, 20, 25];
-  previousPageIndex = 0;
 
+  // Table settings
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
-  disabled = false;
   pageEvent: PageEvent;
+  disabled = false;
 
-  /** Columns table*/
+  // Columns to display in the table
   displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
 
   users$ = this.usersService.users$;
 
   dataLoading: boolean = false;
+
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
-  /** Sorting the table */
+  // Sorting settings
   orderByColumn = 'id' as SortDirection;
   orderByDirection = 'asc' as SortDirection;
 
-  /** Filters */
-  private defaultUsersFilters: UserFilterModel = {email: '', firstName: '', lastName: '', roles: []};
+  // Default user filters
+  private defaultUsersFilters: UserFilterModel = { email: '', firstName: '', lastName: '', roles: [] };
   private usersFilters: UserFilterModel = this.defaultUsersFilters;
 
-
   ngOnInit(): void {
+    // Fetch initial data and apply filters
     this.fetchData();
     this.getUsersFilter();
   }
 
+  /**
+   *   Construct parameters for fetching data
+   */
   private fetchData() {
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
-
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
-
       firstName: this.usersFilters.firstName,
       lastName: this.usersFilters.lastName,
       email: this.usersFilters.email,
       roles: this.usersFilters.roles
     }
 
+    // Trigger data loading animation
     this.dataLoading = true;
+
+    // Dispatch action to fetch users from store
     this.store.dispatch(new GetUsers(params));
 
+    // Subscribe to users and usersCounter observables to update data and pagination
     this.users.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
         this.usersService.users$.next(resp);
         if (resp) {
-          this.dataLoading = false;
+          this.dataLoading = false; // Turn off data loading animation when data is received
         }
       });
 
@@ -106,16 +110,23 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Update sorting parameters and fetch data
+   */
   sortData($event: any) {
     this.orderByColumn = $event.active;
     this.orderByDirection = $event.direction;
     this.fetchData();
   }
 
+  /**
+   * Subscribe to usersFilters$ observable to get user filters
+   */
   private getUsersFilter() {
     this.usersService.usersFilters$.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
+        // Apply user filters and fetch data
         if (!Object.keys(resp).length) {
           this.usersFilters = this.defaultUsersFilters;
         } else {
@@ -125,6 +136,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Handle page change event and fetch data
+   */
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
     this.length = e.length;
@@ -133,44 +147,44 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.fetchData();
   }
 
+  /**
+   * Open dialog to add a new user
+   */
   addUser() {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: {newUser: true}
+      data: { newUser: true }
     });
+
+    // After dialog is closed, render table rows
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialogRef result', result)
       setTimeout(() => {
         this.table.renderRows();
       }, 1000)
-
-      // if (result === 1) {
-      //   this.table.renderRows();
-      // }
     });
   }
 
+  /**
+   * Open dialog to edit a user
+   */
   editUser(id: UserModel) {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: {id, newUser: false}
+      data: { id, newUser: false }
     });
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('EDIT dialogRef result', result)
 
+    // After dialog is closed, render table rows
+    dialogRef.afterClosed().subscribe(result => {
       setTimeout(() => {
         this.table.renderRows();
       }, 1000)
-
-      // if (result === 1) {
-      //   this.table.renderRows();
-      // }
     });
   }
 
+  /**
+   * Open confirmation dialog before deleting a user
+   */
   deleteUser(user: UserModel): void {
-    let {id, firstName, avatar} = user;
-    const params = {
-      avatar
-    }
+    const { id, firstName, avatar } = user;
+    const params = { avatar };
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
@@ -180,6 +194,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       }
     });
 
+    // After confirmation, delete the user
     dialogRef.afterClosed().subscribe(result => {
       console.log('deleteUser - afterClosed', result)
       if (result === true) {

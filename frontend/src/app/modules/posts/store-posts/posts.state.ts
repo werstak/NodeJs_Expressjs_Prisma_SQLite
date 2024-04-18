@@ -18,7 +18,9 @@ import * as _ from 'lodash';
 import { UserListModel } from '../../../core/models/user-list.model';
 import { CategoriesModel } from '../../../../../../backend/src/models/categories.model';
 
-
+/**
+ * Define the structure of the PostsStateModel
+ */
 export class PostsStateModel {
   posts: PostModel[];
   postsCounter?: any;
@@ -27,6 +29,9 @@ export class PostsStateModel {
   categories: CategoriesModel[];
 }
 
+/**
+ * Decorator for defining a state class
+ */
 @State<PostsStateModel>({
   name: 'PostsState',
   defaults: {
@@ -38,7 +43,6 @@ export class PostsStateModel {
   }
 })
 
-
 @Injectable()
 export class PostsState {
 
@@ -49,7 +53,7 @@ export class PostsState {
   }
 
   /**
-   POSTS
+   *Action to get all posts
    */
   @Action(GetPosts)
   getAllPosts({getState, setState}: StateContext<PostsStateModel>, {params}: GetPosts) {
@@ -63,6 +67,9 @@ export class PostsState {
     }));
   }
 
+  /**
+   *Action to set selected post
+   */
   @Action(SetSelectedPost)
   setSelectedPostId({getState, setState}: StateContext<PostsStateModel>, {payload}: SetSelectedPost) {
     const state = getState();
@@ -72,6 +79,9 @@ export class PostsState {
     });
   }
 
+  /**
+   *Action to add a new post
+   */
   @Action(AddPost)
   addNewPost({getState, patchState}: StateContext<PostsStateModel>, {params, avatar}: AddPost) {
     return this.postsService.addPost(params, avatar).pipe(tap((result) => {
@@ -84,13 +94,14 @@ export class PostsState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
+  /**
+   * Action to update an existing post
+   */
   @Action(UpdatePost)
   updateCurrentPost({getState, setState}: StateContext<PostsStateModel>, {
     id, params, picture, pictureOrUrl, previousPictureUrl
@@ -115,6 +126,9 @@ export class PostsState {
     ));
   }
 
+  /**
+   *Action to delete a post
+   */
   @Action(DeletePost)
   deletePost({getState, setState}: StateContext<PostsStateModel>, {id, params}: DeletePost) {
     return this.postsService.removePost(id, params).pipe(tap(() => {
@@ -125,20 +139,18 @@ export class PostsState {
         setState({
           ...state,
           posts: filteredArray,
-          postsCounter: state.postsCounter -1
+          postsCounter: state.postsCounter - 1
         });
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
   /**
-   USERS list All
+   *Action to get all users
    */
   @Action(GetListAllUsers)
   getListAllUsers({getState, setState}: StateContext<PostsStateModel>) {
@@ -152,7 +164,7 @@ export class PostsState {
   }
 
   /**
-   CATEGORIES of posts
+   *Action to get all categories
    */
   @Action(GetCategories)
   getListCategories({getState, setState}: StateContext<PostsStateModel>) {
@@ -165,6 +177,9 @@ export class PostsState {
     }));
   }
 
+  /**
+   *Action to add a new category
+   */
   @Action(AddCategory)
   addNewCategory({getState, patchState}: StateContext<PostsStateModel>, {params}: AddCategory) {
     return this.postsService.addCategory(params).pipe(tap((result) => {
@@ -183,7 +198,9 @@ export class PostsState {
     ));
   }
 
-
+  /**
+   *Action to update an existing category
+   */
   @Action(UpdateCategory)
   updateCurrentCategory({getState, setState}: StateContext<PostsStateModel>, {
     id, params
@@ -201,13 +218,14 @@ export class PostsState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
+  /**
+   *Action to delete a category
+   */
   @Action(DeleteCategory)
   deleteCategory({getState, setState}: StateContext<PostsStateModel>, {id}: DeleteCategory) {
     return this.postsService.removeCategory(id).pipe(tap(() => {

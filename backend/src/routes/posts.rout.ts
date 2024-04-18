@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import * as PostHandler from '../controllers/posts.conroller';
 import { body, validationResult } from 'express-validator';
 import * as fs from 'fs';
+import * as UserHandler from '../controllers/users.conroller';
 
 export const postsRouter = express.Router();
 
@@ -60,6 +61,14 @@ postsRouter.post(
             console.log('Create POST = ', request.body)
             console.log('Create POST = ', request.params)
             const post = JSON.parse(request.body.post_params);
+
+            const existingUser = await UserHandler.findUserById(post.userId);
+
+            if (!existingUser) {
+                return response.status(401).json({message: `No such user exists`})
+            }
+
+
             let filename = '';
             if (request.file?.filename) {
                 filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
