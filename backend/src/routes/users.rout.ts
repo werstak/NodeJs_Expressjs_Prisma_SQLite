@@ -4,16 +4,16 @@ import { body, validationResult } from 'express-validator';
 import * as UserHandler from '../controllers/users.conroller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+
+
 const path = require('path');
 
 export const usersRouter = express.Router();
-
 
 /**
  GET: all USERS
  */
 usersRouter.get('/', async (request: Request, response: Response) => {
-
     console.log('Root GET - All USERS')
     const params = (request.query);
     console.log('USERS', 'paginator', params)
@@ -49,8 +49,8 @@ usersRouter.get('/list_all_users', async (request: Request, response: Response) 
  */
 usersRouter.get('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
-
     console.log('Root GET - single USER')
+
     try {
         const user = await UserHandler.getUserHandler(id);
         if (user) {
@@ -92,7 +92,6 @@ usersRouter.post(
             user.password = hashPassword;
             user.avatar = filename;
 
-            console.log(111111111, user)
             const newUser = await UserHandler.createUserHandler(user);
             return response.status(201).json(newUser);
         } catch (error: any) {
@@ -122,12 +121,13 @@ usersRouter.put(
             const user = JSON.parse(request.body.user_params);
             const imageOrUrl = JSON.parse(request.body.imageOrUrl);
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
+            // const hashPassword = bcrypt.hashSync(user.password, 7);
 
-            let pathRemoveImage ='';
+            let pathRemoveImage = '';
             if (previousImageUrl !== null) {
                 pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
             } else {
-                pathRemoveImage ='';
+                pathRemoveImage = '';
             }
             // const pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
 
@@ -167,12 +167,40 @@ usersRouter.put(
 
                 console.log('first image upload or replacement')
                 fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
-
             }
 
             user.avatar = fileUrl;
+            // user.password = hashPassword;
             const updatedUser = await UserHandler.updateUserHandler(user, id);
             return response.status(200).json(updatedUser);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
+    }
+);
+
+
+/**
+ PUT: Updating Password USER
+ */
+usersRouter.put(
+    '/update_password/:id',
+    // body("firstName").isString(),
+    // body("lastName").isString(),
+    // body("email").isString(),
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+
+        if (!errors.isEmpty()) {
+            return response.status(400).json({errors: errors.array()});
+        }
+        const id: number = parseInt(request.params.id, 10);
+        try {
+            console.log('Root PUT - Updating Password USER = ', request.body);
+            const hashPassword = bcrypt.hashSync(request.body.password, 7);
+            const newUserPassword: any = {password: hashPassword};
+            const updatedUserPassword = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
+            return response.status(200).json(updatedUserPassword);
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -186,7 +214,7 @@ usersRouter.put(
 usersRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
-        console.log('DELETE', 'request.query', request.query)
+        console.log('DELETE USER', 'request.query', request.query)
 
         const previousAvatarUrl = String(request.query.avatar);
         const pathRemovePicture = previousAvatarUrl.replace('http://localhost:5000/', '');

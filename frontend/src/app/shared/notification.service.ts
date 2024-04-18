@@ -33,7 +33,7 @@ export class NotificationService {
     );
   }
 
-  showSuccess(message: string, title?: string): void {
+  showSuccess(message: any, title?: string): void {
     const snackBarRef = this._snackBar.openFromComponent(
       SnackBarMessageComponent,
       {

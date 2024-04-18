@@ -44,10 +44,10 @@ categoriesRouter.put(
     async (request: Request, response: Response) => {
         const id: number = parseInt(request.params.id, 10);
         try {
-            console.log('Update CATEGORY = ', request.body)
+            console.log('Update CATEGORY body = ', request.body)
             console.log('ID = ', id)
-            const updatedPost = await CategoryHandler.updateCategoryHandler(request.body, id);
-            return response.status(201).json(updatedPost);
+            const updatedCategory = await CategoryHandler.updateCategoryHandler(request.body, id);
+            return response.status(201).json(updatedCategory);
         } catch (error: any) {
             return response.status(500).json(error.message);
         }

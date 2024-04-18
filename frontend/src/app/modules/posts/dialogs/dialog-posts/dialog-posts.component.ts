@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../core/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, Observable, ReplaySubject, takeUntil } from 'rxjs';
+import { debounceTime, Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
@@ -41,7 +41,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   listAllCategories: any = [];
 
   dataLoading: boolean = false;
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
   postForm: FormGroup;
 
   currentPost: PostModel;
@@ -84,7 +85,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     this.dataLoading = true;
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(resp => {
         this.listAllCategories = resp;
         if (resp) {
@@ -96,7 +97,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   private fetchCurrentPost() {
     const id: number = this.data.id;
     this.postsService.getPost(id).pipe(
-      takeUntil(this.destroy))
+      takeUntil(this.destroy$))
       .subscribe(data => {
         this.currentPost = data;
         this.initCategories = data.categories;
@@ -134,7 +135,7 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   private calculationSelectedCategories() {
     this.postForm.controls['categories'].valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)
+      takeUntil(this.destroy$)
     ).subscribe(val => {
         this.selectedCategories = val;
 
@@ -275,8 +276,8 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
     this.dialogRef.close();
   }
 }

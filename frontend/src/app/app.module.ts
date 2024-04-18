@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
@@ -14,6 +14,8 @@ import { AppState } from './store/app.state';
 import { SnackBarMessageComponent } from './shared/components/snack-bar-message/snack-bar-message.component';
 import { NotificationService } from './shared/notification.service';
 import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialog-confirm.component';
+import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
 
 @NgModule({
@@ -34,7 +36,9 @@ import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialo
     NgxsReduxDevtoolsPluginModule.forRoot(),
   ],
   providers: [
-    NotificationService
+    NotificationService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

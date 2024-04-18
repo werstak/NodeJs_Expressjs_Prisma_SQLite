@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { debounceTime, ReplaySubject, takeUntil } from 'rxjs';
+import { debounceTime, ReplaySubject, Subject, takeUntil } from 'rxjs';
 import { UsersService } from '../../users.service';
 
 import { ROLES } from '../../../../shared/constants/roles';
@@ -19,8 +19,8 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   public userFilterForm: FormGroup
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  rolesList = ROLES;
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();  rolesList = ROLES;
 
 
   ngOnInit() {
@@ -40,7 +40,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   private onChanges(): void {
     this.userFilterForm.valueChanges.pipe(
       debounceTime(250),
-      takeUntil(this.destroy)).subscribe(val => {
+      takeUntil(this.destroy$)).subscribe(val => {
 
       let arrRoles = [];
       if (val.roles) {
@@ -62,7 +62,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

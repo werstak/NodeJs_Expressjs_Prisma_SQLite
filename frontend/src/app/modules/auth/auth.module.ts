@@ -1,18 +1,15 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthComponent } from './auth.component';
-import { LoginComponent } from './components/login/login.component';
 import { RouterModule, Routes } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// Material imports
+import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { RegisterComponent } from './components/register/register.component';
-import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSortModule } from '@angular/material/sort';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
@@ -21,18 +18,29 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+
+// Custom components
+import { AuthComponent } from './auth.component';
+import { LoginComponent } from './components/login/login.component';
+import { RegisterComponent } from './components/register/register.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
 
+// Shared module
+import { SharedModule } from '../../shared/shared.module';
 
+// Enum for routing paths
+import { AppRouteEnum } from '../../core/enums';
+
+// Define routes for auth module
 const routes: Routes = [
   {
     path: '', component: AuthComponent,
     children: [
-      { path: 'login', component: LoginComponent },
-      { path: 'register', component: RegisterComponent },
-      // { path: 'verify-email', component: VerifyEmailComponent },
-      { path: 'forgot-password', component: ForgotPasswordComponent },
-      { path: 'reset-password', component: ResetPasswordComponent }
+      { path: AppRouteEnum.Login, component: LoginComponent },
+      { path: AppRouteEnum.Registration, component: RegisterComponent },
+      { path: AppRouteEnum.ForgotPassword, component: ForgotPasswordComponent },
+      { path: AppRouteEnum.ResetPassword, component: ResetPasswordComponent }
     ]
   }
 ];
@@ -47,14 +55,13 @@ const routes: Routes = [
   ],
   imports: [
     CommonModule,
-    MatCardModule,
     FormsModule,
+    ReactiveFormsModule,
+    MatCardModule,
     MatButtonModule,
     MatInputModule,
     MatIconModule,
-    ReactiveFormsModule,
     MatFormFieldModule,
-    MatCardModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
     MatAutocompleteModule,
@@ -64,9 +71,8 @@ const routes: Routes = [
     MatNativeDateModule,
     MatTooltipModule,
     MatSnackBarModule,
-    RouterModule.forChild(routes),
-    // NgxsModule.forFeature([AuthState])
+    SharedModule,
+    RouterModule.forChild(routes)
   ]
 })
 export class AuthModule { }
-
