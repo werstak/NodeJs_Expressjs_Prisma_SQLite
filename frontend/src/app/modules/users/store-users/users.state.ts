@@ -1,11 +1,13 @@
 import { Action, State, StateContext } from '@ngxs/store';
-import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser } from './users.action';
+import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser, UpdateUserPassword } from './users.action';
 import { UserModel } from '../../../core/models/user.model';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { NotificationService } from '../../../shared/notification.service';
 import * as _ from 'lodash';
+import { UpdateCategory } from '../../posts/store-posts/posts.action';
+import { PostsStateModel } from '../../posts/store-posts/posts.state';
 
 
 export class UsersStateModel {
@@ -91,6 +93,23 @@ export class UsersState {
           ...state,
           users: usersList,
         });
+      },
+      (error) => {
+        console.error(error);
+        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
+        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
+        this.notificationService.showError(secondErrorAttempt);
+      }
+    ));
+  }
+
+  @Action(UpdateUserPassword)
+  updateUserPassword({getState, setState}: StateContext<UsersStateModel>, {
+    id, params
+  }: UpdateUserPassword) {
+    return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
+        this.notificationService.showSuccess('User password updated successfully');
+        console.log(result);
       },
       (error) => {
         console.error(error);

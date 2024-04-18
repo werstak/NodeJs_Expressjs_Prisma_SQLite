@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
-import { ReplaySubject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-auth',
@@ -9,36 +9,32 @@ import { ReplaySubject, takeUntil } from 'rxjs';
   styleUrls: ['./auth.component.scss']
 })
 export class AuthComponent implements OnInit, OnDestroy {
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
+  // Flag to indicate user's account status
+  public account?: boolean;
+
   constructor(
     private router: Router,
     private authService: AuthService
-  ) {
-    // if (this.authService.accountValue) {
-    //   this.router.navigate(['/']);
-    // }
-  }
+  ) {}
 
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
-  public account?: boolean;
-
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.getAccount();
   }
 
-  private getAccount() {
-    this.authService.account$.pipe(
-      takeUntil(this.destroy))
-      .subscribe(resp => {
-        this.account = resp;
-        if (this.account) {
-          this.router.navigate(['/']);
-        }
-      });
+  /**
+   * Retrieves user account status
+   */
+  private getAccount(): void {
+    if (this.authService.accountValue) {
+      // ANY ACTION AFTER AUTHORIZATION
+      // this.router.navigate(['/users']);
+    }
   }
 
   ngOnDestroy(): void {
-    this.destroy.next(null);
-    this.destroy.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

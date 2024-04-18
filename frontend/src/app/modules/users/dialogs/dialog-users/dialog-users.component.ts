@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subscription } from 'rxjs';
@@ -10,6 +10,10 @@ import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { CountriesModel } from '../../../../core/models/countriesModel';
+import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { AppRouteEnum } from '../../../../core/enums';
+import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
+import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
 
@@ -23,14 +27,17 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   constructor(
     public store: Store,
-    public dialogRef: MatDialogRef<DialogUsersComponent>,
+    public dialogRefUsersComponent: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    public usersService: UsersService
+    public usersService: UsersService,
+    public dialog: MatDialog
   ) {
   }
 
   dataLoading: boolean = false;
+  // Enum to access route names
+  AppRouteEnum = AppRouteEnum;
 
   private subUser: Subscription;
   roleList = ROLES;
@@ -49,10 +56,14 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.buildForm();
-    console.log('DIALOG  data', this.data)
+    console.log('ngOnInit DialogUsers data', this.data)
     this.avatarImageDefault = defaultProfileImage;
     if (this.data.newUser) {
       this.userForm.reset();
+      this.addPasswordControls();
+      // this.userForm.addControl('new', new FormControl('', Validators.required));
+      // this.userForm.addControl('new', new FormControl<string | null>('', Validators.required));
+
       this.userForm.patchValue({
         status: true
       });
@@ -67,6 +78,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
+        Validators.pattern(EMAIL_VALIDATION_PATTERN),
         Validators.maxLength(100)])
       ],
       firstName: [null, Validators.compose([
@@ -85,20 +97,41 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       ],
       location: [null, Validators.compose([
         Validators.required])],
-      password: [null, Validators.compose([
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(50)])
-      ],
+      // password: [null, Validators.compose([
+      //   Validators.required,
+      //   Validators.minLength(3),
+      //   Validators.maxLength(50)])
+      // ],
       birthAt: [null, Validators.compose([
         Validators.required])],
       status: '',
     });
   }
 
+  /**
+   Dynamic add PasswordControls
+   */
+  private addPasswordControls(): void {
+    this.userForm = this.fb.group({
+      ...this.userForm.controls,
+      password: [null, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)])
+      ],
+      confirmPassword: [null, Validators.compose([
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(50)])
+      ]
+    }, {
+      validator: MustMatch('password', 'confirmPassword')
+    });
+  }
+
+
   private initFormValue() {
     this.dataLoading = true;
-
     const id: number = this.data.id;
     this.subUser = this.usersService.getUser(id).subscribe(data => {
       if (data) {
@@ -108,8 +141,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       this.previousImageUrl = data.avatar;
       this.avatarUrl = data.avatar;
 
-      console.log('getUser() = currentUser ', this.currentUser)
-
       this.userForm.setValue({
         email: data.email,
         firstName: data.firstName,
@@ -117,13 +148,16 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         role: data.role,
         location: data.location,
         status: data.status,
-        password: data.password,
         birthAt: data.birthAt,
       });
       this.store.dispatch(new SetSelectedUser(data));
     });
   }
 
+
+  /**
+   Autocomplete for Countries
+   */
   private autocompleteCountries() {
     this.filteredCountries = this.userForm.controls['location'].valueChanges.pipe(
       startWith(''),
@@ -222,7 +256,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const params: any = {
       id: id,
       email: this.userForm.value.email,
-      password: this.userForm.value.password,
+      // password: this.userForm.value.password,
       firstName: this.userForm.value.firstName,
       lastName: this.userForm.value.lastName,
       role: Number(this.userForm.value.role),
@@ -234,13 +268,43 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
   }
 
+  /**
+   Open Dialog NewPassword
+   */
+  openDialogNewPassword(currentUser: UserModel) {
+    console.log('openDialogNewPassword - currentUser', currentUser)
+    const {id, email} = currentUser;
+    const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
+      width: '375px',
+      panelClass: 'dialog-new-password',
+      data: {
+        userId: id,
+        email,
+        title: 'Change Password',
+        okText: 'Submit',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('Change Password - afterClosed', result);
+      if (result === true) {
+      } else {
+        return
+      }
+    });
+  }
+
+
   closeClick(): void {
-    this.dialogRef.close();
+    this.dialogRefUsersComponent.close();
   }
 
   ngOnDestroy(): void {
     this.subUser?.unsubscribe();
-    this.dialogRef.close();
+    this.dialogRefUsersComponent.close();
   }
+
+
 }
 

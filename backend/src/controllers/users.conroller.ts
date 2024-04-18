@@ -1,7 +1,7 @@
 import db from '../utils/db';
 
 /**
- * will be realized through the prisma
+ * Will be realized through the prisma
  * */
 
 
@@ -9,7 +9,7 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles} = params;
 
     const parseRoles = JSON.parse(roles);
-    console.log('ROLES', parseRoles)
+    console.log('ROLES getAllUsersHandler()', parseRoles)
     let rolesArr;
     if (parseRoles.length) {
         rolesArr = parseRoles;
@@ -92,6 +92,7 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
     });
 };
 
+
 export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
     const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
@@ -126,11 +127,12 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
     return {totalCount, newUser}
 };
 
+
 export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
 ): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
+    const {firstName, lastName, email, role, avatar, status, birthAt, location} = user;
 
     return db.user.update({
         where: {
@@ -140,7 +142,6 @@ export const updateUserHandler = async (
             firstName,
             lastName,
             email,
-            password,
             role,
             avatar,
             status,
@@ -164,8 +165,42 @@ export const updateUserHandler = async (
     });
 };
 
+
+export const updateUserPasswordHandler = async (
+    userPassword: Omit<any, 'id'>,
+    id: number
+): Promise<any> => {
+    const {password} = userPassword;
+    return db.user.update({
+        where: {
+            id,
+        },
+        data: {
+            password,
+        },
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            role: true,
+            status: true
+        },
+    });
+};
+
+
 export const deleteUserHandler = async (id: number): Promise<void> => {
     await db.user.delete({
+        where: {
+            id,
+        },
+    });
+};
+
+
+export const findUserById = async (id: any): Promise<any | null> => {
+    return db.user.findUnique({
         where: {
             id,
         },

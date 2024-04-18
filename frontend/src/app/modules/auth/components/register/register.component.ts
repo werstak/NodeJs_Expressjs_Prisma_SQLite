@@ -1,13 +1,17 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Observable, ReplaySubject, startWith, Subscription, takeUntil } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { takeUntil, startWith, map } from 'rxjs/operators';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { UserModel } from '../../../../core/models/user.model';
 import { CountriesModel } from '../../../../core/models/countriesModel';
-import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AuthService } from '../../auth.service';
+import { Router } from '@angular/router';
+import { AppRouteEnum } from '../../../../core/enums';
+import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
+import { NotificationService } from '../../../../shared/notification.service';
 
 @Component({
   selector: 'app-register',
@@ -19,46 +23,68 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService
+    private router: Router,
+    private authService: AuthService,
+    private notificationService: NotificationService,
   ) {
   }
 
-
-  destroy: ReplaySubject<any> = new ReplaySubject<any>(1);
+  // Enum to access route names
+  AppRouteEnum = AppRouteEnum;
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
+  // Loading indicator
   dataLoading: boolean = false;
-
+  // Subscription to user data
   private subUser: Subscription;
 
+  // Lists of roles and countries
   roleList = ROLES;
   countriesList = COUNTRIES;
+  // Default role is 'Client'
+  defaultRole: number = 4;
+  // There may be four role options
+  // 1 = Super Admin
+  // 2 = Project Admin
+  // 3 = Manager
+  // 4 = Client
+
+
+  // Form group for registration
   registerForm: FormGroup;
+  // Password visibility toggle
   hide = true;
 
+  // User and response models
   currentUser: UserModel;
   respNewUser: UserModel;
   respUpdateUser: UserModel;
 
+  // Avatar settings
   avatarUrl: any;
   previousImageUrl = '';
   avatarFile = '';
   avatarImageDefault: any;
+  // Observable for filtered countries
   filteredCountries: Observable<CountriesModel[]>;
 
   ngOnInit() {
-    this.buildRegForm();
-    // this.initRegFormValue();
-
+    this.buildRegForm(); // Initialize registration form
     this.registerForm.patchValue({
       status: true
     });
-    this.autocompleteCountries();
+    this.autocompleteCountries(); // Enable country autocomplete
   }
 
+  /**
+   * Build the registration form with validators
+   */
   private buildRegForm() {
     this.registerForm = this.fb.group({
       email: [null, Validators.compose([
         Validators.required,
         Validators.email,
+        Validators.pattern(EMAIL_VALIDATION_PATTERN),
         Validators.maxLength(100)])
       ],
       firstName: [null, Validators.compose([
@@ -71,10 +97,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.minLength(3),
         Validators.maxLength(50)])
       ],
-      // role: [null, Validators.compose([
-      //   Validators.required,
-      //   Validators.maxLength(50)])
-      // ],
+      role: this.defaultRole, // Default role is 'Client'
+
       location: [null, Validators.compose([
         Validators.required])],
       password: [null, Validators.compose([
@@ -91,38 +115,13 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.required])],
       status: '',
     }, {
-      validator: MustMatch('password', 'confirmPassword')
+      validator: MustMatch('password', 'confirmPassword') // Custom validator for password match
     });
   }
 
-  // private initRegFormValue() {
-  //   this.dataLoading = true;
-  //
-  //   const id: number = this.data.id;
-  //   this.subUser = this.usersService.getUser(id).subscribe(data => {
-  //     if (data) {
-  //       this.dataLoading = false;
-  //     }
-  //     this.currentUser = data;
-  //     this.previousImageUrl = data.avatar;
-  //     this.avatarUrl = data.avatar;
-  //
-  //     console.log('getUser() = currentUser ', this.currentUser)
-  //
-  //     this.registerForm.setValue({
-  //       email: data.email,
-  //       firstName: data.firstName,
-  //       lastName: data.lastName,
-  //       role: data.role,
-  //       location: data.location,
-  //       status: data.status,
-  //       password: data.password,
-  //       birthAt: data.birthAt,
-  //     });
-  //     this.store.dispatch(new SetSelectedUser(data));
-  //   });
-  // }
-
+  /**
+   * Enable country autocomplete
+   */
   private autocompleteCountries() {
     this.filteredCountries = this.registerForm.controls['location'].valueChanges.pipe(
       startWith(''),
@@ -130,39 +129,48 @@ export class RegisterComponent implements OnInit, OnDestroy {
     );
   }
 
+  /**
+   * Filter countries based on user input
+   * @param value User input value for country
+   * @returns Filtered list of countries
+   */
   private _filterStates(value: string): CountriesModel[] {
     const filterValue = value.toLowerCase();
     return this.countriesList.filter(state => state.name.toLowerCase().includes(filterValue));
   }
 
+  /**
+   * Submit new user registration
+   */
   onSubmitNewUser(): void {
     this.dataLoading = true;
-
     if (this.registerForm.valid) {
       const registerUserData = this.registerForm.value;
-      console.log(1, 'registerUserData', registerUserData)
-
       this.authService.register(registerUserData).pipe(
-        takeUntil(this.destroy))
+        takeUntil(this.destroy$))
         .subscribe(resp => {
-          this.registerUserResp = resp;
-          console.log('registerUserResp', this.registerUserResp)
-          if (resp) {
-            this.authService.account$.next(true);
+            this.registerUserResp = resp;
+            if (resp) {
+              setTimeout(() => {
+                this.notificationService.showSuccess(resp.message);
+                this.router.navigate(['/auth/login']);
+              }, 1000);
+
+              this.dataLoading = false;
+            }
+
+          },
+          (error) => {
+            console.error(error);
             this.dataLoading = false;
-          }
-        });
+            this.notificationService.showError(error);
+          });
     }
   }
 
   ngOnDestroy(): void {
     this.subUser?.unsubscribe();
-    this.destroy.next(null);
-    this.destroy.complete();
-  }
-
-
-  closeClick() {
-
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

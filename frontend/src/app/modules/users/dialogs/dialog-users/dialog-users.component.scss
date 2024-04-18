@@ -37,15 +37,24 @@
     justify-content: space-between;
   }
 
+  &__link {
+    text-decoration: none;
+    color: gray;
+    background: #00ffff38;
+    display: block;
+    padding: 3px 15px;
+    border-radius: 20px;
+
+    :hover {
+      cursor: pointer;
+      color: blue;
+    }
+  }
 }
 
 .example-form {
   min-width: 150px;
   max-width: 500px;
-  width: 100%;
-}
-
-.example-full-width {
   width: 100%;
 }
 

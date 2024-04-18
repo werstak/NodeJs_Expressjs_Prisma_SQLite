@@ -1,66 +1,178 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
-import { Account } from '../../core/models/account';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import * as config from '../../../app-config';
-import { map } from 'rxjs/operators';
 import { LoginUser } from '../../core/models/login-user';
 import { RegisterUser } from '../../core/models/register-user';
+import { Auth } from '../../core/models/auth';
+import { PasswordResetTokenModel } from '../../core/models/password-reset-token.model';
+import { ValidResetTokenModel } from '../../core/models/valid-reset-token.model';
+import * as config from '../../../app-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // private accountSubject: BehaviorSubject<boolean>;
-  // public account: Observable<boolean>;
 
+  public accountSubject$ = new BehaviorSubject<Auth | null>(null);
+  public validResetToken$ = new BehaviorSubject<any>({});
+
+  readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
+  readonly JWT_REFRESH_TOKEN_KEY = 'refresh_token';
+  readonly ACCOUNT = 'account';
+
+  private refreshTokenTimeout?: number;
 
   constructor(
     private router: Router,
     private http: HttpClient
-  ) {
-    // this.accountSubject = new BehaviorSubject<boolean>(false);
-    // this.account = this.accountSubject.asObservable();
-  }
-
-  public account$ = new BehaviorSubject<boolean>(false);
+  ) {}
 
   public get accountValue() {
-    return this.account$.value;
+    return this.accountSubject$.value;
   }
 
-
-  login(loginUserData: LoginUser) {
-    console.log('AuthService = LOGIN()', loginUserData)
-    return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
+  /**
+   * New User Registration
+   */
+  register(registerUserData: RegisterUser): Observable<any> {
+    return this.http.post<any>(config.API_URL + `/auth/register/`, { registerUserData })
       .pipe(map(account => {
-        // this.accountSubject.next(account);
-        // this.startRefreshTokenTimer();
+        const { accessToken, refreshToken } = account;
+        this.setTokens(accessToken, refreshToken);
         return account;
       }));
   }
 
-
-  // login(loginUserData: LoginUser): Observable<any> {
-  //   return this.http.post<any>(config.API_URL + `/auth/login/`, {loginUserData})
-  //     .pipe(
-  //       catchError(error => {
-  //         console.log('Error: ', error.message);
-  //         return throwError(error);
-  //       })
-  //     );
-  // }
-
-  register(registerUserData: RegisterUser) {
-    console.log('AuthService = REGISTER()', registerUserData)
-    return this.http.post<any>(config.API_URL + `/auth/register/`, {registerUserData})
+  /**
+   * User authorization
+   */
+  login(loginUserData: LoginUser): Observable<any> {
+    return this.http.post<any>(config.API_URL + `/auth/login/`, { loginUserData })
       .pipe(map(account => {
-        // this.accountSubject.next(account);
-        // this.startRefreshTokenTimer();
+        const { accessToken, refreshToken, userInfo } = account;
+        this.setTokens(accessToken, refreshToken);
+        this.setUser(userInfo);
+        this.startRefreshTokenTimer();
         return account;
       }));
   }
 
+  /**
+   * Saving user data and tokens in LocalStorage
+   */
+  private setTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(this.JWT_ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(this.JWT_REFRESH_TOKEN_KEY, refreshToken);
+  }
 
+  private setUser(userInfo: any): void {
+    localStorage.setItem(this.ACCOUNT, JSON.stringify(userInfo));
+    this.getAccountLocalStorage();
+  }
+
+  /**
+   * Get user account data from LocalStorage and write to Stream - this.accountSubject$
+   */
+  public getAccountLocalStorage() {
+    const userInfo = localStorage.getItem('account');
+    const refreshToken = localStorage.getItem('refresh_token');
+    const accessToken = localStorage.getItem('access_token');
+
+    if (userInfo != null && refreshToken != null && accessToken != null) {
+      const userInfoPars = JSON.parse(userInfo);
+      const account = {
+        userInfo: userInfoPars,
+        refreshToken: refreshToken,
+        accessToken: accessToken
+      }
+      this.accountSubject$.next(account);
+    } else {
+      console.log('NOT AUTHORIZED');
+      return;
+    }
+  }
+
+  /**
+   * Token refresh request (accessToken, refreshToken)
+   */
+  private refreshToken(): Observable<any> {
+    const refreshToken = this.accountValue!.refreshToken;
+    return this.http.post<any>(config.API_URL + `/auth/refreshToken`, { refreshToken })
+      .pipe(map((tokens) => {
+        const { accessToken, refreshToken } = tokens;
+        this.setTokens(accessToken, refreshToken);
+        this.getAccountLocalStorage();
+        this.startRefreshTokenTimer();
+        return tokens;
+      }));
+  }
+
+  /**
+   * User logout
+   */
+  logout(): void {
+    const refreshToken = this.accountValue!.refreshToken;
+    this.http.post<any>(config.API_URL + `/auth/revokeRefreshTokens`, { refreshToken }).subscribe();
+    this.stopRefreshTokenTimer();
+    this.accountSubject$.next(null);
+    this.router.navigate(['/auth/login']);
+    localStorage.removeItem('account');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('access_token');
+  }
+
+  /**
+   * Start refresh tokens Timer (accessToken, refreshToken)
+   */
+  private startRefreshTokenTimer(): void {
+    const jwtBase64 = this.accountValue!.accessToken!.split('.')[1];
+    const jwtToken = JSON.parse(atob(jwtBase64));
+
+    // SET A TIMEOUT TO REFRESH THE TOKEN A MINUTE BEFORE IT EXPIRES
+    const expires = new Date(jwtToken.exp * 1000);
+    const timeout = expires.getTime() - Date.now() - (60 * 1000);
+    this.refreshTokenTimeout = setTimeout(() => this.refreshToken().subscribe(), timeout);
+  }
+
+  /**
+   * Stop Refresh Token Timer
+   */
+  private stopRefreshTokenTimer(): void {
+    clearTimeout(this.refreshTokenTimeout);
+  }
+
+  /**
+   * This request is executed to check whether the user has such a password before launching the password replacement function
+   */
+  fetchValidPassword(validPasswordData: LoginUser): Observable<any> {
+    return this.http.post(config.API_URL + `/auth/valid_password/`, { validPasswordData }).pipe(
+      catchError(error => {
+        console.log('Error: ', error.message);
+        return throwError(error);
+      })
+    );
+  }
+
+  /**
+   * Checking whether the Email exists in the database
+   */
+  fetchVerifyEmail(verifyEmail: string): Observable<any> {
+    return this.http.post(config.API_URL + `/auth/verify_email/`, { verifyEmail });
+  }
+
+  /**
+   * Check - Password Reset Token
+   */
+  checkValidPasswordResetToken(passwordResetToken: PasswordResetTokenModel): Observable<any> {
+    return this.http.post(config.API_URL + `/auth/reset_password_link/`, { passwordResetToken });
+  }
+
+  /**
+   * Change Password
+   */
+  onChangePassword(password: any, passwordResetToken: ValidResetTokenModel): Observable<any> {
+    return this.http.put(config.API_URL + `/auth/change_password/`, { password, passwordResetToken });
+  }
 }
