@@ -2,7 +2,7 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PostModel } from '../../../../core/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
@@ -35,30 +35,55 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     public postsService: PostsService,
   ) {}
 
-  @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
-  listAllCategories: any = [];
+// Selecting list of categories from the store
+@Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
-  dataLoading: boolean = false;
+// Array to store all categories
+listAllCategories: any = [];
 
-  // Subject to handle subscription cleanup
-  private destroy$: Subject<void> = new Subject<void>();
-  postForm: FormGroup;
+// Flag to indicate if data is loading
+dataLoading: boolean = false;
 
-  currentPost: PostModel;
-  respNewPost: PostModel;
-  respUpdatePost: PostModel;
+// Subject to handle subscription cleanup
+private destroy$: Subject<void> = new Subject<void>();
 
-  pictureUrl: any;
-  previousPictureUrl: '';
-  pictureFile: any;
-  pictureDefault: any;
+// Form group for post data
+postForm: FormGroup;
 
-  initCategories: CategoriesModel[] = [];
-  selectedCategories: CategoriesModel[] = [];
+// Current post model
+currentPost: PostModel;
 
-  includedCategories: CategoriesModel[] = [];
-  excludedCategories: CategoriesModel[] = [];
+// Response for new post creation
+respNewPost: PostModel;
+
+// Response for post update
+respUpdatePost: PostModel;
+
+// URL of the picture
+pictureUrl: any;
+
+// URL of the previous picture
+previousPictureUrl: '';
+
+// Uploaded picture file
+pictureFile: any;
+
+// Default picture URL
+pictureDefault: any;
+
+// Array to store initial categories
+initCategories: CategoriesModel[] = [];
+
+// Array to store selected categories
+selectedCategories: CategoriesModel[] = [];
+
+// Array to store included categories
+includedCategories: CategoriesModel[] = [];
+
+// Array to store excluded categories
+excludedCategories: CategoriesModel[] = [];
+
 
   /**
    * Determines if two category objects are the same
@@ -84,6 +109,24 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     }
     this.calculationSelectedCategories();
   }
+
+
+  // TODO To indicate the author of the post
+  // in the addPost() function:
+  // move the functionality of obtaining a user from LocalStore from the User Service to the shared Service
+
+  // private isAth() {
+  //   this.authService.accountSubject$.pipe(
+  //     takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //       this.account = resp;
+  //       console.log(555, this.account)
+  //       if (!this.account) {
+  //         // this.router.navigate(['auth/login']);
+  //       }
+  //     });
+  // }
+
 
   /**
    * Fetches all categories from the store

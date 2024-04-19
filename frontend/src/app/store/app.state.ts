@@ -1,4 +1,4 @@
-import {Action, Selector, State, StateContext} from "@ngxs/store";
+import { Action, Selector, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
 
 export interface AppStateModel {
@@ -24,7 +24,7 @@ export class AppState {
   @Action(SetAppName)
   setHost(ctx: StateContext<AppStateModel>, action: SetAppName) {
     ctx.patchState({
-      appName: action.appName,
+      appName: action.appName
     });
   }
 }

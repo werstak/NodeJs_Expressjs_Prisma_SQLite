@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+
+// Angular Material Modules
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -8,9 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 
-
-const modules = [
-  CommonModule,
+const materialModules = [
   MatToolbarModule,
   MatButtonModule,
   MatSidenavModule,
@@ -21,11 +21,12 @@ const modules = [
 ];
 
 @NgModule({
-  imports: [...modules],
-  exports: [...modules],
-  declarations: [
+  imports: [
+    CommonModule,
+    ...materialModules
   ],
+  exports: [
+    ...materialModules
+  ]
 })
-
-export class MaterialSharedModule {
-}
+export class MaterialSharedModule {}

@@ -1,6 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { PostModel } from '../../../../core/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
+import { PostModel } from '../../../../core/models/post.model';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { PostsService } from '../../posts.service';
@@ -12,8 +12,6 @@ import { DeletePost } from '../../store-posts/posts.action';
   templateUrl: './post.component.html',
   styleUrls: ['./post.component.scss']
 })
-
-
 export class PostComponent implements OnInit, OnDestroy {
   @Input() post: PostModel;
 
@@ -21,15 +19,18 @@ export class PostComponent implements OnInit, OnDestroy {
     public store: Store,
     public dialog: MatDialog,
     public postsService: PostsService,
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
   }
 
+  /**
+   * Opens the dialog for editing a post
+   * @param id ID of the post to edit
+   */
   openDialogEditPost(id: number): void {
     const dialogRef = this.dialog.open(DialogPostsComponent, {
-      data: {id, newPost: false},
+      data: { id, newPost: false },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -37,11 +38,13 @@ export class PostComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Opens the dialog for deleting a post
+   * @param post Post to delete
+   */
   openDialogDeletePost(post: PostModel): void {
-    let {id, title, picture} = post;
-    const params = {
-      picture
-    }
+    const { id, title, picture } = post;
+    const params = { picture };
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
@@ -52,7 +55,6 @@ export class PostComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('deletePost - afterClosed', result)
       if (result === true) {
         this.store.dispatch(new DeletePost(id, params));
       } else {
@@ -62,5 +64,6 @@ export class PostComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    // Cleanup resources
   }
 }

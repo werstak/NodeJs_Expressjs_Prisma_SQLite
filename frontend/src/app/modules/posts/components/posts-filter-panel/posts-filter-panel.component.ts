@@ -1,16 +1,15 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { PostsService } from '../../posts.service';
-import { debounceTime, Observable, ReplaySubject, startWith, Subject, takeUntil } from 'rxjs';
-import { Select, Store } from '@ngxs/store';
-import { UsersService } from '../../../users/users.service';
-import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
-import { UserListModel } from '../../../../core/models/user-list.model';
-import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { map } from 'rxjs/operators';
-import { CategoriesModel } from '../../../../core/models/categories.model';
-import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { MatDialog } from '@angular/material/dialog';
+import { Observable, Subject } from 'rxjs';
+import { debounceTime, map, startWith, takeUntil } from 'rxjs/operators';
+import { Select, Store } from '@ngxs/store';
+import { PostsService } from '../../posts.service';
+import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
+import { CategoriesModel } from '../../../../core/models/categories.model';
+import { UserListModel } from '../../../../core/models/user-list.model';
+import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 
 @Component({
@@ -26,35 +25,37 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     public postsService: PostsService,
     public dialog: MatDialog,
     public store: Store,
-    public usersService: UsersService
   ) {
   }
 
+  // Selectors for retrieving data from Ngxs store
   @Select(PostsSelectors.getListUsers) listAllUsers$: Observable<UserListModel[]>;
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
+  // Object to hold filter data
   private filterData: any = {authors: [], categories: []};
-  public postFilterForm: FormGroup
-  // Subject to handle subscription cleanup
+  public postFilterForm: FormGroup;
   private destroy$: Subject<void> = new Subject<void>();
 
-
-  /** Searchable Multiselect Filters*/
+  // Reference to search input elements
   @ViewChild('search') searchTextBox: ElementRef;
   @ViewChild('searchCategories') searchCategories: ElementRef;
 
+  // Form controls for search inputs
   searchTextboxControl = new FormControl();
   searchTextboxControlCategories = new FormControl();
 
-  listAllUsers: any = [];
+  // Arrays to store fetched data
+  listAllUsers: UserListModel[] = [];
   listAllCategories: CategoriesModel[] = [];
 
+  // Arrays to store selected values
   selectedValues: any = [];
   selectedValuesCategories: any = [];
 
-  filteredOptions: Observable<any['']>;
-  filteredOptionsCategories: Observable<any['']>;
-
+  // Observables for filtering options
+  filteredOptions: Observable<any[]>;
+  filteredOptionsCategories: Observable<any[]>;
 
   ngOnInit() {
     this.fetchUsers();
@@ -64,6 +65,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.onChangesControlCategories();
   }
 
+  /**
+   *Fetches users from the store
+   */
   private fetchUsers() {
     this.store.dispatch(new GetListAllUsers());
     this.listAllUsers$.pipe(
@@ -76,6 +80,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   *Sets up filtering for user search
+   */
   private filteredUsers() {
     this.filteredOptions = this.searchTextboxControl.valueChanges
       .pipe(
@@ -84,6 +91,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   *Builds the form for post filters
+   */
   private buildForm() {
     this.postFilterForm = this.fb.group({
       authors: [],
@@ -91,6 +101,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   *Subscribes to changes in the authors control
+   */
   private onChangesControlAuthors(): void {
     this.postFilterForm.controls['authors'].valueChanges.pipe(
       debounceTime(250),
@@ -111,47 +124,50 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Used to filter data based on search input
+   *Filters users based on input value
    */
   private _filter(name: string): any[] {
     const filterValue = name.toLowerCase();
     this.setSelectedValues();
     this.postFilterForm.controls['authors'].patchValue(this.selectedValues);
-    return this.listAllUsers.filter((option: any) => option.firstName.toLowerCase().indexOf(filterValue) === 0);
+    return this.listAllUsers.filter(option => option.firstName.toLowerCase().indexOf(filterValue) === 0);
   }
 
   /**
-   * Remove from selected values based on uncheck
+   *Handles selection change in the user dropdown
    */
   selectionChange(event: any) {
-    if (event.isUserInput && event.source.selected == false) {
-      let index = this.selectedValues.indexOf(event.source.value);
-      this.selectedValues.splice(index, 1)
+    if (event.isUserInput && !event.source.selected) {
+      const index = this.selectedValues.indexOf(event.source.value);
+      this.selectedValues.splice(index, 1);
     }
   }
 
+  /**
+   *Focuses on search input when dropdown is opened
+   */
   openedChangeAuthors(e: any) {
     this.searchTextboxControl.patchValue('');
-    if (e == true) {
+    if (e) {
       this.searchTextBox.nativeElement.focus();
     }
   }
 
   /**
-   * Clearing search textbox value
+   *Clears the search input value
    */
-  clearSearch(event: any) {
+  clearSearch(event: Event) {
     event.stopPropagation();
     this.searchTextboxControl.patchValue('');
   }
 
   /**
-   * Set selected values to retain the state
+   *Sets selected values to retain state
    */
   setSelectedValues() {
     if (this.postFilterForm.controls['authors'].value && this.postFilterForm.controls['authors'].value.length > 0) {
       this.postFilterForm.controls['authors'].value.forEach((e: any) => {
-        if (this.selectedValues.indexOf(e) == -1) {
+        if (this.selectedValues.indexOf(e) === -1) {
           this.selectedValues.push(e);
         }
       });
@@ -159,44 +175,49 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Filter Categories
+   *Fetches categories from the store
    */
-  private fetchCategories() {
+  fetchCategories() {
     this.store.dispatch(new GetCategories());
     this.listAllCategories$.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
         this.listAllCategories = resp;
-        if (this.listAllUsers.length) {
+        if (this.listAllCategories.length) {
           this.filteredCategories();
         }
       });
   }
 
+  /**
+   *Sets up filtering for category search
+   */
   private filteredCategories() {
-    this.filteredOptionsCategories = this.searchTextboxControlCategories.valueChanges
-      .pipe(
-        startWith<any>(''),
-        map(name => this._filterCategories(name))
-      );
+    this.filteredOptionsCategories = this.searchTextboxControlCategories.valueChanges.pipe(
+      startWith(''),
+      map(name => this._filterCategories(name))
+    );
   }
 
   /**
-   * Used to filter data based on search input in Categories
+   *Filters categories based on input value
    */
   private _filterCategories(name: string): any[] {
     const filterValue = name.toLowerCase();
     this.setSelectedValuesCategories();
     this.postFilterForm.controls['categories'].patchValue(this.selectedValuesCategories);
-    return this.listAllCategories.filter((option: any) => option.name.toLowerCase().indexOf(filterValue) === 0);
+    return this.listAllCategories.filter(option => option.name.toLowerCase().indexOf(filterValue) === 0);
   }
 
+  /**
+   *Subscribes to changes in the categories control
+   */
   private onChangesControlCategories(): void {
     this.postFilterForm.controls['categories'].valueChanges.pipe(
       debounceTime(250),
       takeUntil(this.destroy$)
     ).subscribe(val => {
-      let arrCategories = [];
+        let arrCategories = [];
         if (val.length) {
           for (let i = 0; i < val.length; i++) {
             arrCategories.push(val[i].id);
@@ -211,60 +232,63 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Remove from selected values based on uncheck Categories
+   *Handles selection change in the category dropdown
    */
   selectionChangeCategories(event: any) {
-    if (event.isUserInput && event.source.selected == false) {
-      let index = this.selectedValuesCategories.indexOf(event.source.value);
-      this.selectedValuesCategories.splice(index, 1)
+    if (event.isUserInput && !event.source.selected) {
+      const index = this.selectedValuesCategories.indexOf(event.source.value);
+      this.selectedValuesCategories.splice(index, 1);
     }
   }
 
+  /**
+   *Focuses on search input when dropdown is opened
+   */
   openedChangeCategories(e: any) {
-    // Set search textbox value as empty while opening selectbox
     this.searchTextboxControlCategories.patchValue('');
-    // Focus to search textbox while clicking on selectbox
-    if (e == true) {
+    if (e) {
       this.searchCategories.nativeElement.focus();
     }
   }
 
   /**
-   * Clearing search textbox value Categories
+   *Clears the search input value
    */
-  clearSearchCategories(event: any) {
+  clearSearchCategories(event: Event) {
     event.stopPropagation();
     this.searchTextboxControlCategories.patchValue('');
   }
 
   /**
-   * Set selected values to retain the state Categories
+   *Sets selected values to retain state
    */
   setSelectedValuesCategories() {
     if (this.postFilterForm.controls['categories'].value && this.postFilterForm.controls['categories'].value.length > 0) {
       this.postFilterForm.controls['categories'].value.forEach((e: any) => {
-        if (this.selectedValuesCategories.indexOf(e) == -1) {
+        if (this.selectedValuesCategories.indexOf(e) === -1) {
           this.selectedValuesCategories.push(e);
         }
       });
     }
   }
 
+  /**
+   *Opens the dialog for managing categories
+   */
   openDialog(): void {
-    const dialogRef = this.dialog.open(DialogCategoriesPostComponent, {
-    });
-
+    const dialogRef = this.dialog.open(DialogCategoriesPostComponent);
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
     });
   }
 
+  /**
+   *Opens the dialog for adding a new post
+   */
   addPost() {
-    const dialogRef = this.dialog.open(DialogPostsComponent, {
-      data: {newPost: true}
-    });
+    const dialogRef = this.dialog.open(DialogPostsComponent, {data: {newPost: true}});
     dialogRef.afterClosed().subscribe(result => {
-      console.log('dialogRef result', result)
+      console.log('dialogRef result', result);
     });
   }
 

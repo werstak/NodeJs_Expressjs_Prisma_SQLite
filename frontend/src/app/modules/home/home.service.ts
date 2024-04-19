@@ -8,16 +8,17 @@ import * as config from '../../../app-config';
 })
 export class HomeService {
 
-  constructor(
-    private http: HttpClient,
-  ) { }
+  constructor(private http: HttpClient) { }
 
-
+  /**
+   * Fetches data from the API.
+   * @returns An observable with the data fetched from the API.
+   */
   getData(): Observable<any> {
     return this.http.get(config.API_URL + `/`)
       .pipe(
         catchError(error => {
-          console.log('Error: ', error.message);
+          console.error('Error:', error.message);
           return throwError(error);
         })
       );
