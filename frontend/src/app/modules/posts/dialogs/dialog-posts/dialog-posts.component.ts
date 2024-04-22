@@ -9,6 +9,7 @@ import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { CategoriesModel } from '../../../../core/models/categories.model';
 import * as _ from 'lodash';
+import { AuthService } from '../../../auth/auth.service';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 
@@ -33,56 +34,60 @@ export class DialogPostsComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     public postsService: PostsService,
+    private authService: AuthService
   ) {}
 
 
 // Selecting list of categories from the store
 @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
+// Current userId
+  userId: string | undefined;
+
 // Array to store all categories
-listAllCategories: any = [];
+  listAllCategories: any = [];
 
 // Flag to indicate if data is loading
-dataLoading: boolean = false;
+  dataLoading: boolean = false;
 
 // Subject to handle subscription cleanup
-private destroy$: Subject<void> = new Subject<void>();
+  private destroy$: Subject<void> = new Subject<void>();
 
 // Form group for post data
-postForm: FormGroup;
+  postForm: FormGroup;
 
 // Current post model
-currentPost: PostModel;
+  currentPost: PostModel;
 
 // Response for new post creation
-respNewPost: PostModel;
+  respNewPost: PostModel;
 
 // Response for post update
-respUpdatePost: PostModel;
+  respUpdatePost: PostModel;
 
 // URL of the picture
-pictureUrl: any;
+  pictureUrl: any;
 
 // URL of the previous picture
-previousPictureUrl: '';
+  previousPictureUrl: '';
 
 // Uploaded picture file
-pictureFile: any;
+  pictureFile: any;
 
 // Default picture URL
-pictureDefault: any;
+  pictureDefault: any;
 
 // Array to store initial categories
-initCategories: CategoriesModel[] = [];
+  initCategories: CategoriesModel[] = [];
 
 // Array to store selected categories
-selectedCategories: CategoriesModel[] = [];
+  selectedCategories: CategoriesModel[] = [];
 
 // Array to store included categories
-includedCategories: CategoriesModel[] = [];
+  includedCategories: CategoriesModel[] = [];
 
 // Array to store excluded categories
-excludedCategories: CategoriesModel[] = [];
+  excludedCategories: CategoriesModel[] = [];
 
 
   /**
@@ -96,6 +101,8 @@ excludedCategories: CategoriesModel[] = [];
   }
 
   ngOnInit() {
+    this.userId = this.authService.accountValue?.userInfo.id;
+
     this.fetchCategories();
     this.buildForm();
     this.pictureDefault = pictureDefault;
@@ -109,24 +116,6 @@ excludedCategories: CategoriesModel[] = [];
     }
     this.calculationSelectedCategories();
   }
-
-
-  // TODO To indicate the author of the post
-  // in the addPost() function:
-  // move the functionality of obtaining a user from LocalStore from the User Service to the shared Service
-
-  // private isAth() {
-  //   this.authService.accountSubject$.pipe(
-  //     takeUntil(this.destroy$))
-  //     .subscribe(resp => {
-  //       this.account = resp;
-  //       console.log(555, this.account)
-  //       if (!this.account) {
-  //         // this.router.navigate(['auth/login']);
-  //       }
-  //     });
-  // }
-
 
   /**
    * Fetches all categories from the store
@@ -318,7 +307,7 @@ excludedCategories: CategoriesModel[] = [];
       content: this.postForm.value.content,
       categories: this.postForm.value.categories ? this.postForm.value.categories : [],
       published: this.postForm.value.published,
-      userId: 1
+      userId: this.userId
     };
     this.store.dispatch(new AddPost(params, picture));
   }

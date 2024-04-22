@@ -1,21 +1,27 @@
-import * as dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
-import { router } from './routes'
+import { router } from './routes';
 
 
-dotenv.config();
+const PORT = process.env.PORT || '5000';
+// const PORT = 5000;
 
-// const {PORT} = process.env
-const PORT = 5000;
+const app = express(); // Creating Express application instance
 
-const app = express();
-
+// Middleware to parse JSON bodies of incoming requests
 app.use(express.json());
+
+// Middleware to enable CORS
 app.use(cors());
+
+// Middleware to serve static files from 'src/uploads/' directory
 app.use('/src/uploads/', express.static('src/uploads/'));
 
-
+// Mounting router for handling API routes
 app.use(router);
 
-app.listen(PORT, () => console.log(`Server was started on port ${PORT}`));
+// Starting the server and listening on the specified port
+app.listen(PORT, () => {
+    console.log(`Server was started on port ${PORT}`);
+});
+

@@ -7,7 +7,7 @@ export class NotificationService {
   // Configuration for error messages
   private errorConfig: MatSnackBarConfig = {
     panelClass: 'notification-error-message-wrapper',
-    duration: 5000, // Duration in milliseconds
+    duration: 5000,
     verticalPosition: 'top',
     horizontalPosition: 'center',
   };
@@ -15,7 +15,7 @@ export class NotificationService {
   // Configuration for success messages
   private successConfig: MatSnackBarConfig = {
     panelClass: 'notification-success-message-wrapper',
-    duration: 5000, // Duration in milliseconds
+    duration: 5000,
     verticalPosition: 'top',
     horizontalPosition: 'center',
   };

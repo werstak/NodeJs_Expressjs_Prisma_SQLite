@@ -17,6 +17,17 @@ import { DialogConfirmComponent } from './shared/components/dialog-confirm/dialo
 import { JwtInterceptor } from './core/interceptors/jwt.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
+// Modules array
+const angularMaterialModules = [
+  BrowserModule,
+  HttpClientModule,
+  AppRoutingModule,
+  LayoutModule,
+  BrowserAnimationsModule,
+  MaterialSharedModule,
+  NgxsModule.forRoot([AppState]),
+  NgxsReduxDevtoolsPluginModule.forRoot(),
+];
 
 @NgModule({
   declarations: [
@@ -26,14 +37,7 @@ import { ErrorInterceptor } from './core/interceptors/error.interceptor';
     DialogConfirmComponent,
   ],
   imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule,
-    LayoutModule,
-    BrowserAnimationsModule,
-    MaterialSharedModule,
-    NgxsModule.forRoot([AppState]),
-    NgxsReduxDevtoolsPluginModule.forRoot(),
+    ...angularMaterialModules, // Importing Modules
   ],
   providers: [
     NotificationService,

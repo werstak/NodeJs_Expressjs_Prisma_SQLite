@@ -1,29 +1,44 @@
 import multer from 'multer';
 import moment from 'moment';
 
+/**
+ *Define storage settings for multer
+ */
 const storage = multer.diskStorage({
-    destination(reg, file, cb) {
-        cb(null, 'src/uploads/')
+    // Define destination folder for uploaded files
+    destination(req, file, cb) {
+        cb(null, 'src/uploads/');
     },
-    filename(reg, file, cb) {
-        const date = moment().format('DDMMYYYY-HHmmss')
-        console.log('NAME File = ' , date);
-        cb(null, `${date}-${file.originalname}`)
+    // Define filename for uploaded files
+    filename(req, file, cb) {
+        const date = moment().format('DDMMYYYY-HHmmss');
+        const filename = `${date}-${file.originalname}`;
+        cb(null, filename);
     }
-})
+});
 
+/**
+ *Define file filter function for multer
+ */
 const fileFilter = (req: any, file: any, cb: any) => {
-    if((file.mimetype).includes('jpeg') || (file.mimetype).includes('png') || (file.mimetype).includes('jpg')){
+    // Check if the file mimetype includes 'jpeg', 'png', or 'jpg'
+    if (file.mimetype.includes('jpeg') || file.mimetype.includes('png') || file.mimetype.includes('jpg')) {
         cb(null, true);
-    } else{
+    } else {
         cb(null, false);
     }
 };
 
+/**
+ *Define upload limits for multer
+ */
 const limits = {
-    fileSize: 1024 * 1024 * 5
-}
+    fileSize: 1024 * 1024 * 5 // 5MB file size limit
+};
 
+/**
+ *Create multer instance with defined settings
+ */
 let upload = multer({
     storage: storage,
     fileFilter: fileFilter,

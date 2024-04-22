@@ -45,6 +45,23 @@ authRouter.post(
             const {accessToken, refreshToken} = generateTokens(createdUser.newUser, jti);
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
 
+
+            /** SEND access to the site */
+            /* Set transporter options:*/
+            const siteLink = `${urlClient}`
+            const subject = 'Registration on the website!'
+            const htmlContent =
+                        `<h2>Hi ${createdUser.newUser.firstName} ${createdUser.newUser.lastName}!</h2>
+                        <p>You have registered on the site "NodeJs_Expressjs_Prisma - ${siteLink}"</p>
+                        <p>To enter the site use:</p>
+                        <p>Login - ${createdUser.newUser.email}</p>
+                        <p>Password - ${password} </p>`
+
+            const text = `Some text`
+
+            /* Start send E-MAIL*/
+            await handlerEmailSending(existingUser, email, subject, htmlContent, text);
+
             return response.status(201).json({
                 message: `Registration successful!`,
                 accessToken,

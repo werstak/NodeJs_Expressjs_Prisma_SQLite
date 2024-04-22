@@ -1,15 +1,14 @@
 import db from '../utils/db';
 
 /**
- * Will be realized through the prisma
- * */
-
-
+ * Retrieves all users based on provided parameters.
+ * @param params - Parameters for filtering, sorting, and pagination.
+ * @returns Promise containing total count and list of users.
+ */
 export const getAllUsersHandler = async (params: any): Promise<any> => {
     const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles} = params;
 
     const parseRoles = JSON.parse(roles);
-    console.log('ROLES getAllUsersHandler()', parseRoles)
     let rolesArr;
     if (parseRoles.length) {
         rolesArr = parseRoles;
@@ -56,7 +55,10 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
     return {totalCount, users}
 };
 
-
+/**
+ * Retrieves a list of all users with minimal information.
+ * @returns Promise containing the list of users.
+ */
 export const getListAllUsersHandler = async (): Promise<any> => {
     const users = await db.user.findMany({
         select: {
@@ -68,7 +70,11 @@ export const getListAllUsersHandler = async (): Promise<any> => {
     return {users}
 };
 
-
+/**
+ * Retrieves a single user by ID.
+ * @param id - ID of the user to retrieve.
+ * @returns Promise containing the user information.
+ */
 export const getUserHandler = async (id: number): Promise<any | null> => {
     return db.user.findUnique({
         where: {
@@ -92,7 +98,11 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
     });
 };
 
-
+/**
+ * Creates a new user.
+ * @param user - User information to create.
+ * @returns Promise containing total count and newly created user.
+ */
 export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
     const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
 
@@ -127,7 +137,12 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
     return {totalCount, newUser}
 };
 
-
+/**
+ * Updates an existing user.
+ * @param user - Updated user information.
+ * @param id - ID of the user to update.
+ * @returns Promise containing the updated user information.
+ */
 export const updateUserHandler = async (
     user: Omit<any, 'id'>,
     id: number
@@ -165,7 +180,12 @@ export const updateUserHandler = async (
     });
 };
 
-
+/**
+ * Updates the password of an existing user.
+ * @param userPassword - New password information.
+ * @param id - ID of the user whose password to update.
+ * @returns Promise containing the updated user information.
+ */
 export const updateUserPasswordHandler = async (
     userPassword: Omit<any, 'id'>,
     id: number
@@ -189,7 +209,11 @@ export const updateUserPasswordHandler = async (
     });
 };
 
-
+/**
+ * Deletes a user by ID.
+ * @param id - ID of the user to delete.
+ * @returns Promise without any data.
+ */
 export const deleteUserHandler = async (id: number): Promise<void> => {
     await db.user.delete({
         where: {
@@ -198,7 +222,11 @@ export const deleteUserHandler = async (id: number): Promise<void> => {
     });
 };
 
-
+/**
+ * Finds a user by ID.
+ * @param id - ID of the user to find.
+ * @returns Promise containing the user information or null if not found.
+ */
 export const findUserById = async (id: any): Promise<any | null> => {
     return db.user.findUnique({
         where: {
