@@ -1,15 +1,19 @@
-export interface User {
-    id: number,
-    email: string,
-    password: string,
-    firstName: string,
-    lastName?: string,
-    createdAt?: string,
-    updatedAt?: string,
-    role: number,
-    avatar: string,
-    posts?: [],
-    status: boolean,
-    birthAt: string,
-    location: string,
+import { RefreshToken } from './refresh-token.model';
+import { PasswordResetToken } from './password-reset-token.model';
+
+export interface UserModel {
+    id: number;
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    createdAt?: Date | null;
+    updatedAt?: Date | null;
+    role: number;
+    avatar?: string | null;
+    status?: boolean | null;
+    birthAt?: Date | null;
+    location: string;
+    refreshTokens?: RefreshToken[];
+    passwordResetToken?: PasswordResetToken[];
 }

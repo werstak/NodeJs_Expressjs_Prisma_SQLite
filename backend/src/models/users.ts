@@ -1,4 +1,4 @@
-export interface Users {
+export interface UsersModel {
     orderByColumn: number;
     orderByDirection: 'asc' | 'desc';
     pageIndex: number;

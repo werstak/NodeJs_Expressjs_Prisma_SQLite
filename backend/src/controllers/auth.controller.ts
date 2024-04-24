@@ -1,5 +1,8 @@
 import db from '../utils/db';
 import { hashToken } from '../utils/hashToken';
+import { RefreshToken } from '../models/refresh-token.model';
+import { PasswordResetToken } from '../models/password-reset-token.model';
+import { UserModel } from '../models/user.model';
 
 /**
  * Handlers for user-related operations.
@@ -11,7 +14,7 @@ import { hashToken } from '../utils/hashToken';
  * @param email The email of the user to find.
  * @returns Promise<any | null> A promise that resolves to the found user or null if not found.
  */
-export const findUserByEmail = async (email: string): Promise<any | null> => {
+export const findUserByEmail = async (email: string): Promise<UserModel | null> => {
     return db.user.findUnique({
         where: {
             email: email,
@@ -24,7 +27,7 @@ export const findUserByEmail = async (email: string): Promise<any | null> => {
  * @param email The email of the user to find information for.
  * @returns Promise<any | null> A promise that resolves to the user information or null if not found.
  */
-export const findUserInfoByEmail = async (email: string): Promise<any | null> => {
+export const findUserInfoByEmail = async (email: string): Promise<UserModel | null> => {
     return db.user.findUnique({
         where: {
             email: email,
@@ -34,7 +37,10 @@ export const findUserInfoByEmail = async (email: string): Promise<any | null> =>
             password: true,
             firstName: true,
             lastName: true,
-            passwordResetToken: true
+            passwordResetToken: true,
+            email: true,
+            role: true,
+            location: true
         },
     });
 };
@@ -46,7 +52,7 @@ export const findUserInfoByEmail = async (email: string): Promise<any | null> =>
  * @param userId The ID of the user associated with the refresh token.
  * @returns Promise<any | null> A promise that resolves to the added refresh token or null if not added.
  */
-export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: any): Promise<any | null> => {
+export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: any): Promise<RefreshToken | null> => {
     return db.refreshToken.create({
         data: {
             id: jti,
@@ -61,7 +67,7 @@ export const addRefreshTokenToWhitelist = async ({ jti, refreshToken, userId }: 
  * @param id The unique identifier of the refresh token to find.
  * @returns Promise<any | null> A promise that resolves to the found refresh token or null if not found.
  */
-export const findRefreshTokenById = async (id: any): Promise<any | null> => {
+export const findRefreshTokenById = async (id: any): Promise<RefreshToken | null> => {
     return db.refreshToken.findUnique({
         where: {
             id,
@@ -74,7 +80,7 @@ export const findRefreshTokenById = async (id: any): Promise<any | null> => {
  * @param id The unique identifier of the refresh token to delete.
  * @returns Promise<any | null> A promise that resolves to the deleted refresh token or null if not found.
  */
-export const deleteRefreshToken = async (id: any): Promise<any | null> => {
+export const deleteRefreshToken = async (id: any): Promise<RefreshToken | null> => {
     return db.refreshToken.update({
         where: {
             id,
@@ -90,7 +96,7 @@ export const deleteRefreshToken = async (id: any): Promise<any | null> => {
  * @param id The ID of the user whose tokens should be revoked.
  * @returns Promise<any | null> A promise that resolves when the tokens are successfully revoked.
  */
-export const revokeTokens = async (id: any): Promise<any | null> => {
+export const revokeTokens = async (id: any): Promise<void> => {
     await db.refreshToken.delete({
         where: {
             id,
@@ -103,7 +109,7 @@ export const revokeTokens = async (id: any): Promise<any | null> => {
  * @param userId The ID of the user whose password reset tokens should be found.
  * @returns Promise<any | null> A promise that resolves to an array of password reset tokens or null if none are found.
  */
-export const findPasswordResetToken = async (userId: number): Promise<any | null> => {
+export const findPasswordResetToken = async (userId: number): Promise<PasswordResetToken[] | null> => {
     return db.passwordResetToken.findMany({
         where: {
             userId: +userId,
@@ -115,7 +121,7 @@ export const findPasswordResetToken = async (userId: number): Promise<any | null
  * Deletes all previous password reset tokens from the database.
  * @returns Promise<any | null> A promise that resolves when all previous password reset tokens are successfully deleted.
  */
-export const deletePreviousPasswordResetTokens = async (): Promise<any | null> => {
+export const deletePreviousPasswordResetTokens = async (): Promise<void> => {
     await db.passwordResetToken.deleteMany({});
 };
 
@@ -126,7 +132,7 @@ export const deletePreviousPasswordResetTokens = async (): Promise<any | null> =
  * @param expireTimeReset The expiration time of the password reset token.
  * @returns Promise<any | null> A promise that resolves to the added password reset token or null if not added.
  */
-export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: any, expireTimeReset: any): Promise<any | null> => {
+export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: number, expireTimeReset: any): Promise<PasswordResetToken | null> => {
     return db.passwordResetToken.create({
         data: {
             resetToken: convertPasswordResetToken,
@@ -142,9 +148,9 @@ export const addPasswordResetToken = async (convertPasswordResetToken: any, user
  * @param userId The ID of the user whose password should be changed.
  * @returns Promise<any> A promise that resolves when the password is successfully changed.
  */
-export const changePasswordHandler = async (newPassword: any, userId: number): Promise<any> => {
+export const changePasswordHandler = async (newPassword: any, userId: number): Promise<void> => {
     const { password } = newPassword;
-    return db.user.update({
+    await db.user.update({
         where: {
             id: userId,
         },

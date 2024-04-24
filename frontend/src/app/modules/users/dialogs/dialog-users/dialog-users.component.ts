@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
-import { Observable, startWith, Subject, Subscription, takeUntil } from 'rxjs';
+import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';

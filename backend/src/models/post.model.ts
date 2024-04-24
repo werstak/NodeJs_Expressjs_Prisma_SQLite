@@ -1,6 +1,5 @@
-import { User } from './user.model';
 import { CategoriesModel } from './categories.model';
-
+import { UserModel } from './user.model';
 export type PostModel = {
     id: number;
     title: string;
@@ -8,9 +7,9 @@ export type PostModel = {
     content?: string;
     picture?: string;
     published: boolean;
-    createdAt: string;
-    updatedAt: string;
-    user: User;
+    createdAt?: Date;
+    updatedAt?: Date;
+    user: UserModel;
     userId: number;
-    categories?: CategoriesModel[]
+    categories?: CategoriesModel[];
 };
