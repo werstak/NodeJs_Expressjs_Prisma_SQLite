@@ -1,6 +1,6 @@
 import { UserModel } from './user.model';
 
-export interface PasswordResetToken {
+export interface PasswordResetTokenModel {
     id: number;
     resetToken: string;
     userId: number;

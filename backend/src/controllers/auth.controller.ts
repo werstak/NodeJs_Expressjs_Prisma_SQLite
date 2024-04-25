@@ -1,7 +1,7 @@
 import db from '../utils/db';
 import { hashToken } from '../utils/hashToken';
 import { RefreshToken } from '../models/refresh-token.model';
-import { PasswordResetToken } from '../models/password-reset-token.model';
+import { PasswordResetTokenModel } from '../models/password-reset-token.model';
 import { UserModel } from '../models/user.model';
 
 /**
@@ -109,7 +109,7 @@ export const revokeTokens = async (id: any): Promise<void> => {
  * @param userId The ID of the user whose password reset tokens should be found.
  * @returns Promise<any | null> A promise that resolves to an array of password reset tokens or null if none are found.
  */
-export const findPasswordResetToken = async (userId: number): Promise<PasswordResetToken[] | null> => {
+export const findPasswordResetToken = async (userId: number): Promise<PasswordResetTokenModel[] | null> => {
     return db.passwordResetToken.findMany({
         where: {
             userId: +userId,
@@ -121,8 +121,12 @@ export const findPasswordResetToken = async (userId: number): Promise<PasswordRe
  * Deletes all previous password reset tokens from the database.
  * @returns Promise<any | null> A promise that resolves when all previous password reset tokens are successfully deleted.
  */
-export const deletePreviousPasswordResetTokens = async (): Promise<void> => {
-    await db.passwordResetToken.deleteMany({});
+export const deletePreviousPasswordResetTokens = async (existingUserId: number): Promise<void> => {
+    await db.passwordResetToken.deleteMany({
+            where: {
+                userId: existingUserId
+            },
+    });
 };
 
 /**
@@ -132,7 +136,7 @@ export const deletePreviousPasswordResetTokens = async (): Promise<void> => {
  * @param expireTimeReset The expiration time of the password reset token.
  * @returns Promise<any | null> A promise that resolves to the added password reset token or null if not added.
  */
-export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: number, expireTimeReset: any): Promise<PasswordResetToken | null> => {
+export const addPasswordResetToken = async (convertPasswordResetToken: any, userId: number, expireTimeReset: any): Promise<PasswordResetTokenModel | null> => {
     return db.passwordResetToken.create({
         data: {
             resetToken: convertPasswordResetToken,

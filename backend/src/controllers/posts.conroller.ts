@@ -96,7 +96,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
  * @param id The ID of the post to retrieve.
  * @returns The post object if found, otherwise null.
  */
-export const getSinglePostHandler = async (id: number): Promise<any | null> => {
+export const getSinglePostHandler = async (id: number): Promise<any> => {
     return db.post.findUnique({
         where: {
             id,

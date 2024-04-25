@@ -258,8 +258,8 @@ authRouter.post(
             const existingResetTokens = existingUser.passwordResetToken;
 
             /** Delete existing PasswordResetTokens */
-            if (!(existingResetTokens) || existingResetTokens.length) {
-                await AuthUserHandler.deletePreviousPasswordResetTokens();
+            if (!existingResetTokens || existingResetTokens.length) {
+                await AuthUserHandler.deletePreviousPasswordResetTokens(existingUserId);
             }
 
             /** Generate PasswordResetToke */
@@ -367,7 +367,7 @@ authRouter.put(
                 return response.status(400).json({message: `Missing password or password reset token.`})
             }
 
-            /** Chek existence PasswordResetToken */
+            /** Check existence PasswordResetToken */
             const userId: number = Number(passwordResetToken.id);
             const requestResetToken = passwordResetToken.token;
             const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
@@ -398,7 +398,12 @@ authRouter.put(
 
             const hashNewPassword = bcrypt.hashSync(request.body.password, 7);
             const newUserPassword: any = {password: hashNewPassword};
+
+            /** Update the password of an existing user */
             await AuthUserHandler.changePasswordHandler(newUserPassword, userId);
+
+            /** Delete PasswordResetTokens */
+            await AuthUserHandler.deletePreviousPasswordResetTokens(userId);
 
             return response.status(201).json({message: `Password changed successfully!`});
         } catch (error: any) {

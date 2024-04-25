@@ -1,5 +1,5 @@
 import { RefreshToken } from './refresh-token.model';
-import { PasswordResetToken } from './password-reset-token.model';
+import { PasswordResetTokenModel } from './password-reset-token.model';
 
 export interface UserModel {
     id: number;
@@ -13,7 +13,7 @@ export interface UserModel {
     avatar?: string | null;
     status?: boolean | null;
     birthAt?: Date | null;
-    location: string;
+    location?: string;
     refreshTokens?: RefreshToken[];
-    passwordResetToken?: PasswordResetToken[];
+    passwordResetToken?: PasswordResetTokenModel[];
 }
