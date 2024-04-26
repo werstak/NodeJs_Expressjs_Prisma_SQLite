@@ -1,29 +1,30 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, catchError, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { UserModel } from '../../core/models/user.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { UserParamsModel } from '../../core/models/user-params.model';
 import * as config from '../../../app-config';
 
-
 @Injectable({
   providedIn: 'root'
 })
-
 export class UsersService {
 
   constructor(
     private http: HttpClient,
-    private _snackBar: MatSnackBar
-  ) {
-  }
+  ) {}
 
+  // BehaviorSubject for storing the list of users
   users$ = new BehaviorSubject<any>([]);
+  // BehaviorSubject for storing user filters
   usersFilters$ = new BehaviorSubject<any>({});
 
   /**
-   Adding a new user
+   * Add a new user.
+   * @param params User parameters.
+   * @param avatar User avatar.
    */
   addUser(params: UserModel, avatar: any): Observable<any> {
     const uploadData = new FormData();
@@ -33,7 +34,12 @@ export class UsersService {
   }
 
   /**
-   Updating user information
+   * Update user information.
+   * @param id User ID.
+   * @param params User parameters.
+   * @param avatar User avatar.
+   * @param imageOrUrl Flag to indicate if avatar is an image or URL.
+   * @param previousImageUrl Previous avatar URL.
    */
   updateUser(id: number, params: UserModel, avatar: any, imageOrUrl: boolean, previousImageUrl: string): Observable<any> {
     const uploadData = new FormData();
@@ -45,53 +51,56 @@ export class UsersService {
   }
 
   /**
-   Updating user password
+   * Update user password.
+   * @param id User ID.
+   * @param params Password parameters.
    */
   updateUserPassword(id: number, params: any): Observable<any> {
     return this.http.put(config.API_URL + `/users/update_password/` + id, params);
   }
 
-
   /**
-   Remove user
+   * Remove user.
+   * @param id User ID.
+   * @param params Additional parameters.
    */
   removeUser(id: number, params: any): Observable<any> {
     return this.http.delete(config.API_URL + `/users/` + id, {params});
   }
 
   /**
-   Getting a list of all users
+   * Fetch users based on provided parameters.
+   * @param params User parameters for filtering.
    */
   fetchUsers(params: UserParamsModel): Observable<any> {
-    return this.http.get(config.API_URL + `/users`, {
-      params: new HttpParams()
-        .set('orderByColumn', params.orderByColumn)
-        .set('orderByDirection', params.orderByDirection)
-        .set('pageIndex', params.pageIndex)
-        .set('pageSize', params.pageSize)
-        .set('firstName', params.firstName)
-        .set('lastName', params.lastName)
-        .set('email', params.email)
-        .set('roles', JSON.stringify(params.roles))
-    })
-      .pipe(
-        catchError(error => {
-          console.log('Error: ', error.message);
-          return throwError(error);
-        })
-      );
+    const queryParams = new HttpParams()
+      .set('orderByColumn', params.orderByColumn)
+      .set('orderByDirection', params.orderByDirection)
+      .set('pageIndex', params.pageIndex)
+      .set('pageSize', params.pageSize)
+      .set('firstName', params.firstName)
+      .set('lastName', params.lastName)
+      .set('email', params.email)
+      .set('roles', JSON.stringify(params.roles));
+
+    return this.http.get(config.API_URL + `/users`, { params: queryParams }).pipe(
+      catchError(error => {
+        console.error('Error fetching users: ', error); // Logging error
+        return throwError(error); // Rethrowing the error
+      })
+    );
   }
 
   /**
-   Getting information about one selected user
+   * Get information about a selected user.
+   * @param id User ID.
    */
   getUser(id: number): Observable<any> {
-    return this.http.get(config.API_URL + `/users/` + id)
-      .pipe(
-        catchError(error => {
-          console.log('Error: ', error.message);
-          return throwError(error);
-        })
-      );
+    return this.http.get(config.API_URL + `/users/` + id).pipe(
+      catchError(error => {
+        console.error('Error fetching user: ', error); // Logging error
+        return throwError(error); // Rethrowing the error
+      })
+    );
   }
 }

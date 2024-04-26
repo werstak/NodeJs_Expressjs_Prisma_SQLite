@@ -1,15 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UsersComponent } from './components/users/users.component';
-import { UsersTableComponent } from './components/users-table/users-table.component';
 import { RouterModule, Routes } from '@angular/router';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// Angular Material components
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
-import { UsersState } from './store-users/users.state';
-import { NgxsModule } from '@ngxs/store';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
@@ -21,14 +19,24 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { UsersFilterPanelComponent } from './components/users-filter-panel/users-filter-panel.component';
-import { SharedModule } from '../../shared/shared.module';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+
+// Components
+import { UsersComponent } from './components/users/users.component';
+import { UsersTableComponent } from './components/users-table/users-table.component';
+import { DialogUsersComponent } from './dialogs/dialog-users/dialog-users.component';
+import { UsersFilterPanelComponent } from './components/users-filter-panel/users-filter-panel.component';
 import { DialogNewPasswordComponent } from './dialogs/dialog-new-password/dialog-new-password.component';
+
+// Ngxs State
+import { NgxsModule } from '@ngxs/store';
+import { UsersState } from './store-users/users.state';
+
+// Shared Module
+import { SharedModule } from '../../shared/shared.module';
 
 const routes: Routes = [
   {
@@ -48,11 +56,12 @@ const routes: Routes = [
   imports: [
     CommonModule,
     SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
     MatTableModule,
     MatCardModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    FormsModule,
     MatButtonModule,
     MatInputModule,
     MatIconModule,
@@ -60,7 +69,6 @@ const routes: Routes = [
     MatCheckboxModule,
     MatToolbarModule,
     MatPaginatorModule,
-    ReactiveFormsModule,
     MatFormFieldModule,
     MatAutocompleteModule,
     MatSelectModule,
@@ -69,10 +77,8 @@ const routes: Routes = [
     MatNativeDateModule,
     MatTooltipModule,
     MatSnackBarModule,
-    MatPaginatorModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([UsersState])
   ]
 })
-export class UsersModule {
-}
+export class UsersModule {}

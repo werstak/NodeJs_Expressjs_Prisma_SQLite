@@ -1,43 +1,35 @@
 import db from '../utils/db';
+import { UserModel } from '../models/user.model';
+import { UsersModel } from '../models/users.model';
 
 /**
- * Will be realized through the prisma
- * */
+ * Retrieves all users based on provided parameters.
+ * @param params - Parameters for filtering, sorting, and pagination.
+ * @returns Promise<{ totalCount: number, users: UsersModel[] }> A promise containing total count and list of users.
+ */
+export const getAllUsersHandler = async (params: any): Promise<{ totalCount: number, users: UsersModel[] }> => {
+    const { orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles } = params;
 
+    // Parse roles from string to array of numbers
+    const parseRoles: number[] = JSON.parse(roles);
+    const rolesArr: number[] = parseRoles.length ? parseRoles : [1, 2, 3, 4];
 
-export const getAllUsersHandler = async (params: any): Promise<any> => {
-    const {orderByColumn, orderByDirection, pageIndex, pageSize, firstName, lastName, email, roles} = params;
+    // Calculate skip value for pagination
+    const skip: number = pageIndex * pageSize;
+    // Retrieve total count of users
+    const totalCount: number = await db.user.count();
 
-    const parseRoles = JSON.parse(roles);
-    console.log('ROLES getAllUsersHandler()', parseRoles)
-    let rolesArr;
-    if (parseRoles.length) {
-        rolesArr = parseRoles;
-    } else {
-        rolesArr = [1, 2, 3, 4];
-    }
-
-    const skip = pageIndex * pageSize;
-    const totalCount = await db.user.count();
-
-    const users = await db.user.findMany({
+    // Retrieve users based on parameters
+    const users: UsersModel[] = await db.user.findMany({
         where: {
-            role: {in: rolesArr},
-            firstName: {
-                startsWith: firstName,
-            },
-            lastName: {
-                startsWith: lastName,
-            },
-            email: {
-                startsWith: email
-            }
+            role: { in: rolesArr },
+            firstName: { startsWith: firstName },
+            lastName: { startsWith: lastName },
+            email: { startsWith: email }
         },
         take: parseInt(pageSize),
         skip: skip,
-        orderBy: {
-            [orderByColumn]: orderByDirection,
-        },
+        orderBy: { [orderByColumn]: orderByDirection },
         select: {
             id: true,
             firstName: true,
@@ -53,11 +45,14 @@ export const getAllUsersHandler = async (params: any): Promise<any> => {
             location: true
         },
     });
-    return {totalCount, users}
+    return { totalCount, users };
 };
 
-
-export const getListAllUsersHandler = async (): Promise<any> => {
+/**
+ * Retrieves a list of all users with minimal information.
+ * @returns Promise<{ users: Pick<UsersModel, 'id' | 'firstName' | 'lastName'>[] }> A promise containing the list of users.
+ */
+export const getListAllUsersHandler = async (): Promise<{ users: Pick<UsersModel, 'id' | 'firstName' | 'lastName'>[] }> => {
     const users = await db.user.findMany({
         select: {
             id: true,
@@ -65,15 +60,17 @@ export const getListAllUsersHandler = async (): Promise<any> => {
             lastName: true
         },
     });
-    return {users}
+    return { users };
 };
 
-
-export const getUserHandler = async (id: number): Promise<any | null> => {
+/**
+ * Retrieves a single user by ID.
+ * @param id - ID of the user to retrieve.
+ * @returns Promise<UserModel | null> A promise containing the user information.
+ */
+export const getUserHandler = async (id: number): Promise<UserModel | null> => {
     return db.user.findUnique({
-        where: {
-            id,
-        },
+        where: { id },
         select: {
             id: true,
             firstName: true,
@@ -92,22 +89,15 @@ export const getUserHandler = async (id: number): Promise<any | null> => {
     });
 };
 
-
-export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => {
-    const {firstName, lastName, email, password, role, avatar, status, birthAt, location} = user;
-
+/**
+ * Creates a new user.
+ * @param user - User information to create.
+ * @returns Promise<{ totalCount: number, newUser: UserModel }> A promise containing total count and newly created user.
+ */
+export const createUserHandler = async (user: UserModel): Promise<any> => {
+    const { firstName, lastName, email, password, role, avatar, status, birthAt, location } = user;
     const newUser = await db.user.create({
-        data: {
-            firstName,
-            lastName,
-            email,
-            password,
-            role,
-            avatar,
-            status,
-            birthAt,
-            location
-        },
+        data: { firstName, lastName, email, password, role, avatar, status, birthAt, location: location ?? '' },
         select: {
             id: true,
             firstName: true,
@@ -123,31 +113,21 @@ export const createUserHandler = async (user: Omit<any, 'id'>): Promise<any> => 
             location: true
         },
     });
-    const totalCount = await db.user.count();
-    return {totalCount, newUser}
+    const totalCount: number = await db.user.count();
+    return { totalCount, newUser };
 };
 
-
-export const updateUserHandler = async (
-    user: Omit<any, 'id'>,
-    id: number
-): Promise<any> => {
-    const {firstName, lastName, email, role, avatar, status, birthAt, location} = user;
-
+/**
+ * Updates an existing user.
+ * @param user - Updated user information.
+ * @param id - ID of the user to update.
+ * @returns Promise<any> A promise containing the updated user information.
+ */
+export const updateUserHandler = async (user: UserModel, id: number): Promise<any> => {
+    const { firstName, lastName, email, role, avatar, status, birthAt, location } = user;
     return db.user.update({
-        where: {
-            id,
-        },
-        data: {
-            firstName,
-            lastName,
-            email,
-            role,
-            avatar,
-            status,
-            birthAt,
-            location
-        },
+        where: { id },
+        data: { firstName, lastName, email, role, avatar, status, birthAt, location },
         select: {
             id: true,
             firstName: true,
@@ -165,19 +145,17 @@ export const updateUserHandler = async (
     });
 };
 
-
-export const updateUserPasswordHandler = async (
-    userPassword: Omit<any, 'id'>,
-    id: number
-): Promise<any> => {
-    const {password} = userPassword;
+/**
+ * Updates the password of an existing user.
+ * @param userPassword - New password information.
+ * @param id - ID of the user whose password to update.
+ * @returns Promise<any> A promise containing the updated user information.
+ */
+export const updateUserPasswordHandler = async (userPassword: any, id: number): Promise<any> => {
+    const { password } = userPassword;
     return db.user.update({
-        where: {
-            id,
-        },
-        data: {
-            password,
-        },
+        where: { id },
+        data: { password },
         select: {
             id: true,
             firstName: true,
@@ -189,20 +167,20 @@ export const updateUserPasswordHandler = async (
     });
 };
 
-
+/**
+ * Deletes a user by ID.
+ * @param id - ID of the user to delete.
+ * @returns Promise<void> A promise without any data.
+ */
 export const deleteUserHandler = async (id: number): Promise<void> => {
-    await db.user.delete({
-        where: {
-            id,
-        },
-    });
+    await db.user.delete({ where: { id } });
 };
 
-
-export const findUserById = async (id: any): Promise<any | null> => {
-    return db.user.findUnique({
-        where: {
-            id,
-        },
-    });
+/**
+ * Finds a user by ID.
+ * @param id - ID of the user to find.
+ * @returns Promise<UserModel | null> A promise containing the user information or null if not found.
+ */
+export const findUserById = async (id: number): Promise<UserModel | null> => {
+    return db.user.findUnique({ where: { id } });
 };

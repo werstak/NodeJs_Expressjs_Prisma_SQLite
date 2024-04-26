@@ -1,4 +1,4 @@
-import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogNewPasswordModel } from '../../../../core/models/dialog-new-password.model';
 
@@ -8,16 +8,15 @@ import { DialogNewPasswordModel } from '../../../../core/models/dialog-new-passw
   styleUrls: ['./dialog-new-password.component.scss']
 })
 export class DialogNewPasswordComponent implements OnInit, OnDestroy {
-    constructor(
+  constructor(
     public dialogRefNewPasswordComponent: MatDialogRef<DialogNewPasswordComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogNewPasswordModel
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
-    console.log('ngOnInit DialogNewPasswordComponent - data = ', this.data)
   }
 
+  // Function to close the dialog
   closeClick() {
     this.dialogRefNewPasswordComponent.close();
   }
@@ -25,5 +24,4 @@ export class DialogNewPasswordComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.dialogRefNewPasswordComponent.close();
   }
-
 }

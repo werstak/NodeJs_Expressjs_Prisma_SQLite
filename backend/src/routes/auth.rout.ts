@@ -45,6 +45,23 @@ authRouter.post(
             const {accessToken, refreshToken} = generateTokens(createdUser.newUser, jti);
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
 
+
+            /** SEND access to the site */
+            /* Set transporter options:*/
+            const siteLink = `${urlClient}`
+            const subject = 'Registration on the website!'
+            const htmlContent =
+                        `<h2>Hi ${createdUser.newUser.firstName} ${createdUser.newUser.lastName}!</h2>
+                        <p>You have registered on the site "NodeJs_Expressjs_Prisma - ${siteLink}"</p>
+                        <p>To enter the site use:</p>
+                        <p>Login - ${createdUser.newUser.email}</p>
+                        <p>Password - ${password} </p>`
+
+            const text = `Some text`
+
+            /* Start send E-MAIL*/
+            await handlerEmailSending(existingUser, email, subject, htmlContent, text);
+
             return response.status(201).json({
                 message: `Registration successful!`,
                 accessToken,
@@ -241,8 +258,8 @@ authRouter.post(
             const existingResetTokens = existingUser.passwordResetToken;
 
             /** Delete existing PasswordResetTokens */
-            if (existingResetTokens.length) {
-                await AuthUserHandler.deletePreviousPasswordResetTokens();
+            if (!existingResetTokens || existingResetTokens.length) {
+                await AuthUserHandler.deletePreviousPasswordResetTokens(existingUserId);
             }
 
             /** Generate PasswordResetToke */
@@ -299,20 +316,27 @@ authRouter.post(
             const requestResetToken = passwordResetToken.token;
             const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
 
-            if (!existingPasswordResetToken.length) {
+            if (!existingPasswordResetToken || !existingPasswordResetToken.length) {
                 return response.status(400).json({message: `Token not found`});
             }
 
             /** Checking the validity and expiration time of the PasswordResetToken */
             const currentTime = new Date();
-            const expireResetToken = existingPasswordResetToken[0].resetToken;
-            const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+            let expireResetToken;
+            if (existingPasswordResetToken) {
+                expireResetToken = existingPasswordResetToken[0].resetToken;
+            }
 
             if (requestResetToken !== expireResetToken) {
                 return response.status(400).json({message: `Invalid or Expired Token!`});
             }
 
-            if (expireResetTokenTime.getTime() < currentTime.getTime()) {
+            let expireResetTokenTime;
+            if (existingPasswordResetToken) {
+                expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+            }
+
+            if (!expireResetTokenTime || expireResetTokenTime.getTime() < currentTime.getTime()) {
                 return response.status(400).json({
                     message: `Time to change password has expired. Submit a new request to change your password!`
                 });
@@ -343,31 +367,43 @@ authRouter.put(
                 return response.status(400).json({message: `Missing password or password reset token.`})
             }
 
-            /** Chek existence PasswordResetToken */
+            /** Check existence PasswordResetToken */
             const userId: number = Number(passwordResetToken.id);
             const requestResetToken = passwordResetToken.token;
             const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
 
-            if (!existingPasswordResetToken.length) {
+            if (!existingPasswordResetToken || !existingPasswordResetToken.length) {
                 return response.status(400).json({message: `Token not found`});
             }
 
             /** Checking the validity and expiration time of the PasswordResetToken */
             const currentTime = new Date();
-            const expireResetToken = existingPasswordResetToken[0].resetToken;
-            const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+            let expireResetToken;
+            if (existingPasswordResetToken) {
+                expireResetToken = existingPasswordResetToken[0].resetToken;
+            }
+
+            let expireResetTokenTime;
+            if (existingPasswordResetToken) {
+                expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+            }
 
             if (requestResetToken !== expireResetToken) {
                 return response.status(400).json({message: `Invalid or Expired Token!`});
             }
 
-            if (expireResetTokenTime.getTime() < currentTime.getTime()) {
+            if (!expireResetTokenTime || expireResetTokenTime.getTime() < currentTime.getTime()) {
                 return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
             }
 
             const hashNewPassword = bcrypt.hashSync(request.body.password, 7);
             const newUserPassword: any = {password: hashNewPassword};
+
+            /** Update the password of an existing user */
             await AuthUserHandler.changePasswordHandler(newUserPassword, userId);
+
+            /** Delete PasswordResetTokens */
+            await AuthUserHandler.deletePreviousPasswordResetTokens(userId);
 
             return response.status(201).json({message: `Password changed successfully!`});
         } catch (error: any) {

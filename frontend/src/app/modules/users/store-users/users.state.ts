@@ -5,17 +5,19 @@ import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { NotificationService } from '../../../shared/notification.service';
-import * as _ from 'lodash';
-import { UpdateCategory } from '../../posts/store-posts/posts.action';
-import { PostsStateModel } from '../../posts/store-posts/posts.state';
 
-
+/**
+ * Define the structure of the state
+ */
 export class UsersStateModel {
   users: UserModel[];
   usersCounter?: any;
   selectedUser?: UserModel | null;
 }
 
+/**
+ * Define the state and its initial values
+ */
 @State<UsersStateModel>({
   name: 'UsersState',
   defaults: {
@@ -24,8 +26,6 @@ export class UsersStateModel {
     selectedUser: null
   }
 })
-
-
 @Injectable()
 export class UsersState {
 
@@ -35,6 +35,9 @@ export class UsersState {
   ) {
   }
 
+  /**
+   * Action to fetch all users
+   */
   @Action(GetUsers)
   getAllUsers({getState, setState}: StateContext<UsersStateModel>, {params}: GetUsers) {
     return this.usersService.fetchUsers(params).pipe(tap((result) => {
@@ -47,6 +50,9 @@ export class UsersState {
     }));
   }
 
+  /**
+   * Action to set the selected user
+   */
   @Action(SetSelectedUser)
   setSelectedUserId({getState, setState}: StateContext<UsersStateModel>, {payload}: SetSelectedUser) {
     const state = getState();
@@ -56,6 +62,9 @@ export class UsersState {
     });
   }
 
+  /**
+   * Action to add a new user
+   */
   @Action(AddUser)
   addNewUser({getState, patchState}: StateContext<UsersStateModel>, {params, avatar}: AddUser) {
     return this.usersService.addUser(params, avatar).pipe(tap((result) => {
@@ -68,13 +77,14 @@ export class UsersState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
+  /**
+   * Action to update a user
+   */
   @Action(UpdateUser)
   updateCurrentsUser({getState, setState}: StateContext<UsersStateModel>, {
     id,
@@ -96,15 +106,16 @@ export class UsersState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
+  /**
+   * Action to update a user's password
+   */
   @Action(UpdateUserPassword)
-  updateUserPassword({getState, setState}: StateContext<UsersStateModel>, {
+  updateUserPassword({getState}: StateContext<UsersStateModel>, {
     id, params
   }: UpdateUserPassword) {
     return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
@@ -113,13 +124,14 @@ export class UsersState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
 
+  /**
+   * Action to delete a user
+   */
   @Action(DeleteUser)
   deleteUser({getState, setState}: StateContext<UsersStateModel>, {id, params}: DeleteUser) {
     return this.usersService.removeUser(id, params).pipe(tap((result) => {
@@ -129,14 +141,12 @@ export class UsersState {
         setState({
           ...state,
           users: filteredArray,
-          usersCounter: state.usersCounter -1
+          usersCounter: state.usersCounter - 1
         });
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }

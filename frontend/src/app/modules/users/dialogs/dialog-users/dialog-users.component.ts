@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
-import { Observable, startWith, Subscription } from 'rxjs';
+import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { ROLES } from '../../../../shared/constants/roles';
@@ -15,8 +15,8 @@ import { AppRouteEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 
+// Default profile image path
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
-
 
 @Component({
   selector: 'app-edit-users',
@@ -34,46 +34,64 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     public dialog: MatDialog
   ) {
   }
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
+  // Loading indicator
   dataLoading: boolean = false;
+
   // Enum to access route names
   AppRouteEnum = AppRouteEnum;
 
-  private subUser: Subscription;
+  // Constants
   roleList = ROLES;
   countriesList = COUNTRIES;
+
+  // Form variables
   userForm: FormGroup;
   hide = true;
   currentUser: UserModel;
   respNewUser: UserModel;
   respUpdateUser: UserModel;
 
+  // Avatar variables
   avatarUrl: any;
   previousImageUrl = '';
   avatarFile = '';
   avatarImageDefault: any;
+
   filteredCountries: Observable<CountriesModel[]>;
 
   ngOnInit() {
+    // Initialize form
     this.buildForm();
-    console.log('ngOnInit DialogUsers data', this.data)
+    // Set default avatar image
     this.avatarImageDefault = defaultProfileImage;
+    // Check if new user or existing user
     if (this.data.newUser) {
       this.userForm.reset();
       this.addPasswordControls();
-      // this.userForm.addControl('new', new FormControl('', Validators.required));
-      // this.userForm.addControl('new', new FormControl<string | null>('', Validators.required));
-
+      // Set default status value
       this.userForm.patchValue({
         status: true
       });
     } else {
       this.initFormValue();
     }
+    // Enable country autocomplete
     this.autocompleteCountries();
   }
 
-  private buildForm() {
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.dialogRefUsersComponent.close();
+  }
+
+  /**
+   * Build the user form with default values and validations
+   */
+  private buildForm(): void {
     this.userForm = this.fb.group({
       email: [null, Validators.compose([
         Validators.required,
@@ -97,11 +115,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       ],
       location: [null, Validators.compose([
         Validators.required])],
-      // password: [null, Validators.compose([
-      //   Validators.required,
-      //   Validators.minLength(3),
-      //   Validators.maxLength(50)])
-      // ],
       birthAt: [null, Validators.compose([
         Validators.required])],
       status: '',
@@ -109,9 +122,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Dynamic add PasswordControls
+   * Dynamic add PasswordControls
    */
   private addPasswordControls(): void {
+    // Add password and confirmPassword controls dynamically
     this.userForm = this.fb.group({
       ...this.userForm.controls,
       password: [null, Validators.compose([
@@ -129,34 +143,39 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  /**
+   * Initialize form values for an existing user
+   */
   private initFormValue() {
     this.dataLoading = true;
     const id: number = this.data.id;
-    this.subUser = this.usersService.getUser(id).subscribe(data => {
-      if (data) {
-        this.dataLoading = false;
-      }
-      this.currentUser = data;
-      this.previousImageUrl = data.avatar;
-      this.avatarUrl = data.avatar;
+    this.usersService.getUser(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(data => {
+        if (data) {
+          this.dataLoading = false;
+        }
+        this.currentUser = data;
+        this.previousImageUrl = data.avatar;
+        this.avatarUrl = data.avatar;
 
-      this.userForm.setValue({
-        email: data.email,
-        firstName: data.firstName,
-        lastName: data.lastName,
-        role: data.role,
-        location: data.location,
-        status: data.status,
-        birthAt: data.birthAt,
+        // Set form values
+        this.userForm.setValue({
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          role: data.role,
+          location: data.location,
+          status: data.status,
+          birthAt: data.birthAt,
+        });
+        // Set selected user in the store
+        this.store.dispatch(new SetSelectedUser(data));
       });
-      this.store.dispatch(new SetSelectedUser(data));
-    });
   }
 
-
   /**
-   Autocomplete for Countries
+   *  Enable autocomplete for location field
    */
   private autocompleteCountries() {
     this.filteredCountries = this.userForm.controls['location'].valueChanges.pipe(
@@ -166,12 +185,13 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   private _filterStates(value: string): CountriesModel[] {
+    // Filter countries based on user input
     const filterValue = value.toLowerCase();
     return this.countriesList.filter(state => state.name.toLowerCase().includes(filterValue));
   }
 
   /**
-   Image upload
+   * Handle image loading and validation
    */
   handleImageLoaded(event: any) {
     if (event.target.files && event.target.files[0]) {
@@ -189,7 +209,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Adding Image Preview
+   * Adding Image Preview
    */
   handleImagePreview(files: any): void {
     const reader = new FileReader();
@@ -201,7 +221,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Delete Avatar
+   * Delete selected avatar
    */
   public deleteAvatar() {
     this.avatarUrl = '';
@@ -209,7 +229,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Sending the Form
+   * Submit user form
    */
   onSubmitUser(): void {
     if (this.data.newUser) {
@@ -220,7 +240,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Adding a new User
+   * Add a new user
    */
   private addNewUser(): void {
     if (this.userForm.invalid) {
@@ -242,7 +262,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Update User
+   * Update existing user
    */
   private updateUser(): void {
     if (this.userForm.invalid) {
@@ -256,7 +276,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const params: any = {
       id: id,
       email: this.userForm.value.email,
-      // password: this.userForm.value.password,
       firstName: this.userForm.value.firstName,
       lastName: this.userForm.value.lastName,
       role: Number(this.userForm.value.role),
@@ -269,7 +288,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
   /**
-   Open Dialog NewPassword
+   * Open dialog to change password
    */
   openDialogNewPassword(currentUser: UserModel) {
     console.log('openDialogNewPassword - currentUser', currentUser)
@@ -295,16 +314,11 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     });
   }
 
-
+  /**
+   * Close the dialog
+   */
   closeClick(): void {
     this.dialogRefUsersComponent.close();
   }
 
-  ngOnDestroy(): void {
-    this.subUser?.unsubscribe();
-    this.dialogRefUsersComponent.close();
-  }
-
-
 }
-

@@ -1,13 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { PostsService } from '../../posts.service';
-import { Select, Store } from '@ngxs/store';
-import { PostModel } from '../../../../core/models/post.model';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, ReplaySubject, Subject, takeUntil } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
+import { Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PostModel } from '../../../../core/models/post.model';
+import { PostFilterModel } from '../../../../core/models/post-filter.model';
+import { PostsService } from '../../posts.service';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { PageEvent } from '@angular/material/paginator';
-import { PostFilterModel } from '../../../../core/models/post-filter.model';
+import { Select, Store } from '@ngxs/store';
 
 @Component({
   selector: 'app-posts',
@@ -20,29 +21,28 @@ export class PostsComponent implements OnInit, OnDestroy {
     public postsService: PostsService,
     public dialog: MatDialog,
     public store: Store
-  ) {
-  }
+  ) {}
 
+  // Selectors for retrieving posts list and counter from the Ngxs store
   @Select(PostsSelectors.getPostsList) posts$: Observable<PostModel[]>;
   @Select(PostsSelectors.getPostsCounter) postsCounter$: Observable<number>;
 
+  // Flag to indicate whether data is loading
   dataLoading: boolean = false;
+
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
-  /** Filters */
+  // Default and current filters for posts
   private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
   private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
-  /**
-   Pagination variables
-   */
-  length = 0;
-  pageSize = 2;
-  pageIndex = 0;
+  // Pagination variables
+  length = 0; // Total number of items
+  pageSize = 2; // Number of items per page
+  pageIndex = 0; // Current page index
   pageSizeOptions = [2, 3, 5, 10, 15, 20, 25];
   previousPageIndex = 0;
-
   hidePageSize = false;
   showPageSizeOptions = true;
   showFirstLastButtons = true;
@@ -53,31 +53,33 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.getPostsFilter();
   }
 
+  /**
+   * Subscribe to post filter changes
+   */
   private getPostsFilter() {
     this.postsService.postsFilters$.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
-        // console.log(1111111111, resp)
         if (!Object.keys(resp).length) {
           this.postsFilters = this.defaultPostsFilters;
         } else {
-          this.postsFilters = resp
+          this.postsFilters = resp;
           this.fetchData();
-          // console.log(22222222222)
         }
       });
   }
 
+  /**
+   * Fetch posts based on filters and pagination
+   */
   private fetchData() {
     this.dataLoading = true;
-
     const params = {
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
       authors: this.postsFilters.authors,
       categories: this.postsFilters.categories
-    }
-
+    };
     this.store.dispatch(new GetPosts(params));
     this.postsCounter$.pipe(
       takeUntil(this.destroy$))
@@ -89,6 +91,10 @@ export class PostsComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Handle page change event
+   * @param e PageEvent object containing pagination data
+   */
   handlePageEvent(e: PageEvent) {
     this.pageEvent = e;
     this.length = e.length;
@@ -97,6 +103,12 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.fetchData();
   }
 
+  /**
+   * TrackBy function for ngFor
+   * @param index Index of the current item
+   * @param item Current item being iterated over
+   * @returns Unique identifier for the item
+   */
   trackByFn(index: any, item: any) {
     return item.id;
   }
@@ -106,4 +118,3 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 }
-

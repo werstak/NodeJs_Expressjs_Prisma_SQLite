@@ -1,13 +1,16 @@
 <div class="posts">
 
+  <!-- Filter panel component -->
   <div class="posts__filter">
     <app-posts-filter-panel></app-posts-filter-panel>
   </div>
 
+  <!-- Post components -->
   <app-post *ngFor="let post of posts$ | async; trackBy: trackByFn; let i = index"
             [post]="post"
   ></app-post>
 
+  <!-- Paginator component -->
   <mat-paginator class="demo-paginator"
                  (page)="handlePageEvent($event)"
                  [length]="length"
@@ -20,6 +23,7 @@
                  aria-label="Select page">
   </mat-paginator>
 
+  <!-- Progress spinner -->
   <mat-progress-spinner
     *ngIf="dataLoading"
     color="primary"

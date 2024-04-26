@@ -1,10 +1,11 @@
 <div class="dialog-post">
 
+  <!-- Post Header -->
   <div class="dialog-post__header">
     <div class="dialog-post__title">
-      <p>
-        {{this.currentPost ? this.currentPost.title : 'Add Post'}}
-      </p>
+      <!-- Display post title -->
+      <p>{{this.currentPost ? this.currentPost.title : 'Add Post'}}</p>
+      <!-- Display author's name -->
       <p class="dialog-post__subTitle">
         Author:
         {{this.currentPost ? this.currentPost.user.firstName : ''}}
@@ -12,14 +13,16 @@
       </p>
     </div>
 
-
+    <!-- Avatar -->
     <div class="dialog-post__avatar">
+      <!-- Avatar image -->
       <label class="hoverable" for="fileInput">
         <img [src]="pictureUrl ? pictureUrl : pictureDefault">
         <div class="hover-text">Choose file</div>
         <div class="background"></div>
       </label>
       <br/>
+      <!-- Input for selecting avatar image -->
       <input
         name="fileInput"
         id="fileInput"
@@ -27,6 +30,8 @@
         accept="image/*"
         (change)="handleImageLoaded($event)">
     </div>
+
+    <!-- Button to delete avatar -->
     <button *ngIf="pictureUrl"
             mat-icon-button
             (click)="deletePicture()"
@@ -37,24 +42,29 @@
     </button>
   </div>
 
-
+  <!-- Post Form -->
   <form [formGroup]="postForm" novalidate (ngSubmit)="onSubmitPost()" class="dialog-post__form">
     <div mat-dialog-content>
+
+      <!-- Title Input -->
       <mat-form-field class="example-full-width">
         <mat-label>Title</mat-label>
         <input matInput class="form-control" placeholder="Title" formControlName="title">
       </mat-form-field>
 
+      <!-- Description Input -->
       <mat-form-field class="example-full-width">
         <mat-label>Description</mat-label>
         <input matInput class="form-control" placeholder="Description" formControlName="description">
       </mat-form-field>
 
+      <!-- Content Input -->
       <mat-form-field class="example-full-width">
         <mat-label>Content</mat-label>
         <textarea matInput class="form-control" placeholder="Content..." rows="5" formControlName="content"></textarea>
       </mat-form-field>
 
+      <!-- Select Categories -->
       <mat-form-field class="example-full-width">
         <mat-label>Select categories</mat-label>
         <mat-select formControlName="categories" placeholder="Favorite food" multiple [compareWith]="isSameCategory">
@@ -88,24 +98,27 @@
       <!--        </mat-select>-->
       <!--      </mat-form-field>-->
 
-<!--      <br/>-->
-<!--      {{  postForm.controls['categories'].value | json }}-->
-
+      <!--      <br/>-->
+      <!--      {{  postForm.controls['categories'].value | json }}-->
 
 
     </div>
 
+    <!-- Checkbox for Publishing -->
     <p>
       <mat-checkbox formControlName="published">Published</mat-checkbox>
     </p>
 
+    <!-- Form Actions -->
     <div mat-dialog-actions class="dialog-post__actions">
+      <!-- Submit Button -->
       <button mat-raised-button color="primary"
               type="submit"
               [disabled]="!postForm.valid"
               [mat-dialog-close]="true">
         {{this.data.newPost ? 'Create' : 'Update'}}
       </button>
+      <!-- Cancel Button -->
       <button mat-raised-button color="accent"
               type="button"
               [mat-dialog-close]="1"
@@ -115,6 +128,7 @@
     </div>
   </form>
 
+  <!-- Loading Spinner -->
   <mat-progress-spinner
     *ngIf="dataLoading"
     color="primary"

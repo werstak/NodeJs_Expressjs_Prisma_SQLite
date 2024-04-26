@@ -1,31 +1,38 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PostsComponent } from './components';
 import { RouterModule, Routes } from '@angular/router';
-import { PostComponent } from './components/post/post.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+// Angular Material components
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { PostsState } from './store-posts/posts.state';
-import { NgxsModule } from '@ngxs/store';
-import { DialogPostsComponent } from './dialogs/dialog-posts/dialog-posts.component';
 import { MatDialogModule } from '@angular/material/dialog';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { PostsFilterPanelComponent } from './components/posts-filter-panel/posts-filter-panel.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
-import { DialogCategoriesPostComponent } from './dialogs/dialog-categories-post/dialog-categories-post.component';
 import { MatListModule } from '@angular/material/list';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
+// Components
+import { PostsComponent } from './components';
+import { PostComponent } from './components/post/post.component';
+import { DialogPostsComponent } from './dialogs/dialog-posts/dialog-posts.component';
+import { PostsFilterPanelComponent } from './components/posts-filter-panel/posts-filter-panel.component';
+import { DialogCategoriesPostComponent } from './dialogs/dialog-categories-post/dialog-categories-post.component';
 
+// Ngxs State
+import { NgxsModule } from '@ngxs/store';
+import { PostsState } from './store-posts/posts.state';
+
+
+// Define routes for the Posts module
 const routes: Routes = [
   {
     path: '',
@@ -35,6 +42,7 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
+    // Declare components and dialogs used within the module
     PostComponent,
     PostsComponent,
     DialogPostsComponent,
@@ -42,6 +50,7 @@ const routes: Routes = [
     DialogCategoriesPostComponent
   ],
   imports: [
+    // Import required Angular modules and Angular Material modules
     CommonModule,
     RouterModule.forChild(routes),
     NgxsModule.forFeature([PostsState]),

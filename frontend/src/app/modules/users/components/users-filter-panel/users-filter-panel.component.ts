@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { debounceTime, ReplaySubject, Subject, takeUntil } from 'rxjs';
+import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { UsersService } from '../../users.service';
 
 import { ROLES } from '../../../../shared/constants/roles';
@@ -18,16 +18,25 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  public userFilterForm: FormGroup
-  // Subject to handle subscription cleanup
-  private destroy$: Subject<void> = new Subject<void>();  rolesList = ROLES;
+  // Form group for user filter
+  public userFilterForm: FormGroup;
 
+  // List of roles
+  rolesList = ROLES;
+
+  // Subject to handle subscription cleanup
+  private destroy$: Subject<void> = new Subject<void>();
 
   ngOnInit() {
+    // Initialize form
     this.buildForm();
+    // Listen for form changes
     this.onChanges();
   }
 
+  /**
+   * Build the form
+   */
   private buildForm() {
     this.userFilterForm = this.fb.group({
       firstName: '',
@@ -37,6 +46,9 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * Listen for changes in the form fields
+   **/
   private onChanges(): void {
     this.userFilterForm.valueChanges.pipe(
       debounceTime(250),

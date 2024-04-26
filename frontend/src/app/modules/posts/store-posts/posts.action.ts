@@ -1,16 +1,18 @@
 import { PostModel } from '../../../core/models/post.model';
 
 /**
- POSTS
+ * Actions related to posts
  */
 export class GetPosts {
   static readonly type = '[Posts] Get';
 
   constructor(public params: any) {
   }
-
 }
 
+/**
+ * Action to add a new post
+ */
 export class AddPost {
   static readonly type = '[Posts] Add';
 
@@ -18,6 +20,9 @@ export class AddPost {
   }
 }
 
+/**
+ * Action to update an existing post
+ */
 export class UpdatePost {
   static readonly type = '[Posts] Update';
 
@@ -25,6 +30,9 @@ export class UpdatePost {
   }
 }
 
+/**
+ * Action to delete a post
+ */
 export class DeletePost {
   static readonly type = '[Posts] Delete';
 
@@ -32,6 +40,9 @@ export class DeletePost {
   }
 }
 
+/**
+ * Action to set the selected post
+ */
 export class SetSelectedPost {
   static readonly type = '[Posts] Set';
 
@@ -40,7 +51,7 @@ export class SetSelectedPost {
 }
 
 /**
- USERS list
+ * Actions related to users
  */
 export class GetListAllUsers {
   static readonly type = '[Users] Get List All Users';
@@ -50,7 +61,7 @@ export class GetListAllUsers {
 }
 
 /**
- CATEGORIES of posts
+ * Actions related to categories of posts
  */
 export class GetCategories {
   static readonly type = '[Categories] Get';
@@ -59,6 +70,9 @@ export class GetCategories {
   }
 }
 
+/**
+ * Action to add a new category
+ */
 export class AddCategory {
   static readonly type = '[Categories] Add';
 
@@ -66,6 +80,9 @@ export class AddCategory {
   }
 }
 
+/**
+ * Action to update an existing category
+ */
 export class UpdateCategory {
   static readonly type = '[Categories] Update';
 
@@ -73,10 +90,12 @@ export class UpdateCategory {
   }
 }
 
+/**
+ * Action to delete a category
+ */
 export class DeleteCategory {
   static readonly type = '[Categories] Delete';
 
   constructor(public id: number) {
   }
 }
-
