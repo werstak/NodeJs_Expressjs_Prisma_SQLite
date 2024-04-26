@@ -1,3 +1,5 @@
+import { PostModel } from './post.model';
+
 export class UserModel {
   id: number;
   email: string;
@@ -8,21 +10,8 @@ export class UserModel {
   updatedAt?: string;
   role: number;
   avatar?: string;
-  posts?: PostsModel[];
+  posts?: PostModel[];
   status: boolean;
   birthAt: string;
   location: string;
-}
-
-
-export class PostsModel {
-  id: number;
-  title: string;
-  description: string;
-  content?: string;
-  picture?: string;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
-  userId: number;
 }

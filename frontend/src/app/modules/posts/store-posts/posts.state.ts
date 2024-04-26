@@ -16,7 +16,7 @@ import {
 } from './posts.action';
 import * as _ from 'lodash';
 import { UserListModel } from '../../../core/models/user-list.model';
-import { CategoriesModel } from '../../../../../../backend/src/models/categories.model';
+import { CategoriesModel } from '../../../core/models/categories.model';
 
 /**
  * Define the structure of the PostsStateModel

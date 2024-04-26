@@ -1,7 +1,7 @@
 import { PostModel } from './post.model';
 
-export type CategoriesModel = {
+export interface CategoriesModel {
     id: number;
     name: string;
     posts?: PostModel[];
-};
+}
