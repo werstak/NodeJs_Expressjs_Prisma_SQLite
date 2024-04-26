@@ -4,6 +4,7 @@ import * as PostHandler from '../controllers/posts.conroller';
 import { body, validationResult } from 'express-validator';
 import * as fs from 'fs';
 import * as UserHandler from '../controllers/users.conroller';
+import { PostsQueryParamsModel } from '../models/posts-query-params.model';
 
 export const postsRouter = express.Router();
 
@@ -13,9 +14,16 @@ export const postsRouter = express.Router();
  */
 postsRouter.get('/', async (request: Request, response: Response) => {
     try {
+        if(!request.query.pageIndex || !request.query.pageSize || !request.query.authors || !request.query.categories) {
+            return response.status(400).json('pageIndex and pageSize are required');
+        }
         console.log('Root GET - All POSTS')
-        const params = (request.query);
-        console.log('USERS', 'paginator', params)
+        const params: PostsQueryParamsModel = {
+            pageIndex: Number(request.query.pageIndex),
+            pageSize: Number(request.query.pageSize),
+            authors: String(request.query.authors),
+            categories: String(request.query.categories)
+        };
 
         const posts = await PostHandler.getAllPostsHandler(params);
         return response.status(200).json(posts);

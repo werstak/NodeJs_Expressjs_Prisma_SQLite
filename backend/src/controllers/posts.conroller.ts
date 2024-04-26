@@ -1,58 +1,24 @@
 import db from '../utils/db';
+import { PostModel } from '../models/post.model';
+import { PostsQueryParamsModel } from '../models/posts-query-params.model';
+import { CreateUpdatePostModel } from '../models/create-update-post.model';
 
-// interface Post {
-//     id: number;
-//     title: string;
-//     description: string;
-//     content: string;
-//     picture: string;
-//     published: boolean;
-//     userId: number;
-//     categories: number[];
-// }
-//
-// interface PostQueryParams {
-//     pageIndex: number;
-//     pageSize: number;
-//     authors: string;
-//     categories: string;
-// }
-//
-//
-// interface PostResponse {
-//     totalCount: number;
-//     posts: Post[];
-// }
 
 /**
  * Handles retrieval of all posts based on provided query parameters.
  * @param params Query parameters for filtering posts.
  * @returns An object containing an array of posts and the total count of posts.
  */
-export const getAllPostsHandler = async (params: any): Promise<any> => {
+export const getAllPostsHandler = async (params: PostsQueryParamsModel): Promise<{ posts: PostModel[]; totalCount: number; }> =>  {
     const {pageIndex, pageSize, authors, categories} = params;
 
-    const totalCount = await db.post.count();
-    const skip = pageIndex * pageSize;
-    const parseAuthors = JSON.parse(authors);
+    const totalCount: number = await db.post.count();
+    const skip: number = pageIndex * pageSize;
+    const parseAuthors = JSON.parse(authors as string);
 
-    console.log('ROLES = ', parseAuthors)
-    let authorsArr;
-    if (parseAuthors.length) {
-        authorsArr = parseAuthors;
-    } else {
-        authorsArr = undefined;
-    }
-
-    const parseCategories = JSON.parse(categories);
-    console.log('CATEGORIES = ', parseCategories)
-    let categoriesArr;
-    if (parseCategories.length) {
-        categoriesArr = parseCategories;
-    } else {
-        categoriesArr = undefined;
-    }
-
+    let authorsArr = parseAuthors.length ? parseAuthors : undefined;
+    const parseCategories = JSON.parse(categories as string);
+    let categoriesArr = parseCategories.length ? parseCategories : undefined;
 
     const posts = await db.post.findMany({
         where: {
@@ -65,7 +31,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
                 }
             }
         },
-        take: parseInt(pageSize),
+        take: Number(pageSize),
         skip: skip,
         select: {
             id: true,
@@ -88,7 +54,7 @@ export const getAllPostsHandler = async (params: any): Promise<any> => {
             },
         },
     });
-    return {posts, totalCount}
+    return { posts, totalCount } as { posts: PostModel[]; totalCount: number; };
 };
 
 /**
@@ -128,9 +94,12 @@ export const getSinglePostHandler = async (id: number): Promise<any> => {
  * @param post The post data to create.
  * @returns An object containing the total count of posts and the newly created post.
  */
-export const createPostHandler = async (post: any): Promise<any> => {
+export const createPostHandler = async (post: CreateUpdatePostModel): Promise<any> => {
     const {title, description, content, picture, published, userId, categories} = post;
 
+    /** In this code, `categories.map(category => ({ id: category.id }))`
+     * converts the array of `CategoriesModel` objects into an array of objects containing only category IDs,
+     * which matches the expected type of `CategoryWhereUniqueInput`.*/
     const newPost = await db.post.create({
         data: {
             title,
@@ -140,7 +109,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
             published,
             userId,
             categories: {
-                connect: categories
+                connect: categories?.map(category => ({ id: category.id }))
             }
         },
         select: {
@@ -173,7 +142,7 @@ export const createPostHandler = async (post: any): Promise<any> => {
  * @param id The ID of the post to update.
  * @returns The updated post object.
  */
-export const updatePostHandler = async (post: any, id: number
+export const updatePostHandler = async (post: CreateUpdatePostModel, id: number
 ): Promise<any> => {
     const {title, description, content, picture, published, userId, includedCategories, excludedCategories} = post;
     return db.post.update({

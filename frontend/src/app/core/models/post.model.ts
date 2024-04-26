@@ -1,4 +1,5 @@
 import { CategoriesModel } from './categories.model';
+import { UserModel } from './user.model';
 
 export class PostModel {
   id: number;
@@ -9,13 +10,7 @@ export class PostModel {
   published: boolean;
   createdAt: string;
   updatedAt: string;
-  user: User;
+  user: UserModel;
   userId: number;
   categories: CategoriesModel[]
-}
-
-export class User {
-  id: number;
-  firstName: string;
-  lastName: string
 }
