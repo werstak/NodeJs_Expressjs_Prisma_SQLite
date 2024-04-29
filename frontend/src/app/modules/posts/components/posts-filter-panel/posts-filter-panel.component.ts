@@ -7,10 +7,9 @@ import { Select, Store } from '@ngxs/store';
 import { PostsService } from '../../posts.service';
 import { GetCategories, GetListAllUsers } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { CategoriesModel } from '../../../../core/models/categories.model';
-import { UserListModel } from '../../../../core/models/user-list.model';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
+import { CategoriesModel, UserListModel } from '../../../../core/models';
 
 @Component({
   selector: 'app-posts-filter-panel',

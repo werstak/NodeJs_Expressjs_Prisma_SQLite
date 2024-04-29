@@ -68,7 +68,7 @@
       <mat-form-field class="example-full-width">
         <mat-label>Select categories</mat-label>
         <mat-select formControlName="categories" placeholder="Favorite food" multiple [compareWith]="isSameCategory">
-          <mat-option *ngFor="let category of listAllCategories" [value]="category">
+          <mat-option *ngFor="let category of listAllCategories trackBy: trackByFn; let i = index" [value]="category">
             {{category.name}}
           </mat-option>
         </mat-select>

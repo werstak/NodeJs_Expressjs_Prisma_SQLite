@@ -10,6 +10,7 @@ const userData: Prisma.UserCreateInput[] = [
         password: '123456',
         role: 1,
         avatar: '',
+        location: 'United States',
         posts: {
             create: [
                 {
@@ -28,6 +29,7 @@ const userData: Prisma.UserCreateInput[] = [
         password: '123456',
         role: 1,
         avatar: '',
+        location: 'United States',
         posts: {
             create: [
                 {
@@ -46,6 +48,7 @@ const userData: Prisma.UserCreateInput[] = [
         password: '123456',
         role: 1,
         avatar: '',
+        location: 'United States',
         posts: {
             create: [
                 {
@@ -68,6 +71,7 @@ const userData: Prisma.UserCreateInput[] = [
         password: '123456',
         role: 1,
         avatar: '',
+        location: 'United States',
         posts: {
             create: [
                 {

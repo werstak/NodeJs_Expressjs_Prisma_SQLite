@@ -1,7 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { UserModel } from '../../../../core/models/user.model';
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
@@ -9,11 +8,11 @@ import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.ac
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
-import { CountriesModel } from '../../../../core/models/countriesModel';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AppRouteEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
+import { CountriesModel, UserModel } from '../../../../core/models';
 
 // Default profile image path
 const defaultProfileImage = 'assets/images/avatar_1.jpg';

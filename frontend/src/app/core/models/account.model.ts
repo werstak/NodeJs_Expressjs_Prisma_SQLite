@@ -1,6 +1,6 @@
 // import { Role } from './role';
 
-export class Account {
+export class AccountModel {
   id?: string;
   title?: string;
   firstName?: string;

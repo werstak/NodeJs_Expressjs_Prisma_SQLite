@@ -1,6 +1,5 @@
 import db from '../utils/db';
-import { UserModel } from '../models/user.model';
-import { UsersModel } from '../models/users.model';
+import { UserModel, UsersModel } from '../models';
 
 /**
  * Retrieves all users based on provided parameters.

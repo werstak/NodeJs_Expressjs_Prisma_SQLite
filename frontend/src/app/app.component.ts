@@ -4,7 +4,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { AuthService } from './modules/auth/auth.service';
 import { Router } from '@angular/router';
-import { Auth } from './core/models/auth';
+import { AuthModel } from './core/models/auth-model';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +12,7 @@ import { Auth } from './core/models/auth';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  account?: Auth | null; // Current user account information
+  account?: AuthModel | null; // Current user account information
 
   // Observable to track if the device is a handset or not
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -53,6 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(resp => {
       this.account = resp;
+      // console.log(this.account);
       if (!this.account) {
         // If the user is not authenticated, navigate to the login page
         // Commented out for now as it's not enabled

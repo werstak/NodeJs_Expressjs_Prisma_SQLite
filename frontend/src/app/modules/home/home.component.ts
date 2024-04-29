@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { HomeService } from './home.service';
-import { GetCategories } from '../posts/store-posts/posts.action';
 import { Subject, takeUntil } from 'rxjs';
-import { Account } from '../../core/models/account';
+import { AccountModel } from '../../core/models';
 
 @Component({
   selector: 'app-home',
@@ -21,7 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
-  data: Account;
+  data: AccountModel;
 
   ngOnInit(): void {
     this.fetchData();

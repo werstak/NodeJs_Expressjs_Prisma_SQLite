@@ -2,10 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { PostModel } from '../../core/models/post.model';
 import * as config from '../../../app-config';
-import { CategoriesModel } from '../../core/models/categories.model';
-import { PostParamsModel } from '../../core/models/post-params.model';
+import { CategoriesModel, PostModel, PostParamsModel } from '../../core/models';
+
 
 @Injectable({
   providedIn: 'root'

@@ -1,15 +1,14 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { PostModel } from '../../../../core/models/post.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { debounceTime, Observable, Subject, takeUntil } from 'rxjs';
 import { PostsService } from '../../posts.service';
 import { Select, Store } from '@ngxs/store';
 import { AddPost, GetCategories, SetSelectedPost, UpdatePost } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
-import { CategoriesModel } from '../../../../core/models/categories.model';
 import * as _ from 'lodash';
 import { AuthService } from '../../../auth/auth.service';
+import { CategoriesModel, PostModel } from '../../../../core/models';
 
 const pictureDefault = 'assets/images/image-placeholder.jpg';
 

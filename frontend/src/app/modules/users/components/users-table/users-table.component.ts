@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UsersService } from '../../users.service';
-import { UserModel } from '../../../../core/models/user.model';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.component';
@@ -11,7 +10,8 @@ import { DeleteUser, GetUsers } from '../../store-users/users.action';
 import { UsersSelectors } from '../../store-users/users.selectors';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSort, SortDirection } from '@angular/material/sort';
-import { UserFilterModel } from '../../../../core/models/user-filter.model';
+import { AuthModel, UserFilterModel, UserModel } from '../../../../core/models';
+import { AuthService } from '../../../auth/auth.service';
 
 
 @Component({
@@ -24,6 +24,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   constructor(
     public store: Store,
     public usersService: UsersService,
+    private authService: AuthService,
     public dialog: MatDialog
   ) {
   }
@@ -34,6 +35,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
   @ViewChild(MatSort) sort: MatSort;
+
+  // Current user account information
+  currentAccount: AuthModel | null = this.authService.accountValue;
 
   // Pagination variables
   length = 0;
@@ -70,6 +74,16 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     // Fetch initial data and apply filters
     this.fetchData();
     this.getUsersFilter();
+    this.isAdminOrModerator()
+
+    console.log('currentAccount', this.currentAccount)
+  }
+
+  /**
+   * Check if the user is an admin or moderator
+   */
+  isAdminOrModerator(): boolean {
+    return this.currentAccount?.userInfo?.role == 1 || this.currentAccount?.userInfo?.role == 2;
   }
 
   /**
@@ -209,5 +223,4 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
 }

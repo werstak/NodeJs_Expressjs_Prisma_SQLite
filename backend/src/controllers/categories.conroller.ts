@@ -1,11 +1,6 @@
 import db from '../utils/db';
 
 /**
- * Handlers for category-related operations.
- * These operations interact with the database to manage categories.
- */
-
-/**
  * Retrieves all categories from the database.
  * @returns Promise<any> A promise that resolves to an array of categories.
  */
@@ -34,7 +29,7 @@ export const createCategoryHandler = async (category: any): Promise<any> => {
         select: {
             id: true,
             name: true,
-            posts: true // Optionally select posts associated with the newly created category
+            posts: true
         },
     });
     return {newCategory};
@@ -54,7 +49,7 @@ export const updateCategoryHandler = async (category: any, id: number): Promise<
         },
         data: {
             name,
-            posts // Optionally update posts associated with the category
+            posts
         },
         select: {
             id: true,

@@ -1,4 +1,4 @@
-import { UserModel } from '../../../core/models/user.model';
+import { UserModel } from '../../../core/models';
 
 /**
  * Action to get users

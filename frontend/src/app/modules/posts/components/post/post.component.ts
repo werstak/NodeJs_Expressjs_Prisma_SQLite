@@ -1,11 +1,11 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { PostModel } from '../../../../core/models/post.model';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { PostsService } from '../../posts.service';
 import { Store } from '@ngxs/store';
 import { DeletePost } from '../../store-posts/posts.action';
+import { PostModel } from '../../../../core/models';
 
 @Component({
   selector: 'app-post',

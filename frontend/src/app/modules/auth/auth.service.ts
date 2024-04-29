@@ -3,19 +3,21 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { LoginUser } from '../../core/models/login-user';
-import { RegisterUser } from '../../core/models/register-user';
-import { Auth } from '../../core/models/auth';
-import { PasswordResetTokenModel } from '../../core/models/password-reset-token.model';
-import { ValidResetTokenModel } from '../../core/models/valid-reset-token.model';
 import * as config from '../../../app-config';
+import {
+  AuthModel,
+  LoginUserModel,
+  PasswordResetTokenModel,
+  RegisterUserModel,
+  ValidResetTokenModel
+} from '../../core/models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  public accountSubject$ = new BehaviorSubject<Auth | null>(null);
+  public accountSubject$ = new BehaviorSubject<AuthModel | null>(null);
   public validResetToken$ = new BehaviorSubject<any>({});
 
   readonly JWT_ACCESS_TOKEN_KEY = 'access_token';
@@ -36,7 +38,7 @@ export class AuthService {
   /**
    * New User Registration
    */
-  register(registerUserData: RegisterUser): Observable<any> {
+  register(registerUserData: RegisterUserModel): Observable<any> {
     return this.http.post<any>(config.API_URL + `/auth/register/`, { registerUserData })
       .pipe(map(account => {
         const { accessToken, refreshToken } = account;
@@ -48,7 +50,7 @@ export class AuthService {
   /**
    * User authorization
    */
-  login(loginUserData: LoginUser): Observable<any> {
+  login(loginUserData: LoginUserModel): Observable<any> {
     return this.http.post<any>(config.API_URL + `/auth/login/`, { loginUserData })
       .pipe(map(account => {
         const { accessToken, refreshToken, userInfo } = account;
@@ -146,7 +148,8 @@ export class AuthService {
   /**
    * This request is executed to check whether the user has such a password before launching the password replacement function
    */
-  fetchValidPassword(validPasswordData: LoginUser): Observable<any> {
+  fetchValidPassword(validPasswordData: LoginUserModel): Observable<any> {
+    console.log('fetchValidPassword')
     return this.http.post(config.API_URL + `/auth/valid_password/`, { validPasswordData }).pipe(
       catchError(error => {
         console.log('Error: ', error.message);

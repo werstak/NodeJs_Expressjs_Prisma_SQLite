@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { UserModel } from '../../core/models/user.model';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { UserParamsModel } from '../../core/models/user-params.model';
 import * as config from '../../../app-config';
+import { UserModel, UserParamsModel } from '../../core/models';
 
 @Injectable({
   providedIn: 'root'
