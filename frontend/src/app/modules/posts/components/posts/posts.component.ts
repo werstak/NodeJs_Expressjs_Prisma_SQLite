@@ -3,12 +3,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { PostModel } from '../../../../core/models/post.model';
-import { PostFilterModel } from '../../../../core/models/post-filter.model';
 import { PostsService } from '../../posts.service';
 import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { Select, Store } from '@ngxs/store';
+import { PostFilterModel, PostModel } from '../../../../core/models';
 
 @Component({
   selector: 'app-posts',

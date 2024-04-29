@@ -90,7 +90,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell class="header-btn" *matHeaderCellDef>
           <!-- Button to add a new user -->
-          <button mat-icon-button color="primary" matTooltip="Add new user" (click)="addUser()">
+          <button *ngIf="isAdminOrModerator()" mat-icon-button color="primary" matTooltip="Add new user" (click)="addUser()">
             <mat-icon aria-label="Add">add</mat-icon>
           </button>
         </th>

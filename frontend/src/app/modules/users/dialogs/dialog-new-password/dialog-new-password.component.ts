@@ -1,6 +1,6 @@
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { DialogNewPasswordModel } from '../../../../core/models/dialog-new-password.model';
+import { DialogNewPasswordModel } from '../../../../core/models';
 
 @Component({
   selector: 'app-dialog-new-password',

@@ -5,12 +5,11 @@ import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { MustMatch } from '../../../core/helpers/must-match.validator';
 import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
 import { Store } from '@ngxs/store';
-import { DialogNewPasswordModel } from '../../../core/models/dialog-new-password.model';
 import { UsersService } from '../../../modules/users/users.service';
 import { AppRouteEnum } from '../../../core/enums';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../notification.service';
-import { ValidResetTokenModel } from '../../../core/models/valid-reset-token.model';
+import { DialogNewPasswordModel, ValidResetTokenModel } from '../../../core/models';
 
 @Component({
   selector: 'app-change-password',

@@ -1,8 +1,6 @@
 import db from '../utils/db';
 import { hashToken } from '../utils/hashToken';
-import { RefreshToken } from '../models/refresh-token.model';
-import { PasswordResetTokenModel } from '../models/password-reset-token.model';
-import { UserModel } from '../models/user.model';
+import { UserModel, RefreshToken, PasswordResetTokenModel } from '../models';
 
 /**
  * Handlers for user-related operations.
@@ -107,7 +105,7 @@ export const revokeTokens = async (id: any): Promise<void> => {
 /**
  * Finds password reset tokens associated with a user by their user ID.
  * @param userId The ID of the user whose password reset tokens should be found.
- * @returns Promise<any | null> A promise that resolves to an array of password reset tokens or null if none are found.
+ * @returns Promise<PasswordResetTokenModel | null> A promise that resolves to an array of password reset tokens or null if none are found.
  */
 export const findPasswordResetToken = async (userId: number): Promise<PasswordResetTokenModel[] | null> => {
     return db.passwordResetToken.findMany({

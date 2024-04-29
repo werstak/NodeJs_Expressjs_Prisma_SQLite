@@ -1,7 +1,5 @@
 import db from '../utils/db';
-import { PostModel } from '../models/post.model';
-import { PostsQueryParamsModel } from '../models/posts-query-params.model';
-import { CreateUpdatePostModel } from '../models/create-update-post.model';
+import { PostModel, PostsQueryParamsModel, CreateUpdatePostModel } from '../models';
 
 
 /**

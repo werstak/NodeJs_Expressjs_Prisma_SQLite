@@ -5,7 +5,7 @@ import { takeUntil, startWith, map } from 'rxjs/operators';
 import { ROLES } from '../../../../shared/constants/roles';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { UserModel } from '../../../../core/models/user.model';
-import { CountriesModel } from '../../../../core/models/countriesModel';
+import { CountriesModel } from '../../../../core/models/countries-model';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';

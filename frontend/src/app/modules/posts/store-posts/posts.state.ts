@@ -1,6 +1,5 @@
 import { Action, State, StateContext } from '@ngxs/store';
 import { Injectable } from '@angular/core';
-import { PostModel } from '../../../core/models/post.model';
 import { NotificationService } from '../../../shared/notification.service';
 import { PostsService } from '../posts.service';
 import { tap } from 'rxjs';
@@ -15,8 +14,8 @@ import {
   UpdatePost
 } from './posts.action';
 import * as _ from 'lodash';
-import { UserListModel } from '../../../core/models/user-list.model';
-import { CategoriesModel } from '../../../core/models/categories.model';
+import { CategoriesModel, PostModel, UserListModel } from '../../../core/models';
+
 
 /**
  * Define the structure of the PostsStateModel

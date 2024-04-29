@@ -1,10 +1,10 @@
 import { Action, State, StateContext } from '@ngxs/store';
 import { AddUser, DeleteUser, GetUsers, SetSelectedUser, UpdateUser, UpdateUserPassword } from './users.action';
-import { UserModel } from '../../../core/models/user.model';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { NotificationService } from '../../../shared/notification.service';
+import { UserModel } from '../../../core/models';
 
 /**
  * Define the structure of the state
