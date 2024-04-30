@@ -12,7 +12,7 @@ import { AuthModel } from './core/models/auth-model';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  account?: AuthModel | null; // Current user account information
+  account: AuthModel | null; // Current user account information
 
   // Observable to track if the device is a handset or not
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -53,7 +53,6 @@ export class AppComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(resp => {
       this.account = resp;
-      // console.log(this.account);
       if (!this.account) {
         // If the user is not authenticated, navigate to the login page
         // Commented out for now as it's not enabled

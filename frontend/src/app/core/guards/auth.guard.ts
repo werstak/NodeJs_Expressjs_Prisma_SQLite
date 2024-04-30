@@ -21,13 +21,11 @@ export class AuthGuard implements CanActivate {
 
     if (account) {
       // Check if route is restricted by role
-      // Note: Uncomment and modify this section for role-based authorization
-
-      // if (route.data.roles && !route.data.roles.includes(account.role)) {
-      //   // Role not authorized so redirect to home page
-      //   this.router.navigate(['/']);
-      //   return false;
-      // }
+      if (route.data['roles'] && !route.data['roles'].includes(account.userInfo.role)) {
+        // Role not authorized so redirect to home page
+        this.router.navigate(['/']);
+        return false;
+      }
 
       // Authorized so return true
       return true;
@@ -37,4 +35,32 @@ export class AuthGuard implements CanActivate {
       return false;
     }
   }
+
+
+
+  // canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+  //   const account = this.authService.accountValue;
+  //
+  //   if (account) {
+  //     // Check if route is restricted by role
+  //     // Note: Uncomment and modify this section for role-based authorization
+  //
+  //     // if (route.data.roles && !route.data.roles.includes(account.role)) {
+  //     //   // Role not authorized so redirect to home page
+  //     //   this.router.navigate(['/']);
+  //     //   return false;
+  //     // }
+  //
+  //     // Authorized so return true
+  //     return true;
+  //   } else {
+  //     // Not logged in so redirect to login page with the return URL
+  //     this.router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+  //     return false;
+  //   }
+  // }
+
+
+
+
 }

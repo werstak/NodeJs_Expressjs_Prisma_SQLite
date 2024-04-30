@@ -1,5 +1,13 @@
 <h1>Home !</h1>
 
+<div *appAllowAccess="[1, 2, 3]"> <!-- Only Super Admin, Project Admin, Manager can access -->
+  Only Super Admin, Project Admin, Manager can access - Content for allowed roles
+</div>
+
+<div *appDenyAccess="[4]"> <!-- Deny access for Client -->
+  Deny access for Client - Content for denied roles
+</div>
+
 <div>
   <pre>{{data | json}}</pre>
 </div>
