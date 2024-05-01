@@ -53,7 +53,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   disabled = false;
 
   // Columns to display in the table
-  displayedColumns = ['id', 'avatar', 'email', 'firstName', 'lastName', 'createdAt', 'role', 'posts', 'status', 'location', 'birthAt', 'actions'];
+  displayedColumns = ['id', 'avatar', 'role', 'email', 'firstName', 'lastName', 'createdAt', 'posts', 'status', 'location', 'birthAt', 'actions'];
 
   users$ = this.usersService.users$;
 
@@ -74,16 +74,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     // Fetch initial data and apply filters
     this.fetchData();
     this.getUsersFilter();
-    this.isAdminOrModerator()
-
-    console.log('currentAccount', this.currentAccount)
-  }
-
-  /**
-   * Check if the user is an admin or moderator
-   */
-  isAdminOrModerator(): boolean {
-    return this.currentAccount?.userInfo?.role == 1 || this.currentAccount?.userInfo?.role == 2;
   }
 
   /**

@@ -3,21 +3,21 @@ import { CommonModule } from '@angular/common';
 import { AllowAccessDirective } from './allow-access.directive';
 import { DenyAccessDirective } from './deny-access.directive';
 
-// Directives
-const sharedDirectives = [
+// Directives RBAC
+const rbacDirectives = [
   AllowAccessDirective,
   DenyAccessDirective
 ];
 
 @NgModule({
   declarations: [
-    ...sharedDirectives
+    ...rbacDirectives
   ],
   imports: [
     CommonModule
   ],
   exports: [
-    ...sharedDirectives
+    ...rbacDirectives
   ]
 })
 export class DirectivesModule {

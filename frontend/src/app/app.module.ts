@@ -40,7 +40,6 @@ const angularMaterialModules = [
   imports: [
     ...angularMaterialModules,
     SharedModule,
-    // Importing Modules
   ],
   providers: [
     NotificationService,

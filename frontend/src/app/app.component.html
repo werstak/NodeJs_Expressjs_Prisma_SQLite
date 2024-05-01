@@ -16,7 +16,7 @@
           <mat-icon class="sidenav__icon" aria-label="home">home</mat-icon>
           <span>Home</span>
         </a>
-        <a class="sidenav__item" mat-list-item routerLink='/users'>
+        <a *appDenyAccess="[4]" class="sidenav__item" mat-list-item routerLink='/users'>
           <mat-icon class="sidenav__icon" aria-label="people">people</mat-icon>
           <span>Users</span>
         </a>

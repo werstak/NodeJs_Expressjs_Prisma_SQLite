@@ -8,6 +8,7 @@ import { GetPosts } from '../../store-posts/posts.action';
 import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { Select, Store } from '@ngxs/store';
 import { PostFilterModel, PostModel } from '../../../../core/models';
+import { AuthService } from '../../../auth/auth.service';
 
 @Component({
   selector: 'app-posts',
@@ -16,8 +17,10 @@ import { PostFilterModel, PostModel } from '../../../../core/models';
 })
 export class PostsComponent implements OnInit, OnDestroy {
 
+
   constructor(
     public postsService: PostsService,
+    private authService: AuthService,
     public dialog: MatDialog,
     public store: Store
   ) {}
@@ -36,6 +39,9 @@ export class PostsComponent implements OnInit, OnDestroy {
   private defaultPostsFilters: PostFilterModel = {authors: [], categories: []};
   private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
+  // Current userId
+  userId: any
+
   // Pagination variables
   length = 0; // Total number of items
   pageSize = 2; // Number of items per page
@@ -49,29 +55,80 @@ export class PostsComponent implements OnInit, OnDestroy {
   pageEvent: PageEvent;
 
   ngOnInit(): void {
+    this.userId = this.authService.accountValue?.userInfo.id;
     this.getPostsFilter();
   }
 
   /**
    * Subscribe to post filter changes
    */
+  // private getPostsFilter(): void {
+  //   this.postsService.postsFilters$.pipe(
+  //     takeUntil(this.destroy$)
+  //   ).subscribe(resp => {
+  //     if (this.authService.currentRole === 4) {
+  //       this.postsFilters = { ...this.defaultPostsFilters, authors: [this.userId!] };
+  //     } else {
+  //       this.postsFilters = Object.keys(resp).length ? resp : this.defaultPostsFilters;
+  //     }
+  //     this.fetchData();
+  //   });
+  // }
+
   private getPostsFilter() {
     this.postsService.postsFilters$.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
-        if (!Object.keys(resp).length) {
-          this.postsFilters = this.defaultPostsFilters;
+
+        if (this.authService.currentRole === 4) {
+          if (!Object.keys(resp).length) {
+            this.postsFilters = this.defaultPostsFilters;
+            this.postsFilters.authors = [this.userId];
+          } else {
+            this.postsFilters = resp;
+            this.postsFilters.authors = [this.userId];
+          }
+
+          // this.postsFilters = this.defaultPostsFilters;
+          // this.postsFilters.authors = [this.userId];
         } else {
-          this.postsFilters = resp;
-          this.fetchData();
+          if (!Object.keys(resp).length) {
+            this.postsFilters = this.defaultPostsFilters;
+          } else {
+            this.postsFilters = resp;
+          }
         }
+
+        this.fetchData();
       });
   }
+
+
+  // private getPostsFilter() {
+  //   this.postsService.postsFilters$.pipe(
+  //     takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //
+  //       if (this.authService.currentRole === 3) {
+  //         this.postsFilters = this.defaultPostsFilters;
+  //         this.postsFilters.authors = [this.userId];
+  //       } else {
+  //         if (!Object.keys(resp).length) {
+  //           this.postsFilters = this.defaultPostsFilters;
+  //         } else {
+  //           this.postsFilters = resp;
+  //           // this.fetchData();
+  //         }
+  //       }
+  //
+  //       this.fetchData();
+  //     });
+  // }
 
   /**
    * Fetch posts based on filters and pagination
    */
-  private fetchData() {
+  private fetchData(): void {
     this.dataLoading = true;
     const params = {
       pageIndex: this.pageIndex,
@@ -81,20 +138,20 @@ export class PostsComponent implements OnInit, OnDestroy {
     };
     this.store.dispatch(new GetPosts(params));
     this.postsCounter$.pipe(
-      takeUntil(this.destroy$))
-      .subscribe(resp => {
-        this.length = resp;
-        if (resp) {
-          this.dataLoading = false;
-        }
-      });
+      takeUntil(this.destroy$)
+    ).subscribe(resp => {
+      this.length = resp;
+      if (resp) {
+        this.dataLoading = false;
+      }
+    });
   }
 
   /**
    * Handle page change event
    * @param e PageEvent object containing pagination data
    */
-  handlePageEvent(e: PageEvent) {
+  handlePageEvent(e: PageEvent): void {
     this.pageEvent = e;
     this.length = e.length;
     this.pageSize = e.pageSize;
@@ -108,11 +165,11 @@ export class PostsComponent implements OnInit, OnDestroy {
    * @param item Current item being iterated over
    * @returns Unique identifier for the item
    */
-  trackByFn(index: any, item: any) {
+  trackByFn(index: number, item: PostModel): number {
     return item.id;
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
