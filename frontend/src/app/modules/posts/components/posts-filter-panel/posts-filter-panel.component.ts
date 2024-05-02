@@ -32,6 +32,9 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   @Select(PostsSelectors.getListUsers) listAllUsers$: Observable<UserListModel[]>;
   @Select(PostsSelectors.getListCategories) listAllCategories$: Observable<CategoriesModel[]>;
 
+  // Enum to access route names
+  protected readonly RoleEnum = RoleEnum;
+
   // Object to hold filter data
   private filterData: any = {authors: [], categories: []};
   public postFilterForm: FormGroup;
@@ -296,6 +299,4 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  protected readonly RoleEnum = RoleEnum;
 }

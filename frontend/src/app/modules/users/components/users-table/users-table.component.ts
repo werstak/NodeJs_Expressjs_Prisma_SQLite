@@ -37,6 +37,9 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
   @ViewChild(MatSort) sort: MatSort;
 
+  // Enum to access route names
+  protected readonly RoleEnum = RoleEnum;
+
   // Current user account information
   currentAccount: AuthModel | null = this.authService.accountValue;
 
@@ -214,6 +217,4 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  protected readonly RoleEnum = RoleEnum;
 }

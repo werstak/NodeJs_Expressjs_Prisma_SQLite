@@ -18,6 +18,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  // Enum to access route names
+  protected readonly RoleEnum = RoleEnum;
+
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
@@ -43,6 +46,4 @@ export class HomeComponent implements OnInit, OnDestroy {
         // console.log(this.data)
       });
   }
-
-    protected readonly RoleEnum = RoleEnum;
 }

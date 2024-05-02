@@ -19,6 +19,9 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   ) {
   }
 
+  // Enum to access route names
+  protected readonly RoleEnum = RoleEnum;
+
   // Form group for user filter
   public userFilterForm: FormGroup;
 
@@ -78,6 +81,4 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  protected readonly RoleEnum = RoleEnum;
 }

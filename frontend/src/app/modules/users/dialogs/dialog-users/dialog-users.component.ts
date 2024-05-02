@@ -9,7 +9,7 @@ import { ROLES_LIST } from '../../../../shared/constants/roles-list';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
-import { AppRouteEnum } from '../../../../core/enums';
+import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { CountriesModel, UserModel } from '../../../../core/models';
@@ -33,6 +33,10 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     public dialog: MatDialog
   ) {
   }
+
+  // Enum to access route names
+  protected readonly RoleEnum = RoleEnum;
+
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
@@ -50,8 +54,6 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   userForm: FormGroup;
   hide = true;
   currentUser: UserModel;
-  respNewUser: UserModel;
-  respUpdateUser: UserModel;
 
   // Avatar variables
   avatarUrl: any;
@@ -319,5 +321,4 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   closeClick(): void {
     this.dialogRefUsersComponent.close();
   }
-
 }
