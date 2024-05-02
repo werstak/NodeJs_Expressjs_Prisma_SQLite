@@ -10,6 +10,7 @@ import { PostsSelectors } from '../../store-posts/posts.selectors';
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 import { CategoriesModel, UserListModel } from '../../../../core/models';
+import { RoleEnum } from '../../../../core/enums';
 
 @Component({
   selector: 'app-posts-filter-panel',
@@ -295,4 +296,6 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  protected readonly RoleEnum = RoleEnum;
 }

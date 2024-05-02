@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { UsersService } from '../../users.service';
 
-import { ROLES } from '../../../../shared/constants/roles';
+import { ROLES_LIST } from '../../../../shared/constants/roles-list';
+import { RoleEnum } from '../../../../core/enums';
 
 @Component({
   selector: 'app-users-filter-panel',
@@ -22,7 +23,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   public userFilterForm: FormGroup;
 
   // List of roles
-  rolesList = ROLES;
+  rolesList = ROLES_LIST;
 
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
@@ -77,4 +78,6 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  protected readonly RoleEnum = RoleEnum;
 }

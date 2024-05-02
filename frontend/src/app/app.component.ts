@@ -4,7 +4,8 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { AuthService } from './modules/auth/auth.service';
 import { Router } from '@angular/router';
-import { AuthModel } from './core/models/auth-model';
+import { AuthModel } from './core/models';
+import { RoleEnum } from './core/enums';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
   ) {
   }
+
+  // Enum for user roles
+  protected readonly RoleEnum = RoleEnum;
 
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();

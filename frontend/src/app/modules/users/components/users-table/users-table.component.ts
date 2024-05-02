@@ -12,6 +12,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatSort, SortDirection } from '@angular/material/sort';
 import { AuthModel, UserFilterModel, UserModel } from '../../../../core/models';
 import { AuthService } from '../../../auth/auth.service';
+import { RoleEnum } from '../../../../core/enums';
 
 
 @Component({
@@ -213,4 +214,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  protected readonly RoleEnum = RoleEnum;
 }

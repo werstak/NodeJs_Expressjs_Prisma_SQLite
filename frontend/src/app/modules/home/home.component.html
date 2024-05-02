@@ -1,10 +1,10 @@
 <h1>Home !</h1>
 
-<div *appAllowAccess="[1, 2, 3]"> <!-- Only Super Admin, Project Admin, Manager can access -->
+<div *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin, RoleEnum.Manager]"> <!-- Only Super Admin, Project Admin, Manager can access -->
   1 Only Super Admin, Project Admin, Manager can access - Content for allowed roles
 </div>
 
-<div *appDenyAccess="[4]"> <!-- Deny access for Client -->
+<div *appDenyAccess="[RoleEnum.Client]"> <!-- Deny access for Client -->
  2 Deny access for Client - Content for denied roles
 </div>
 

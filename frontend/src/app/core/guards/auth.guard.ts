@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
     if (account) {
       // Check if route is restricted by role
       if (route.data['roles'] && !route.data['roles'].includes(account.userInfo.role)) {
-        // Role not authorized so redirect to home page
+        // RoleEnum not authorized so redirect to home page
         this.router.navigate(['/']);
         return false;
       }
@@ -46,7 +46,7 @@ export class AuthGuard implements CanActivate {
   //     // Note: Uncomment and modify this section for role-based authorization
   //
   //     // if (route.data.roles && !route.data.roles.includes(account.role)) {
-  //     //   // Role not authorized so redirect to home page
+  //     //   // RoleEnum not authorized so redirect to home page
   //     //   this.router.navigate(['/']);
   //     //   return false;
   //     // }

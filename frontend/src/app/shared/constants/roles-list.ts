@@ -1,4 +1,4 @@
-export const ROLES = [
+export const ROLES_LIST = [
   {id: 1, viewValue: 'Super Admin'},
   {id: 2, viewValue: 'Project Admin'},
   {id: 3, viewValue: 'Manager'},

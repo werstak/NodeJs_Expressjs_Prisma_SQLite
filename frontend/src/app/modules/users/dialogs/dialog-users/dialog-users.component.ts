@@ -5,7 +5,7 @@ import { UsersService } from '../../users.service';
 import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
-import { ROLES } from '../../../../shared/constants/roles';
+import { ROLES_LIST } from '../../../../shared/constants/roles-list';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { MustMatch } from '../../../../core/helpers/must-match.validator';
@@ -43,7 +43,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   AppRouteEnum = AppRouteEnum;
 
   // Constants
-  roleList = ROLES;
+  rolesList = ROLES_LIST;
   countriesList = COUNTRIES;
 
   // Form variables

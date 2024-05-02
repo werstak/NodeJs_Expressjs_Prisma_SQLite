@@ -62,68 +62,45 @@ export class PostsComponent implements OnInit, OnDestroy {
   /**
    * Subscribe to post filter changes
    */
-  // private getPostsFilter(): void {
-  //   this.postsService.postsFilters$.pipe(
-  //     takeUntil(this.destroy$)
-  //   ).subscribe(resp => {
-  //     if (this.authService.currentRole === 4) {
-  //       this.postsFilters = { ...this.defaultPostsFilters, authors: [this.userId!] };
-  //     } else {
-  //       this.postsFilters = Object.keys(resp).length ? resp : this.defaultPostsFilters;
-  //     }
-  //     this.fetchData();
-  //   });
-  // }
-
   private getPostsFilter() {
-    this.postsService.postsFilters$.pipe(
-      takeUntil(this.destroy$))
+    this.postsService.postsFilters$
+      .pipe(takeUntil(this.destroy$))
       .subscribe(resp => {
 
+        // Initialize filters with default values
+        this.postsFilters = !Object.keys(resp).length ? this.defaultPostsFilters : resp;
+
+        // Set current user's ID as the author if the role is 4
         if (this.authService.currentRole === 4) {
-          if (!Object.keys(resp).length) {
-            this.postsFilters = this.defaultPostsFilters;
-            this.postsFilters.authors = [this.userId];
-          } else {
-            this.postsFilters = resp;
-            this.postsFilters.authors = [this.userId];
-          }
-
-          // this.postsFilters = this.defaultPostsFilters;
-          // this.postsFilters.authors = [this.userId];
-        } else {
-          if (!Object.keys(resp).length) {
-            this.postsFilters = this.defaultPostsFilters;
-          } else {
-            this.postsFilters = resp;
-          }
+          this.postsFilters.authors = [this.userId];
         }
-
         this.fetchData();
       });
   }
-
 
   // private getPostsFilter() {
   //   this.postsService.postsFilters$.pipe(
   //     takeUntil(this.destroy$))
   //     .subscribe(resp => {
-  //
-  //       if (this.authService.currentRole === 3) {
-  //         this.postsFilters = this.defaultPostsFilters;
-  //         this.postsFilters.authors = [this.userId];
+  //       if (this.authService.currentRole === 4) {
+  //         if (!Object.keys(resp).length) {
+  //           this.postsFilters = this.defaultPostsFilters;
+  //           this.postsFilters.authors = [this.userId];
+  //         } else {
+  //           this.postsFilters = resp;
+  //           this.postsFilters.authors = [this.userId];
+  //         }
   //       } else {
   //         if (!Object.keys(resp).length) {
   //           this.postsFilters = this.defaultPostsFilters;
   //         } else {
   //           this.postsFilters = resp;
-  //           // this.fetchData();
   //         }
   //       }
-  //
   //       this.fetchData();
   //     });
   // }
+
 
   /**
    * Fetch posts based on filters and pagination
