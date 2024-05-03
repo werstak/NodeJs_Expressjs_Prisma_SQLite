@@ -1,6 +1,5 @@
-export class AccountModel {
+export class AuthUserModel {
   id?: string;
-  title?: string;
   firstName?: string;
   lastName?: string;
   email?: string;
