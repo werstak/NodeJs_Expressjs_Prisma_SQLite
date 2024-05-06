@@ -88,6 +88,10 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
       this.usersFilters.roles = [RoleEnum.Client];
     }
+    //
+    // else if (this.currentAccount?.userInfo?.role === RoleEnum.ProjectAdmin) {
+    //   this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
+    // }
 
     // Construct parameters for fetching data
     const params = {

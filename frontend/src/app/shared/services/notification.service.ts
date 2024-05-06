@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar, MatSnackBarConfig } from '@angular/material/snack-bar';
-import { SnackBarMessageComponent } from './components/snack-bar-message/snack-bar-message.component';
+import { SnackBarMessageComponent } from '../components/snack-bar-message/snack-bar-message.component';
 
 @Injectable()
 export class NotificationService {
