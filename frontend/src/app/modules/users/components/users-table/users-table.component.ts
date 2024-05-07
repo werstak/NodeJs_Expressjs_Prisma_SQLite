@@ -61,6 +61,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   users$ = this.usersService.users$;
 
+  // Flag to indicate data loading state
   dataLoading: boolean = false;
 
   // Subject to handle subscription cleanup
@@ -75,26 +76,40 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   private usersFilters: UserFilterModel = this.defaultUsersFilters;
 
   ngOnInit(): void {
-    // Fetch initial data and apply filters
-    this.fetchData();
+    this.setRolesForFiltering();
     this.getUsersFilter();
+  }
+
+  /**
+   * Set roles for filtering based on the current user's role
+   */
+  public setRolesForFiltering() {
+    let roles: number[] | undefined = [];
+    const userRole = this.currentAccount?.userInfo?.role;
+
+    if (userRole === RoleEnum.Manager) {
+      roles = [RoleEnum.Client];
+    } else if (userRole === RoleEnum.ProjectAdmin) {
+      roles = [RoleEnum.Client, RoleEnum.Manager];
+    } else if (userRole === RoleEnum.SuperAdmin) {
+      roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+    }
+
+    this.usersFilters.roles = roles;
+    this.defaultUsersFilters.roles = roles;
+    this.usersService.usersFilters$.next(this.usersFilters);
   }
 
   /**
    *   Construct parameters for fetching data
    */
   private fetchData() {
-    // Set roles for filtering
-    if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
-      this.usersFilters.roles = [RoleEnum.Client];
-    }
-
-    // Construct parameters for fetching data
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
+
       firstName: this.usersFilters.firstName,
       lastName: this.usersFilters.lastName,
       email: this.usersFilters.email,
@@ -125,29 +140,27 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Subscribe to user filter changes
+   */
+  private getUsersFilter() {
+    this.usersService.usersFilters$.pipe(
+      takeUntil(this.destroy$))
+      .subscribe(resp => {
+        this.usersFilters = resp || this.setRolesForFiltering();
+        if (!this.usersFilters?.roles?.length) {
+          this.setRolesForFiltering();
+        }
+        this.fetchData();
+      });
+  }
+
+  /**
    * Update sorting parameters and fetch data
    */
   sortData($event: any) {
     this.orderByColumn = $event.active;
     this.orderByDirection = $event.direction;
     this.fetchData();
-  }
-
-  /**
-   * Subscribe to usersFilters$ observable to get user filters
-   */
-  private getUsersFilter() {
-    this.usersService.usersFilters$.pipe(
-      takeUntil(this.destroy$))
-      .subscribe(resp => {
-        // Apply user filters and fetch data
-        if (!Object.keys(resp).length) {
-          this.usersFilters = this.defaultUsersFilters;
-        } else {
-          this.usersFilters = resp
-          this.fetchData();
-        }
-      });
   }
 
   /**

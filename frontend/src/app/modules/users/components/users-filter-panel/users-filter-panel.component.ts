@@ -2,9 +2,8 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { UsersService } from '../../users.service';
-
-import { ROLES_LIST } from '../../../../shared/constants/roles-list';
 import { RoleEnum } from '../../../../core/enums';
+import { RoleService } from '../../../../shared/services';
 
 @Component({
   selector: 'app-users-filter-panel',
@@ -15,7 +14,8 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    public usersService: UsersService
+    public usersService: UsersService,
+    public roleService: RoleService
   ) {
   }
 
@@ -24,9 +24,6 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
 
   // Form group for user filter
   public userFilterForm: FormGroup;
-
-  // List of roles
-  rolesList = ROLES_LIST;
 
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
