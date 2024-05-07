@@ -98,8 +98,6 @@ export class AuthService {
         accessToken: accessToken
       }
       this.accountSubject$.next(account);
-
-      // Get user roles list from LocalStorage
       this.getRoleListLocalStorage();
     } else {
       console.log('NOT AUTHORIZED');

@@ -75,30 +75,115 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   private usersFilters: UserFilterModel = this.defaultUsersFilters;
 
   ngOnInit(): void {
-    // Fetch initial data and apply filters
-    this.fetchData();
+    this.setRolesForFiltering();
     this.getUsersFilter();
   }
+
+  /**
+   * Set roles for filtering based on the current user's role
+   */
+  public setRolesForFiltering() {
+    let roles: number[] | undefined = [];
+    const userRole = this.currentAccount?.userInfo?.role;
+
+    if (userRole === RoleEnum.Manager) {
+      roles = [RoleEnum.Client];
+    } else if (userRole === RoleEnum.ProjectAdmin) {
+      roles = [RoleEnum.Client, RoleEnum.Manager];
+    } else if (userRole === RoleEnum.SuperAdmin) {
+      roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+    }
+
+    this.usersFilters.roles = roles;
+    this.defaultUsersFilters.roles = roles;
+    this.usersService.usersFilters$.next(this.usersFilters);
+  }
+
+
+  //
+  // public setRolesForFiltering() {
+  //   if (!this.usersFilters?.roles?.length) {
+  //     if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
+  //       this.usersFilters.roles = [RoleEnum.Client];
+  //     } else if (this.currentAccount?.userInfo?.role === RoleEnum.ProjectAdmin) {
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
+  //     } else if (this.currentAccount?.userInfo?.role === RoleEnum.SuperAdmin) {
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+  //     } else {
+  //       console.log(888888888888)
+  //       this.usersFilters.roles = [];
+  //     }
+  //     this.usersService.usersFilters$.next(this.usersFilters);
+  //   } else {
+  //     if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
+  //       this.usersFilters.roles = [RoleEnum.Client];
+  //     } else if (this.currentAccount?.userInfo?.role === RoleEnum.ProjectAdmin) {
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
+  //     } else if (this.currentAccount?.userInfo?.role === RoleEnum.SuperAdmin) {
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+  //     } else {
+  //       console.log(888888888888)
+  //       this.usersFilters.roles = [];
+  //     }
+  //     this.defaultUsersFilters.roles = this.usersFilters.roles;
+  //     this.usersService.usersFilters$.next(this.defaultUsersFilters);
+  //   }
+  // }
+  //
+  //
+
+
+  // public setRolesForFiltering() {
+  //   if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
+  //     this.usersFilters.roles = [RoleEnum.Client];
+  //   } else if (this.currentAccount?.userInfo?.role === RoleEnum.ProjectAdmin) {
+  //     this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
+  //   } else if (this.currentAccount?.userInfo?.role === RoleEnum.SuperAdmin) {
+  //     this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+  //   } else {
+  //     console.log(888888888888)
+  //     this.usersFilters.roles = [];
+  //   }
+  //   this.defaultUsersFilters.roles = this.usersFilters.roles;
+  //   this.usersService.usersFilters$.next(this.defaultUsersFilters);
+  // }
+
+  /**
+   * Set roles for filtering based on the current user's role
+   */
+  // private setRolesForFiltering(): void {
+  //   const { role } = this.currentAccount?.userInfo || {};
+  //   switch (role) {
+  //     case RoleEnum.Manager:
+  //       this.usersFilters.roles = [RoleEnum.Client];
+  //       break;
+  //     case RoleEnum.ProjectAdmin:
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
+  //       break;
+  //     case RoleEnum.SuperAdmin:
+  //       this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
+  //       break;
+  //     default:
+  //       this.usersFilters.roles = [];
+  //       break;
+  //   }
+  //
+  //   console.log('setRolesForFiltering - ', this.usersFilters.roles)
+  // }
+
 
   /**
    *   Construct parameters for fetching data
    */
   private fetchData() {
-    // Set roles for filtering
-    if (this.currentAccount?.userInfo?.role === RoleEnum.Manager) {
-      this.usersFilters.roles = [RoleEnum.Client];
-    }
-    //
-    // else if (this.currentAccount?.userInfo?.role === RoleEnum.ProjectAdmin) {
-    //   this.usersFilters.roles = [RoleEnum.Client, RoleEnum.Manager];
-    // }
 
-    // Construct parameters for fetching data
+
     const params = {
       orderByColumn: this.orderByColumn,
       orderByDirection: this.orderByDirection,
       pageIndex: this.pageIndex,
       pageSize: this.pageSize,
+
       firstName: this.usersFilters.firstName,
       lastName: this.usersFilters.lastName,
       email: this.usersFilters.email,
@@ -126,7 +211,103 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       .subscribe(resp => {
         this.length = resp;
       });
+
   }
+
+  /**
+   * Subscribe to user filters and fetch data
+   * @private
+   */
+  private getUsersFilter() {
+    this.usersService.usersFilters$.pipe(
+      takeUntil(this.destroy$))
+      .subscribe(resp => {
+        this.usersFilters = resp || this.setRolesForFiltering();
+
+        if (!this.usersFilters?.roles?.length) {
+          this.setRolesForFiltering();
+        }
+        this.fetchData();
+      });
+  }
+
+
+  // private getUsersFilter() {
+  //   this.usersService.usersFilters$.pipe(
+  //     takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //       if (!Object.keys(resp).length) {
+  //         console.log(111)
+  //         this.usersFilters = this.defaultUsersFilters;
+  //         // this.setRolesForFiltering();
+  //         this.fetchData();
+  //       } else {
+  //         console.log(222)
+  //         this.usersFilters = resp
+  //         this.fetchData();
+  //       }
+  //     });
+  // }
+  //
+
+
+
+
+
+
+  // private getUsersFilter() {
+  //   this.usersService.usersFilters$
+  //     .pipe(takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //
+  //       console.log('getUsersFilter - ', resp)
+  //       this.usersFilters = Object.keys(resp).length ? resp : this.setRolesForFiltering();
+  //       this.fetchData();
+  //     });
+  // }
+
+
+  // private getUsersFilter() {
+  //   this.usersService.usersFilters$.pipe(
+  //     takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //       if (
+  //         resp.firstName === '' &&
+  //         resp.lastName === '' &&
+  //         resp.email === '' &&
+  //         resp.roles.length === 0
+  //       ) {
+  //         console.log(111);
+  //         // this.usersFilters = this.defaultUsersFilters;
+  //         this.setRolesForFiltering();
+  //       } else {
+  //         console.log(222);
+  //         this.usersFilters = resp;
+  //       }
+  //       this.fetchData();
+  //     });
+  // }
+
+
+  // private getUsersFilter() {
+  //   this.usersService.usersFilters$.pipe(
+  //     takeUntil(this.destroy$))
+  //     .subscribe(resp => {
+  //       if (
+  //         resp.roles.length === 0
+  //       ) {
+  //         console.log(111);
+  //         // this.usersFilters = this.defaultUsersFilters;
+  //         this.setRolesForFiltering();
+  //       } else {
+  //         console.log(222);
+  //         this.usersFilters = resp;
+  //       }
+  //       this.fetchData();
+  //     });
+  // }
+
+
 
   /**
    * Update sorting parameters and fetch data
@@ -135,23 +316,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     this.orderByColumn = $event.active;
     this.orderByDirection = $event.direction;
     this.fetchData();
-  }
-
-  /**
-   * Subscribe to usersFilters$ observable to get user filters
-   */
-  private getUsersFilter() {
-    this.usersService.usersFilters$.pipe(
-      takeUntil(this.destroy$))
-      .subscribe(resp => {
-        // Apply user filters and fetch data
-        if (!Object.keys(resp).length) {
-          this.usersFilters = this.defaultUsersFilters;
-        } else {
-          this.usersFilters = resp
-          this.fetchData();
-        }
-      });
   }
 
   /**
