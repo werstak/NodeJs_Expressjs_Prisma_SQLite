@@ -195,7 +195,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
    */
   editUser(id: UserModel) {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: { id, newUser: false }
+      data: { id, newUser: false, displayRolesField: true }
     });
 
     // After dialog is closed, render table rows
@@ -232,7 +232,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }

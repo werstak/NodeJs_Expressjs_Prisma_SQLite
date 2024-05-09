@@ -49,31 +49,37 @@
         <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">Last Name <strong>required</strong></mat-error>
       </mat-form-field>
 
+
+
       <!-- RoleEnum Select -->
-      <mat-form-field *appDenyAccess="[RoleEnum.Client, RoleEnum.Manager]" color="accent" class="field-full-width">
-        <mat-label>Roles</mat-label>
+      <ng-container *ngIf="this.data.id !== this.authService.accountValue?.userInfo?.id">
+        <mat-form-field *appDenyAccess="[RoleEnum.Client, RoleEnum.Manager]" color="accent" class="field-full-width">
+
+          <mat-label>Roles</mat-label>
+
+          <mat-select formControlName="role">
+            <mat-option
+              *ngFor="let role of this.roleService.rolesListSubject$ | async"
+              [value]="role.id"
+              [disabled]="!role.display">
+              {{ role.viewValue }}
+            </mat-option>
+          </mat-select>
+
+          <!--        <mat-select formControlName="role">-->
+          <!--          <ng-container *ngFor="let role of this.roleService.rolesListSubject$ | async">-->
+          <!--            <mat-option *ngIf="role.display" [value]="role.id">-->
+          <!--              {{ role.viewValue }}-->
+          <!--            </mat-option>-->
+          <!--          </ng-container>-->
+          <!--        </mat-select>-->
 
 
-        <mat-select formControlName="role">
-          <mat-option
-            *ngFor="let role of this.roleService.rolesListSubject$ | async"
-            [value]="role.id"
-            [disabled]="!role.display">
-            {{ role.viewValue }}
-          </mat-option>
-        </mat-select>
-
-<!--        <mat-select formControlName="role">-->
-<!--          <ng-container *ngFor="let role of this.roleService.rolesListSubject$ | async">-->
-<!--            <mat-option *ngIf="role.display" [value]="role.id">-->
-<!--              {{ role.viewValue }}-->
-<!--            </mat-option>-->
-<!--          </ng-container>-->
-<!--        </mat-select>-->
+          <mat-error *ngIf="userForm.controls['role'].hasError('required')">RoleEnum <strong>required</strong></mat-error>
+        </mat-form-field>
+      </ng-container>
 
 
-        <mat-error *ngIf="userForm.controls['role'].hasError('required')">RoleEnum <strong>required</strong></mat-error>
-      </mat-form-field>
 
       <!-- Country Input -->
       <mat-form-field class="field-full-width">

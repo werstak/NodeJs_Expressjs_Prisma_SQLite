@@ -13,6 +13,7 @@ import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-pa
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { CountriesModel, UserModel } from '../../../../core/models';
 import { RoleService } from '../../../../shared/services';
+import { AuthService } from '../../../auth/auth.service';
 
 // Default profile image path
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
@@ -30,10 +31,12 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
     public usersService: UsersService,
+    public authService: AuthService,
     public roleService: RoleService,
     public dialog: MatDialog
   ) {
   }
+
 
   // Enum to access route names
   protected readonly RoleEnum = RoleEnum;
