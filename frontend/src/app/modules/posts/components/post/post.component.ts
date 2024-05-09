@@ -1,13 +1,15 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngxs/store';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
-import { Store } from '@ngxs/store';
+import { AuthService } from '../../../auth/auth.service';
 import { DeletePost } from '../../store-posts/posts.action';
 import { PostModel } from '../../../../core/models';
 import { RoleEnum } from '../../../../core/enums';
-import { Subject } from 'rxjs';
-import { AuthService } from '../../../auth/auth.service';
 import { AuthorPostModel } from '../../../../core/models/author-post.model';
 
 @Component({
@@ -22,60 +24,6 @@ export class PostComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
   // Enum to access route names
   protected readonly RoleEnum = RoleEnum;
-
-  // Define permissions for each role
-  // private readonly permissions: { [key: number]: (authorRole: number) => boolean } = {
-  //   [RoleEnum.SuperAdmin]: () => true,
-  //   [RoleEnum.ProjectAdmin]: (authorRole: number) => authorRole === RoleEnum.ProjectAdmin || [RoleEnum.Manager, RoleEnum.Client].includes(authorRole),
-  //   [RoleEnum.Manager]: (authorRole: number) => authorRole === RoleEnum.Manager || authorRole === RoleEnum.Client,
-  //   [RoleEnum.Client]: (authorRole: number) => authorRole === RoleEnum.Client
-  // };
-
-
-  // private currentUserRole: RoleEnum;
-  // private currentUserId: number;
-  // private readonly permissions: { [key: number]: (authorRole: number, authorId: number, currentUser: AuthorPostModel) => boolean } = {
-  //   [RoleEnum.SuperAdmin]: () => true,
-  //   [RoleEnum.ProjectAdmin]: (authorRole: number, authorId: number, currentUser: AuthorPostModel) =>
-  //     (this.currentUserRole === RoleEnum.SuperAdmin || (this.currentUserRole === RoleEnum.ProjectAdmin && authorId === this.currentUserId) || (authorRole === RoleEnum.Manager || authorRole === RoleEnum.Client)),
-  //
-  //   [RoleEnum.Manager]: (authorRole: number, authorId: number, currentUser: AuthorPostModel) =>
-  //     (this.currentUserRole === RoleEnum.SuperAdmin || (this.currentUserRole === RoleEnum.ProjectAdmin && authorId === this.currentUserId) || (authorRole === RoleEnum.Client)),
-  //
-  //   [RoleEnum.Client]: (authorRole: number, authorId: number, currentUser: AuthorPostModel) =>
-  //     (this.currentUserRole === RoleEnum.SuperAdmin || (authorId === this.currentUserId))
-  // };
-
-
-  // Define permissions for each role
-  // private readonly permissions: { [key: number]: (author: AuthorPostModel, currentUser: AuthorPostModel) => boolean } = {
-  //   [RoleEnum.SuperAdmin]: () => true,
-  //   [RoleEnum.ProjectAdmin]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-  //     (currentUser.role === RoleEnum.ProjectAdmin && author.id === currentUser.id) || [RoleEnum.Manager, RoleEnum.Client].includes(author.role),
-  //
-  //   [RoleEnum.Manager]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-  //     (currentUser.role === RoleEnum.Manager && author.id === currentUser.id) || author.role === RoleEnum.Client,
-  //
-  //   [RoleEnum.Client]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-  //     author.role === RoleEnum.Client && author.id === currentUser.id
-  // };
-
-
-  // Define permissions for each role
-  private readonly permissions: { [key: number]: (author: AuthorPostModel, currentUser: AuthorPostModel) => boolean } = {
-    [RoleEnum.SuperAdmin]: () => true,
-    [RoleEnum.ProjectAdmin]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-      (currentUser.role === RoleEnum.ProjectAdmin && author.id === currentUser.id) || [RoleEnum.Manager, RoleEnum.Client].includes(author.role),
-
-    [RoleEnum.Manager]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-      (currentUser.role === RoleEnum.Manager && author.id === currentUser.id) || author.role === RoleEnum.Client,
-
-    [RoleEnum.Client]: (author: AuthorPostModel, currentUser: AuthorPostModel) =>
-      author.role === RoleEnum.Client && author.id === currentUser.id
-  };
-
-
-
 
   constructor(
     public store: Store,
@@ -95,7 +43,9 @@ export class PostComponent implements OnInit, OnDestroy {
       data: { id, newPost: false },
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
+    dialogRef.afterClosed().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((result) => {
       console.log('The dialog was closed', result);
     });
   }
@@ -116,28 +66,24 @@ export class PostComponent implements OnInit, OnDestroy {
       }
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(result => {
       if (result === true) {
         this.store.dispatch(new DeletePost(id, params));
-      } else {
-        return;
       }
     });
   }
 
   /**
-   * Check if the user has permission to edit or delete a post
-   * @param author
+   * Check if the current user has permission to edit or delete a post
+   * @param author Author of the post
    */
-  public checkPermissionRole(author: AuthorPostModel): boolean {
-
+  public checkPermissionRolePosts(author: AuthorPostModel): boolean {
     const authorRole = author.role;
     const authorId = author.id
-
     const currentUserId  = this.authService.accountSubject$.value?.userInfo.id;
     const currentUserRole = this.authService.accountSubject$.value?.userInfo.role;
-    const currentUser = this.authService.accountSubject$.value?.userInfo;
-
     if (currentUserRole) {
       if (currentUserRole === RoleEnum.SuperAdmin) {
         return true;
@@ -151,36 +97,11 @@ export class PostComponent implements OnInit, OnDestroy {
         return authorRole === RoleEnum.Client && authorId === currentUserId;
       }
     }
-
-
-
-    // if (currentUserRole) {
-    //   let checkPermission: any;
-    //   // @ts-ignore
-    //   checkPermission = this.permissions[author];
-    //   // let checkPermission = this.permissions[currentUserRole](author, currentUser);
-    //   // let checkPermission = this.permissions[currentUserRole](author, currentUser);
-    //   // return checkPermission ? checkPermission(author, currentUser) : false;
-    //   return checkPermission ? checkPermission(authorRole) : false;
-    // }
     return false;
   }
 
-
-  // public checkPermissionRole(authorRole: number): boolean {
-  //   const currentUserRole = this.authService.accountSubject$.value?.userInfo.role;
-  //   if (currentUserRole) {
-  //     const checkPermission = this.permissions[currentUserRole];
-  //     return checkPermission ? checkPermission(authorRole) : false;
-  //   }
-  //   return false;
-  // }
-
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  // Helper function to cast to number
-  protected readonly Number = Number;
 }
