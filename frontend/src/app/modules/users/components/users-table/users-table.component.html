@@ -95,13 +95,28 @@
           </button>
         </th>
         <td mat-cell class="body-btn" *matCellDef="let element">
+
           <!-- Buttons for editing and deleting a user -->
-          <button *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" mat-icon-button color="primary" (click)="editUser(element.id)">
-            <mat-icon aria-label="Edit">edit</mat-icon>
-          </button>
-          <button *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" mat-icon-button color="primary" (click)="deleteUser(element)">
-            <mat-icon aria-label="Delete">delete</mat-icon>
-          </button>
+          <ng-container *ngIf="isHeadSuperAdmin(element)">
+            <ng-container *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]">
+              <button
+                mat-icon-button
+                color="primary"
+                (click)="editUser(element.id)"
+              >
+                <mat-icon aria-label="Edit">edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="primary"
+                [disabled]="isAuthUser(element)"
+                (click)="deleteUser(element)"
+              >
+                <mat-icon aria-label="Delete">delete</mat-icon>
+              </button>
+            </ng-container>
+          </ng-container>
+
         </td>
       </ng-container>
 

@@ -13,6 +13,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { AuthModel, UserFilterModel, UserModel } from '../../../../core/models';
 import { AuthService } from '../../../auth/auth.service';
 import { RoleEnum } from '../../../../core/enums';
+import { HEAD_SUPER_ADMIN } from '../../../../shared/constants/head-super-admin';
 
 
 @Component({
@@ -195,7 +196,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
    */
   editUser(id: UserModel) {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: { id, newUser: false, displayRolesField: true }
+      data: { id, newUser: false }
     });
 
     // After dialog is closed, render table rows
@@ -208,6 +209,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
 
   /**
    * Open confirmation dialog before deleting a user
+   * ngOnDestroy is a lifecycle hook that is called when a directive, pipe, or service is destroyed.
    */
   deleteUser(user: UserModel): void {
     const { id, firstName, avatar } = user;
@@ -232,8 +234,26 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     });
   }
 
+  /**
+   * isHeadSuperAdmin checks if the user is a super admin.
+   * Hiding edit and delete items of the HEAD_SUPER_ADMIN
+   * @param element UserModel
+   */
+  isHeadSuperAdmin(element: UserModel): boolean {
+    return !(element.role === HEAD_SUPER_ADMIN.role && element.id === HEAD_SUPER_ADMIN.id);
+  }
+
+  /**
+   * isAuthUser checks if the user is the authenticated user
+   * @param element
+   */
+  isAuthUser(element: UserModel): boolean {
+    return element.id === this.currentAccount?.userInfo?.id;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
 }
