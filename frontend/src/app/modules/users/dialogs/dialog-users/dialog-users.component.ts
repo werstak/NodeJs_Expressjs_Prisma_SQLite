@@ -11,9 +11,10 @@ import { MustMatch } from '../../../../core/helpers/must-match.validator';
 import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
-import { CountriesModel, UserModel } from '../../../../core/models';
+import { AuthUserModel, CountriesModel, UserModel } from '../../../../core/models';
 import { RoleService } from '../../../../shared/services';
 import { AuthService } from '../../../auth/auth.service';
+import { PERMISSIONS } from '../../../../shared/constants/permissions';
 
 // Default profile image path
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
@@ -40,6 +41,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
 
   // Enum to access route names
   protected readonly RoleEnum = RoleEnum;
+
+  authUser: AuthUserModel | undefined = this.authService.accountSubject$.value?.userInfo;
 
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
@@ -230,6 +233,17 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   public deleteAvatar() {
     this.avatarUrl = '';
     this.avatarFile = '';
+  }
+  /**
+   * Check if the current Manager has access to the dialog box elements
+   * @param authUser
+   * @param currentUser Current user
+   */
+  checkManagerPermissions(authUser: any, currentUser: any): boolean | string[] {
+    if (authUser?.role === RoleEnum.Manager && authUser?.id !== currentUser?.id) {
+      return PERMISSIONS.MANAGER.PAGE_USERS.DIALOG.elements;
+    }
+    return true;
   }
 
   /**
