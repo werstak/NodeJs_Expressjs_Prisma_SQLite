@@ -239,7 +239,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
    * @param authUser
    * @param currentUser Current user
    */
-  checkManagerPermissions(authUser: any, currentUser: any): boolean | string[] {
+  checkManagerPermissions(authUser: AuthUserModel | undefined, currentUser: UserModel): boolean | string[] {
     if (authUser?.role === RoleEnum.Manager && authUser?.id !== currentUser?.id) {
       return PERMISSIONS.MANAGER.PAGE_USERS.DIALOG.elements;
     }

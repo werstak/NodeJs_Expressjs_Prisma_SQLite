@@ -4,7 +4,6 @@ export const PERMISSIONS = {
     PAGE_USERS: {
       create: true,
       edit: true,
-      delete: true,
       DIALOG: {
         status: true
       },
@@ -15,7 +14,6 @@ export const PERMISSIONS = {
     PAGE_USERS: {
       create: true,
       edit: true,
-      delete: true,
       DIALOG: {
         status: true
       },
@@ -26,7 +24,6 @@ export const PERMISSIONS = {
     PAGE_USERS: {
       create: true,
       edit: true,
-      delete: true,
       DIALOG: {
         elements: false,
       },
@@ -37,7 +34,6 @@ export const PERMISSIONS = {
     PAGE_USERS: {
       create: true,
       edit: true,
-      delete: true,
       DIALOG: {
         status: true
       },

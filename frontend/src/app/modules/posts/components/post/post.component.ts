@@ -82,8 +82,8 @@ export class PostComponent implements OnInit, OnDestroy {
   public checkPermissionRolePosts(author: AuthorPostModel): boolean {
     const authorRole = author.role;
     const authorId = author.id
-    const currentUserId  = this.authService.accountSubject$.value?.userInfo.id;
-    const currentUserRole = this.authService.accountSubject$.value?.userInfo.role;
+    const { id: currentUserId, role: currentUserRole } = this.authService.accountSubject$.value?.userInfo || {};
+
     if (currentUserRole) {
       if (currentUserRole === RoleEnum.SuperAdmin) {
         return true;
