@@ -73,21 +73,20 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   orderByDirection = 'asc' as SortDirection;
 
   // Default user filters
-  private defaultUsersFilters: UserFilterModel = { email: '', firstName: '', lastName: '', roles: [] };
+  private defaultUsersFilters: UserFilterModel = {email: '', firstName: '', lastName: '', roles: []};
   private usersFilters: UserFilterModel = this.defaultUsersFilters;
 
   ngOnInit(): void {
-    this.setRolesForFiltering();
+    // this.setRolesForFiltering();
     this.getUsersFilter();
   }
 
   /**
-   * Set roles for filtering based on the current user's role
+   * If the roles array in userFilters is empty, then the available roles for filtering are set based on the current user's role.
    */
   public setRolesForFiltering() {
-    let roles: number[] | undefined = [];
+    let roles: number[] = [];
     const userRole = this.currentAccount?.userInfo?.role;
-
     if (userRole === RoleEnum.Manager) {
       roles = [RoleEnum.Client];
     } else if (userRole === RoleEnum.ProjectAdmin) {
@@ -95,14 +94,14 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     } else if (userRole === RoleEnum.SuperAdmin) {
       roles = [RoleEnum.Client, RoleEnum.Manager, RoleEnum.ProjectAdmin, RoleEnum.SuperAdmin];
     }
-
     this.usersFilters.roles = roles;
-    this.defaultUsersFilters.roles = roles;
-    this.usersService.usersFilters$.next(this.usersFilters);
   }
 
   /**
-   *   Construct parameters for fetching data
+   * Fetches data based on the current filters and sorting parameters.
+   * It constructs the parameters for fetching data, triggers data loading animation,
+   * dispatches action to fetch users from store, and subscribes to users and usersCounter observables
+   * to update data and pagination.
    */
   private fetchData() {
     const params = {
@@ -141,19 +140,22 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Subscribe to user filter changes
+   * Subscribes to user filter changes. It updates the usersFilters variable whenever a new value is emitted.
+   * If the roles array in usersFilters is empty, it calls setRolesForFiltering() to set the roles for filtering.
+   * After updating the usersFilters, it calls fetchData() to fetch the data based on the updated filters.
    */
   private getUsersFilter() {
     this.usersService.usersFilters$.pipe(
       takeUntil(this.destroy$))
       .subscribe(resp => {
-        this.usersFilters = resp || this.setRolesForFiltering();
+        this.usersFilters = resp;
         if (!this.usersFilters?.roles?.length) {
           this.setRolesForFiltering();
         }
         this.fetchData();
       });
   }
+
 
   /**
    * Update sorting parameters and fetch data
@@ -180,7 +182,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
    */
   addUser() {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: { newUser: true }
+      data: {newUser: true}
     });
 
     // After dialog is closed, render table rows
@@ -196,7 +198,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
    */
   editUser(id: UserModel) {
     const dialogRef = this.dialog.open(DialogUsersComponent, {
-      data: { id, newUser: false }
+      data: {id, newUser: false}
     });
 
     // After dialog is closed, render table rows
@@ -212,8 +214,8 @@ export class UsersTableComponent implements OnInit, OnDestroy {
    * ngOnDestroy is a lifecycle hook that is called when a directive, pipe, or service is destroyed.
    */
   deleteUser(user: UserModel): void {
-    const { id, firstName, avatar } = user;
-    const params = { avatar };
+    const {id, firstName, avatar} = user;
+    const params = {avatar};
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {

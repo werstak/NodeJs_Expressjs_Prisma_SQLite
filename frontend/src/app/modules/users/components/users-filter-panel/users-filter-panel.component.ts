@@ -45,6 +45,14 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       email: '',
       roles: [],
     });
+    this.initDefaultUsersFilters();
+  }
+
+  /**
+   * Initializing data in the stream (usersFilters$) of user filters
+   */
+  private initDefaultUsersFilters() {
+    this.usersService.usersFilters$.next(this.userFilterForm.value)
   }
 
   /**

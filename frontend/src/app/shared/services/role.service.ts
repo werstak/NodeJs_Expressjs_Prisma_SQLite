@@ -14,6 +14,7 @@ export class RoleService {
 
   /**
    * Function to set the list of available roles based on the current user role
+   * For the ProjectAdmin, the roles of Managers and Clients are displayed
    * @param currentUserRole - current user role
    */
   public setRolesList(currentUserRole: number | undefined): void {
