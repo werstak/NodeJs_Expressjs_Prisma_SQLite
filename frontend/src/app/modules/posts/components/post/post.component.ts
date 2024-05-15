@@ -6,11 +6,11 @@ import { takeUntil } from 'rxjs/operators';
 
 import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
-import { AuthService } from '../../../auth/auth.service';
 import { DeletePost } from '../../store-posts/posts.action';
 import { PostModel } from '../../../../core/models';
 import { RoleEnum } from '../../../../core/enums';
 import { AuthorPostModel } from '../../../../core/models/author-post.model';
+import { PermissionService } from '../../../../shared/services';
 
 @Component({
   selector: 'app-post',
@@ -22,13 +22,13 @@ export class PostComponent implements OnInit, OnDestroy {
 
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
-  // Enum to access route names
+  // Enum for user roles
   protected readonly RoleEnum = RoleEnum;
 
   constructor(
     public store: Store,
     public dialog: MatDialog,
-    private authService: AuthService,
+    public permissionService: PermissionService
   ) {}
 
   ngOnInit(): void {
@@ -79,25 +79,8 @@ export class PostComponent implements OnInit, OnDestroy {
    * Check if the current user has permission to edit or delete a post
    * @param author Author of the post
    */
-  public checkPermissionRolePosts(author: AuthorPostModel): boolean {
-    const authorRole = author.role;
-    const authorId = author.id
-    const { id: currentUserId, role: currentUserRole } = this.authService.accountSubject$.value?.userInfo || {};
-
-    if (currentUserRole) {
-      if (currentUserRole === RoleEnum.SuperAdmin) {
-        return true;
-      } else if (currentUserRole === RoleEnum.ProjectAdmin) {
-        return (currentUserRole === RoleEnum.ProjectAdmin && authorId === currentUserId) || [RoleEnum.Manager, RoleEnum.Client].includes(authorRole);
-
-      } else if (currentUserRole === RoleEnum.Manager) {
-        return (currentUserRole === RoleEnum.Manager && authorId === currentUserId) || authorRole === RoleEnum.Client;
-
-      } else if (currentUserRole === RoleEnum.Client) {
-        return authorRole === RoleEnum.Client && authorId === currentUserId;
-      }
-    }
-    return false;
+  public hasActionPermission(author: AuthorPostModel): boolean {
+    return this.permissionService.checkActionPostPermission(author);
   }
 
   ngOnDestroy(): void {

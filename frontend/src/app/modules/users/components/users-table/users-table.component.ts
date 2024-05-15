@@ -13,7 +13,7 @@ import { MatSort, SortDirection } from '@angular/material/sort';
 import { AuthModel, UserFilterModel, UserModel } from '../../../../core/models';
 import { AuthService } from '../../../auth/auth.service';
 import { RoleEnum } from '../../../../core/enums';
-import { HEAD_SUPER_ADMIN } from '../../../../shared/constants/head-super-admin';
+import { PermissionService } from '../../../../shared/services';
 
 
 @Component({
@@ -27,6 +27,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
     public store: Store,
     public usersService: UsersService,
     private authService: AuthService,
+    public permissionService: PermissionService,
     public dialog: MatDialog
   ) {
   }
@@ -38,7 +39,7 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   @ViewChild(MatTable) table: MatTable<UserModel[]>;
   @ViewChild(MatSort) sort: MatSort;
 
-  // Enum to access route names
+  // Enum for user roles
   protected readonly RoleEnum = RoleEnum;
 
   // Current user account information
@@ -156,7 +157,6 @@ export class UsersTableComponent implements OnInit, OnDestroy {
       });
   }
 
-
   /**
    * Update sorting parameters and fetch data
    */
@@ -237,20 +237,20 @@ export class UsersTableComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * isHeadSuperAdmin checks if the user is a super admin.
+   * isPermissionEdit checks if the user is a super admin.
    * Hiding edit and delete items of the HEAD_SUPER_ADMIN
-   * @param element UserModel
+   * @param user UserModel
    */
-  isHeadSuperAdmin(element: UserModel): boolean {
-    return !(element.role === HEAD_SUPER_ADMIN.role && element.id === HEAD_SUPER_ADMIN.id);
+  isPermissionHeadSuperAdmin(user: UserModel): boolean {
+    return this.permissionService.isHeadSuperAdmin(user);
   }
 
   /**
-   * isAuthUser checks if the user is the authenticated user
-   * @param element
+   * isPermissionEdit checks if the user has permission to delete a user.
+   * @param user UserModel
    */
-  isAuthUser(element: UserModel): boolean {
-    return element.id === this.currentAccount?.userInfo?.id;
+  isPermissionRemove(user: UserModel): boolean {
+    return this.permissionService.isAuthUser(user);
   }
 
   ngOnDestroy(): void {

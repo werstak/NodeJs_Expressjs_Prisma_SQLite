@@ -19,7 +19,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   ) {
   }
 
-  // Enum to access route names
+  // Enum for user roles
   protected readonly RoleEnum = RoleEnum;
 
   // Form group for user filter
