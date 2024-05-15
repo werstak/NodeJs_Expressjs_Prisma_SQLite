@@ -100,7 +100,7 @@
         <td mat-cell class="body-btn" *matCellDef="let element">
 
           <!-- Buttons for editing and deleting a user -->
-          <ng-container *ngIf="isHeadSuperAdmin(element)">
+          <ng-container *ngIf="isPermissionHeadSuperAdmin(element)">
             <ng-container *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin, RoleEnum.Manager]">
               <button
                 mat-icon-button
@@ -113,7 +113,7 @@
                 *appDenyAccess="[RoleEnum.Manager, RoleEnum.Client]"
                 mat-icon-button
                 color="primary"
-                [disabled]="isAuthUser(element)"
+                [disabled]="isPermissionRemove(element)"
                 (click)="deleteUser(element)"
               >
                 <mat-icon aria-label="Delete">delete</mat-icon>

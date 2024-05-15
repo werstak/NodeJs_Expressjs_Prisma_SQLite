@@ -18,13 +18,13 @@
         type='file'
         accept="image/*"
         (change)="handleImageLoaded($event)"
-        [disabled]="!checkManagerPermissions(authUser, currentUser)"
+        [disabled]="!isPermissionsManager(authUser, currentUser)"
       >
     </div>
 
     <!-- Delete Avatar Button -->
     <!-- Show only if the avatar exists and the user is not a manager -->
-    <button *ngIf="avatarUrl && checkManagerPermissions(authUser, currentUser)" mat-icon-button (click)="deleteAvatar()"
+    <button *ngIf="avatarUrl && isPermissionsManager(authUser, currentUser)" mat-icon-button (click)="deleteAvatar()"
             class="dialog__iconClose" tabindex="-2"
             matTooltip="Delete avatar">
       <mat-icon>close</mat-icon>
@@ -36,7 +36,7 @@
     <div mat-dialog-content>
 
       <!-- Only show if the user is not a manager -->
-      <ng-container *ngIf="checkManagerPermissions(authUser, currentUser)">
+      <ng-container *ngIf="isPermissionsManager(authUser, currentUser)">
 
         <!-- Email Input -->
         <mat-form-field color="accent" class="field-full-width">
@@ -79,15 +79,6 @@
                 {{ role.viewValue }}
               </mat-option>
             </mat-select>
-
-            <!--        <mat-select formControlName="role">-->
-            <!--          <ng-container *ngFor="let role of this.roleService.rolesListSubject$ | async">-->
-            <!--            <mat-option *ngIf="role.display" [value]="role.id">-->
-            <!--              {{ role.viewValue }}-->
-            <!--            </mat-option>-->
-            <!--          </ng-container>-->
-            <!--        </mat-select>-->
-
 
             <mat-error *ngIf="userForm.controls['role'].hasError('required')">RoleEnum <strong>required</strong>
             </mat-error>
@@ -171,9 +162,8 @@
         </mat-checkbox>
 
         <!-- Change Password Link (if not new user) -->
-        <ng-container *ngIf="checkManagerPermissions(authUser, currentUser)">
-          <!-- Do not show if Role of manager -->
-
+        <!-- Do not show if Role of manager -->
+        <ng-container *ngIf="isPermissionsManager(authUser, currentUser)">
           <a *ngIf="!data.newUser" class="dialog__actions_link" (click)="openDialogNewPassword(currentUser)">
             <span>Change password</span>
           </a>

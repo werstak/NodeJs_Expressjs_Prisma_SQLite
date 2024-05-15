@@ -12,9 +12,8 @@ import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { AuthUserModel, CountriesModel, UserModel } from '../../../../core/models';
-import { RoleService } from '../../../../shared/services';
+import { PermissionService, RoleService } from '../../../../shared/services';
 import { AuthService } from '../../../auth/auth.service';
-import { PERMISSIONS } from '../../../../shared/constants/permissions';
 
 // Default profile image path
 const defaultProfileImage = 'assets/images/avatar_1.jpg';
@@ -31,6 +30,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     public dialogRefUsersComponent: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
+    public permissionService: PermissionService,
     public usersService: UsersService,
     public authService: AuthService,
     public roleService: RoleService,
@@ -39,7 +39,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
   }
 
 
-  // Enum to access route names
+  // Enum for user roles
   protected readonly RoleEnum = RoleEnum;
 
   authUser: AuthUserModel | undefined = this.authService.accountSubject$.value?.userInfo;
@@ -234,16 +234,14 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     this.avatarUrl = '';
     this.avatarFile = '';
   }
+
   /**
    * Check if the current Manager has access to the dialog box elements
    * @param authUser
    * @param currentUser Current user
    */
-  checkManagerPermissions(authUser: AuthUserModel | undefined, currentUser: UserModel): boolean | string[] {
-    if (authUser?.role === RoleEnum.Manager && authUser?.id !== currentUser?.id) {
-      return PERMISSIONS.MANAGER.PAGE_USERS.DIALOG.elements;
-    }
-    return true;
+  isPermissionsManager(authUser: AuthUserModel | undefined, currentUser: UserModel): boolean | string[] {
+    return this.permissionService.checkManagerPermissions(authUser, currentUser);
   }
 
   /**
