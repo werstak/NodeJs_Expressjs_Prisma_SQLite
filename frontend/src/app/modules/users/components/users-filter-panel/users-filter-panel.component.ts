@@ -11,7 +11,6 @@ import { RoleService } from '../../../../shared/services';
   styleUrls: ['./users-filter-panel.component.scss']
 })
 export class UsersFilterPanelComponent implements OnInit, OnDestroy {
-
   constructor(
     private fb: FormBuilder,
     public usersService: UsersService,
@@ -28,6 +27,12 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
+  // Select All option label
+  public selectAllOption = 'Select All';
+
+  // Flag to track if all roles are selected
+  private selectAllFlag = false;
+
   ngOnInit() {
     // Initialize form
     this.buildForm();
@@ -43,7 +48,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       firstName: '',
       lastName: '',
       email: '',
-      roles: [],
+      roles: [[]], // Set initial value as an empty array
     });
     this.initDefaultUsersFilters();
   }
@@ -78,8 +83,46 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
         email: val.email,
         roles: arrRoles
       }
-      this.usersService.usersFilters$.next(filterData)
+      this.usersService.usersFilters$.next(filterData);
+      this.updateSelectAllLabel();
     });
+  }
+
+  /**
+   * Function to toggle all roles selection
+   */
+  toggleAllRoles() {
+    const rolesFormControl = this.userFilterForm.get('roles');
+    const rolesList = this.roleService.rolesListSubject$.value;
+    if (rolesFormControl && rolesList) {
+      if (this.selectAllFlag) {
+        // If all roles are selected, deselect all
+        rolesFormControl.setValue([]);
+      } else {
+        // Otherwise, select all roles
+        rolesFormControl.setValue(rolesList);
+      }
+      this.selectAllFlag = !this.selectAllFlag;
+      this.updateSelectAllLabel();
+    }
+  }
+
+  /**
+   * Update the label of the "Select All" option based on current selection
+   */
+  updateSelectAllLabel() {
+    const rolesFormControl = this.userFilterForm.get('roles');
+    const rolesList = this.roleService.rolesListSubject$.value;
+    if (rolesFormControl && rolesList) {
+      const selectedRoles = rolesFormControl.value;
+      if (selectedRoles.length === rolesList.length) {
+        // If all roles are selected, change label to "Deselect All"
+        this.selectAllOption = 'Deselect All';
+      } else {
+        // Otherwise, change label to "Select All"
+        this.selectAllOption = 'Select All';
+      }
+    }
   }
 
   ngOnDestroy(): void {
