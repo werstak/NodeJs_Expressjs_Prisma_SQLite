@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { debounceTime, map, startWith, takeUntil } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { PostsService } from '../../posts.service';
@@ -57,8 +57,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   selectedValuesCategories: any = [];
 
   // Observables for filtering options
-  filteredOptions: Observable<any[]>;
-  filteredOptionsCategories: Observable<any[]>;
+  filteredOptions$: Observable<any[]>;
+  filteredOptionsCategories$: Observable<any[]>;
 
   ngOnInit() {
     this.fetchUsers();
@@ -87,7 +87,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    *Sets up filtering for user search
    */
   private filteredUsers() {
-    this.filteredOptions = this.searchTextboxControl.valueChanges
+    this.filteredOptions$ = this.searchTextboxControl.valueChanges
       .pipe(
         startWith<any>(''),
         map(name => this._filter(name))
@@ -196,7 +196,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    *Sets up filtering for category search
    */
   private filteredCategories() {
-    this.filteredOptionsCategories = this.searchTextboxControlCategories.valueChanges.pipe(
+    this.filteredOptionsCategories$ = this.searchTextboxControlCategories.valueChanges.pipe(
       startWith(''),
       map(name => this._filterCategories(name))
     );
@@ -298,5 +298,22 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  isFilterFieldsPosts() {
+    const {authors, categories} = this.postFilterForm.value;
+    return [authors?.length, categories?.length].filter(Boolean).length > 1;
+  }
+
+  clearAllFields() {
+    this.postFilterForm.setValue({
+      authors: [],
+      categories: []
+    });
+    this.postsService.postsFilters$.next({});
+    this.filterData = {authors: [], categories: []};
+
+    // this.filteredOptions$
+    // filteredOptionsCategories$: Observable<any[]>;
   }
 }

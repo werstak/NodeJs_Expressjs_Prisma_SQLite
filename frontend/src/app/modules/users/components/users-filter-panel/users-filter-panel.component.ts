@@ -51,7 +51,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Get available roles list
    */
-  private getAvailableRoleList() {
+  private getAvailableRoleList(): void {
     this.roleService.rolesListSubject$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(resp => {
@@ -62,7 +62,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Build the form
    */
-  private buildForm() {
+  private buildForm(): void{
     this.userFilterForm = this.fb.group({
       firstName: '',
       lastName: '',
@@ -105,7 +105,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       this.usersService.usersFilters$.next(filterData);
 
       // Check if all fields are filled
-      this.allFieldsFilled = this.isFormFilled();
+      this.allFieldsFilled = this.isFilterFieldsUsers();
       this.updateSelectAllLabel();
     });
   }
@@ -113,7 +113,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Function to toggle all roles selection
    */
-  toggleAllRoles() {
+  toggleAllRoles(): void {
     const rolesControl = this.userFilterForm.get('roles');
     const rolesList = this.rolesList
     if (rolesControl && rolesList) {
@@ -126,7 +126,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Update the label of the "Select All" option based on current selection
    */
-  updateSelectAllLabel() {
+  updateSelectAllLabel(): void {
     const selectedRoles = this.userFilterForm.get('roles')?.value?.length;
     const totalRoles = this.rolesList?.length;
     this.selectAllOption = selectedRoles === totalRoles ? 'Deselect All' : 'Select All';
@@ -135,7 +135,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Check if more than one form field is filled
    */
-  isFormFilled(): boolean {
+  isFilterFieldsUsers(): boolean {
     const {firstName, lastName, email, roles} = this.userFilterForm.value;
     return [firstName, lastName, email, roles?.length].filter(Boolean).length > 1;
   }
@@ -143,7 +143,7 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Clear all form fields
    */
-  clearAllFields() {
+  clearAllFields(): void {
     this.userFilterForm.setValue({
       firstName: '',
       lastName: '',
@@ -151,7 +151,6 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
       roles: [],
     })
   }
-
 
   ngOnDestroy(): void {
     this.destroy$.next();
