@@ -25,6 +25,7 @@ import { DirectivesModule } from './directives/directives.module';
 // Custom Pipes
 import { RolesPipe } from './pipes/roles.pipe';
 import { AgePipe } from './pipes/age.pipe';
+import { FormFilledPipe } from './pipes/form-filled.pipe';
 
 // Custom Components
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
@@ -57,6 +58,7 @@ const sharedModules = [
 
 @NgModule({
   declarations: [
+    FormFilledPipe,
     RolesPipe,
     AgePipe,
     ChangePasswordComponent,
@@ -64,6 +66,7 @@ const sharedModules = [
   imports: [...sharedModules],
   exports: [
     ...sharedModules,
+    FormFilledPipe,
     RolesPipe,
     AgePipe,
     ChangePasswordComponent

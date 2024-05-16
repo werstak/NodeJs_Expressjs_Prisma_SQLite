@@ -3,17 +3,47 @@
     <!-- User filter form -->
     <form [formGroup]="userFilterForm" class="filters__form">
 
+      <!-- Only show if the user is a Super Admin or Project Admin -->
+<!--      <mat-form-field *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" class="filters__input">-->
+<!--        <mat-label>Roles</mat-label>-->
+<!--        <mat-select formControlName="roles" multiple>-->
+<!--          <ng-container *ngFor="let role of this.roleService.rolesListSubject$ | async">-->
+<!--            <mat-option *ngIf="role.display" [value]="role">-->
+<!--              {{ role.viewValue }}-->
+<!--            </mat-option>-->
+<!--          </ng-container>-->
+<!--        </mat-select>-->
+<!--      </mat-form-field>-->
+
+
       <!-- Roles filter -->
       <mat-form-field *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" class="filters__input">
         <mat-label>Roles</mat-label>
         <mat-select formControlName="roles" multiple>
+
+          <!-- Select All option -->
           <mat-option [value]="selectAllOption" (click)="toggleAllRoles()">{{ selectAllOption }}</mat-option>
-          <mat-option *ngFor="let role of this.roleService.rolesListSubject$ | async" [value]="role">
-            {{ role.viewValue }}
-          </mat-option>
+
+          <!-- Only show if the user is a Super Admin or Project Admin -->
+          <ng-container *ngFor="let role of rolesList">
+            <mat-option *ngIf="role.display" [value]="role">
+              {{ role.viewValue }}
+            </mat-option>
+          </ng-container>
+
         </mat-select>
       </mat-form-field>
 
+      <!-- Roles filter -->
+<!--      <mat-form-field *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" class="filters__input">-->
+<!--        <mat-label>Roles</mat-label>-->
+<!--        <mat-select formControlName="roles" multiple>-->
+<!--          <mat-option [value]="selectAllOption" (click)="toggleAllRoles()">{{ selectAllOption }}</mat-option>-->
+<!--          <mat-option *ngFor="let role of roleService.rolesListSubject$ | async" [value]="role">-->
+<!--            {{ role.viewValue }}-->
+<!--          </mat-option>-->
+<!--        </mat-select>-->
+<!--      </mat-form-field>-->
 
       <!-- First Name filter -->
       <mat-form-field class="filters__input">
@@ -57,6 +87,8 @@
         </button>
       </mat-form-field>
 
+      <!-- Clear all fields button -->
+      <button mat-raised-button color="warn" *ngIf="isFormFilled()" (click)="clearAllFields()">Clear All Fields</button>
     </form>
   </mat-card-content>
 </mat-card>
