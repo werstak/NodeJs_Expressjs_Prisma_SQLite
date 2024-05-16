@@ -95,9 +95,7 @@ export class PostsComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(resp => {
       this.length = resp;
-      if (resp) {
-        this.dataLoading = false;
-      }
+      this.dataLoading = false;
     });
   }
 

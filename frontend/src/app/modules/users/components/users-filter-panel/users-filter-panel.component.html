@@ -7,13 +7,19 @@
       <mat-form-field *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" class="filters__input">
         <mat-label>Roles</mat-label>
         <mat-select formControlName="roles" multiple>
+
+          <!-- Select All option -->
           <mat-option [value]="selectAllOption" (click)="toggleAllRoles()">{{ selectAllOption }}</mat-option>
-          <mat-option *ngFor="let role of this.roleService.rolesListSubject$ | async" [value]="role">
-            {{ role.viewValue }}
-          </mat-option>
+
+          <!-- Only show if the user is a Super Admin or Project Admin -->
+          <ng-container *ngFor="let role of rolesList">
+            <mat-option *ngIf="role.display" [value]="role">
+              {{ role.viewValue }}
+            </mat-option>
+          </ng-container>
+
         </mat-select>
       </mat-form-field>
-
 
       <!-- First Name filter -->
       <mat-form-field class="filters__input">
@@ -44,7 +50,7 @@
       </mat-form-field>
 
       <!-- Email filter -->
-      <mat-form-field>
+      <mat-form-field class="filters__input">
         <mat-label>Email</mat-label>
         <input matInput type="text" placeholder="Email" formControlName="email" name="email">
         <!-- Clear button for Email filter -->
@@ -57,6 +63,9 @@
         </button>
       </mat-form-field>
 
+      <!-- Clear all fields button -->
+      <button mat-button color="warn" *ngIf="isFilterFieldsUsers()" (click)="clearAllFields()">Clear All</button>
     </form>
+
   </mat-card-content>
 </mat-card>
