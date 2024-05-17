@@ -31,13 +31,13 @@ export class UsersFilterPanelComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
 
   // Select All option label
-  public selectAllOption = 'Select All';
+  public selectAllOption: string = 'Select All';
 
   // Flag to track if all roles are selected
-  private selectAllFlag = false;
+  private selectAllFlag: boolean = false;
 
   // Initialize flag to track if all fields are filled
-  public allFieldsFilled = false;
+  public allFieldsFilled: boolean = false;
 
   ngOnInit() {
     // Get available roles list
