@@ -40,6 +40,14 @@
               <div>No results found!</div>
             </mat-optgroup>
 
+            <!-- Clear all authors button -->
+            <mat-option
+              class="filters__option_clearAll"
+              *ngIf="postFilterForm.controls['authors'].value?.length > 0"
+              [value]="clearAllOption" (click)="clearAllAuthors()">
+              {{ clearAllOption }}
+            </mat-option>
+
             <!-- Option for each author -->
             <mat-option
               (onSelectionChange)="selectionChange($event)"
@@ -53,7 +61,7 @@
       </mat-form-field>
 
       <!-- Select input for categories -->
-      <mat-form-field>
+      <mat-form-field class="filters__field">
         <mat-select class="filters__select" (openedChange)="openedChangeCategories($event)"
                     placeholder="Select categories"
                     formControlName="categories"
@@ -88,6 +96,15 @@
             <mat-optgroup *ngIf="(filteredOptionsCategories$ | async)?.length == 0">
               <div>No results found!</div>
             </mat-optgroup>
+
+            <!-- Clear all categories button -->
+            <mat-option
+              class="filters__option_clearAll"
+              *ngIf="postFilterForm.controls['categories'].value?.length > 0"
+              [value]="clearAllOption"
+              (click)="clearAllCategories()">
+              {{ clearAllOption }}
+            </mat-option>
 
             <!-- Option for each category -->
             <mat-option

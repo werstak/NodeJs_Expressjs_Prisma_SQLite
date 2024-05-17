@@ -41,7 +41,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   private postsFilters: PostFilterModel = this.defaultPostsFilters;
 
   // Current userId
-  userId: any
+  userId: any;
 
   // Pagination variables
   length = 0; // Total number of items
