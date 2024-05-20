@@ -1,0 +1,37 @@
+<p>post-statistics works!</p>
+
+<div>
+  <mat-card class="post-statistics">
+    <mat-card-header>
+      <mat-card-title>Post Statistics</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="post-statistics__item">
+        <div class="post-statistics__item-title">Total Posts</div>
+        <div class="post-statistics__item-value">====== {{ length | json }}</div>
+      </div>
+<!--      <div class="post-statistics__item">-->
+<!--        <div class="post-statistics__item-title">Total Comments</div>-->
+<!--        <div class="post-statistics__item-value">{{ totalComments }}</div>-->
+<!--      </div>-->
+<!--      <div class="post-statistics__item">-->
+<!--        <div class="post-statistics__item-title">Total Likes</div>-->
+<!--        <div class="post-statistics__item-value">{{ totalLikes }}</div>-->
+<!--      </div>-->
+<!--      <div class="post-statistics__item">-->
+<!--        <div class="post-statistics__item-title">Total Dislikes</div>-->
+<!--        <div class="post-statistics__item-value">{{ totalDislikes }}</div>-->
+<!--      </div>-->
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Spinner to indicate loading -->
+<mat-progress-spinner
+  *ngIf="dataLoading"
+  color="primary"
+  diameter="70"
+  mode="indeterminate"
+  class="posts-spinner"
+>
+</mat-progress-spinner>

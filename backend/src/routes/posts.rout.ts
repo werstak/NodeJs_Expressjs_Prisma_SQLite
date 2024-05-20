@@ -1,9 +1,9 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import * as PostHandler from '../controllers/posts.conroller';
+import * as PostHandler from '../controllers/posts.controller';
 import { body, validationResult } from 'express-validator';
 import * as fs from 'fs';
-import * as UserHandler from '../controllers/users.conroller';
+import * as UserHandler from '../controllers/users.controller';
 import { PostsQueryParamsModel } from '../models';
 export const postsRouter = express.Router();
 
@@ -190,3 +190,17 @@ postsRouter.delete('/:id', async (request: Request, response: Response) => {
         return response.status(500).json(error.message);
     }
 });
+
+
+// /**
+//  * GET: Get post counts
+//  */
+// postsRouter.get('/counts', async (request: Request, response: Response) => {
+//     console.log(88888888,'Root GET - Get post counts');
+//     try {
+//         const counts = await PostHandler.getPostCountsHandler();
+//         return response.status(200).json(counts);
+//     } catch (error: any) {
+//         return response.status(500).json(error.message);
+//     }
+// });
