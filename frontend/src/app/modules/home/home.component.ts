@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   data: AuthUserModel;
 
   ngOnInit(): void {
-    this.fetchData();
+    // this.fetchData();
   }
 
   ngOnDestroy(): void {

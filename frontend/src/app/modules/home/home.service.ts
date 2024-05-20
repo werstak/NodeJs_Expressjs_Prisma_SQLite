@@ -23,4 +23,16 @@ export class HomeService {
         })
       );
   }
+
+
+  getPostsCounts(): Observable<any> {
+    console.log(444, 'getPostsCounts');
+    return this.http.get(config.API_URL + `/`)
+      .pipe(
+        catchError(error => {
+          console.error('Error:', error.message);
+          return throwError(error);
+        })
+      );
+  }
 }

@@ -3,6 +3,16 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { RouterModule, Routes } from '@angular/router';
 import { SharedModule } from '../../shared/shared.module';
+import { PostStatisticsComponent } from './components/post-statistics/post-statistics.component';
+import { UserStatisticsComponent } from './components/user-statistics/user-statistics.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatCardModule } from '@angular/material/card';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { NgxsModule } from '@ngxs/store';
+import { HomeState } from './store-home/home.state';
 
 // Define the routes for the HomeComponent
 const routes: Routes = [
@@ -14,12 +24,21 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [
-    HomeComponent
+    HomeComponent,
+    PostStatisticsComponent,
+    UserStatisticsComponent,
+    DashboardComponent
   ],
   imports: [
     CommonModule,
     SharedModule,
+    MatGridListModule,
+    MatCardModule,
+    MatMenuModule,
+    MatIconModule,
+    MatButtonModule,
     RouterModule.forChild(routes),
+    NgxsModule.forFeature([HomeState])
   ]
 })
 export class HomeModule { }
