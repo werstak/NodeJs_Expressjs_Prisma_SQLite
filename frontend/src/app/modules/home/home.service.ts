@@ -11,22 +11,10 @@ export class HomeService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Fetches data from the API.
-   * @returns An observable with the data fetched from the API.
+   * Fetches post counts from the API.
+   * @returns An observable with the post counts fetched from the API.
    */
-  getData(): Observable<any> {
-    return this.http.get(config.API_URL + `/`)
-      .pipe(
-        catchError(error => {
-          console.error('Error:', error.message);
-          return throwError(error);
-        })
-      );
-  }
-
-
   getPostsCounts(): Observable<any> {
-    console.log(444, 'getPostsCounts');
     return this.http.get(config.API_URL + `/`)
       .pipe(
         catchError(error => {

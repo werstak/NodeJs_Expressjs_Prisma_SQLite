@@ -190,17 +190,3 @@ postsRouter.delete('/:id', async (request: Request, response: Response) => {
         return response.status(500).json(error.message);
     }
 });
-
-
-// /**
-//  * GET: Get post counts
-//  */
-// postsRouter.get('/counts', async (request: Request, response: Response) => {
-//     console.log(88888888,'Root GET - Get post counts');
-//     try {
-//         const counts = await PostHandler.getPostCountsHandler();
-//         return response.status(200).json(counts);
-//     } catch (error: any) {
-//         return response.status(500).json(error.message);
-//     }
-// });

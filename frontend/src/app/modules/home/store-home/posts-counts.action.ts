@@ -5,6 +5,5 @@ export class GetPostsCounts {
   static readonly type = '[PostsCounts] Get Posts Counts';
 
   constructor() {
-    console.log(222, 'GetPostsCounts')
   }
 }

@@ -39,7 +39,6 @@ export class HomeState {
    */
   @Action(GetPostsCounts)
   getAllPostsCounts({getState, setState}: StateContext<HomeStateModel>) {
-    console.log(333, 'GetPostsCounts')
     return this.homeService.getPostsCounts().pipe(tap((result) => {
         const state = getState();
         setState({
