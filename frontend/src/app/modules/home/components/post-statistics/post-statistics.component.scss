@@ -1,0 +1,35 @@
+.post-statistics {
+  &__description {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    border-bottom: 1px solid #e0e0e0;
+
+    &-title {
+      font-size: 16px;
+      font-weight: 600;
+      padding: 10px 20px 10px 0;
+    }
+
+    &-value {
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+  &__item {
+
+  }
+
+  &__charts {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  &__chart {
+    margin-top: 20px;
+  }
+}
