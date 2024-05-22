@@ -1,11 +1,11 @@
 import db from '../utils/db';
-import { PostCountResponse, RolePostCount } from '../models';
+import { StatisticsResponse, RolePostCount } from '../models';
 
 /**
- * Retrieves post counts by various criteria.
+ * Retrieves post counts and user counts by various criteria.
  * @returns An object containing counts by total, role, user, category, and status.
  */
-export const getPostCountsHandler = async (): Promise<PostCountResponse> => {
+export const getStatisticsHandler = async (): Promise<StatisticsResponse> => {
     // Total number of posts
     const totalPosts = await db.post.count();
 
@@ -64,7 +64,27 @@ export const getPostCountsHandler = async (): Promise<PostCountResponse> => {
         }
     });
 
+    // Total number of users
+    const totalUser = await db.user.count();
+
+    // Number of users by role
+    const usersByRole = await db.user.groupBy({
+        by: ['role'],
+        _count: {
+            _all: true
+        }
+    });
+
+    // Number of users by status
+    const usersByStatus = await db.user.groupBy({
+        by: ['status'],
+        _count: {
+            _all: true
+        }
+    });
+
     return {
+        // Add post counts
         totalPosts,
         postsByRole: postsByRoleArray,
         postsByUser,
@@ -72,6 +92,19 @@ export const getPostCountsHandler = async (): Promise<PostCountResponse> => {
         postsByStatus: postsByStatus.map(status => ({
             published: status.published,
             count: status._count._all
-        }))
+        })),
+
+        // Add user counts
+        totalUser,
+        usersByRole: usersByRole.map(role => ({
+            role: role.role,
+            count: role._count._all
+        })),
+        usersByStatus: usersByStatus
+            .filter(status => status.status !== null)  // Filter out null values
+            .map(status => ({
+                status: status.status as boolean,  // Cast status to boolean
+                count: status._count._all
+            }))
     };
 };

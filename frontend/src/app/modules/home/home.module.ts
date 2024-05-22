@@ -12,7 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { NgxsModule } from '@ngxs/store';
-import { HomeState } from './store-home/home.state';
+import { DashboardState } from './store-dashboard/dashboard-state.service';
 
 // Define the routes for the HomeComponent
 const routes: Routes = [
@@ -38,7 +38,7 @@ const routes: Routes = [
     MatIconModule,
     MatButtonModule,
     RouterModule.forChild(routes),
-    NgxsModule.forFeature([HomeState])
+    NgxsModule.forFeature([DashboardState])
   ]
 })
 export class HomeModule { }

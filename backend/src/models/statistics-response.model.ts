@@ -34,11 +34,26 @@ export interface StatusPostCount {
     count: number;
 }
 
+// Interface for counting users by role
+export interface RoleUserCount {
+    role: number;
+    count: number;
+}
+
+// Interface for counting users by status
+export interface StatusUserCount {
+    status: boolean;
+    count: number;
+}
+
 // Main interface for response
-export interface PostCountResponse {
+export interface StatisticsResponse {
     totalPosts: number;
     postsByRole: RolePostCount[];
     postsByUser: UserPostCount[];
     postsByCategory: CategoryPostCount[];
     postsByStatus: StatusPostCount[];
+    totalUser: number;
+    usersByRole: RoleUserCount[];
+    usersByStatus: StatusUserCount[];
 }

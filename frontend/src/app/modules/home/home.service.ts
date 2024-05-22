@@ -11,10 +11,10 @@ export class HomeService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Fetches post counts from the API.
-   * @returns An observable with the post counts fetched from the API.
+   * Get the statistics for the dashboard
+   * @returns An object containing counts by total, role, user, category, and status.
    */
-  getPostsCounts(): Observable<any> {
+  getStatistics(): Observable<any> {
     return this.http.get(config.API_URL + `/dashboard`)
       .pipe(
         catchError(error => {

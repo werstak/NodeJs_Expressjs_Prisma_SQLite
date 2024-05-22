@@ -16,4 +16,4 @@ export * from './user-filter.model';
 export * from './user-list.model';
 export * from './user-params.model';
 export * from './valid-reset-token.model';
-export * from './posts-counts.model';
+export * from './statistics.response';

@@ -1,7 +1,7 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import * as DashboardHandler from '../controllers/dashboard.controllers';
-import { PostCountResponse } from '../models';
+import { StatisticsResponse } from '../models';
 
 
 export const dashboardRouter = express.Router();
@@ -13,7 +13,7 @@ export const dashboardRouter = express.Router();
  */
 dashboardRouter.get('/', async (request: Request, response: Response) => {
     try {
-        const counts: PostCountResponse = await DashboardHandler.getPostCountsHandler();
+        const counts: StatisticsResponse = await DashboardHandler.getStatisticsHandler();
         return response.status(200).json(counts);
     } catch (error: any) {
         return response.status(500).json(error.message);

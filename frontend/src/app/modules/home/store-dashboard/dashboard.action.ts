@@ -1,9 +1,10 @@
 /**
- * Action to get posts counts
+ * Action to get Statistics
  */
-export class GetPostsCounts {
+export class GetStatisticsAction {
   static readonly type = '[PostsCounts] Get Posts Counts';
 
   constructor() {
   }
 }
+

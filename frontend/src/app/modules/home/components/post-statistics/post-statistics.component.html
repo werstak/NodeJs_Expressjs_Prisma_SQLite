@@ -5,16 +5,16 @@
     </mat-card-header>
     <mat-card-content>
       <div class="post-statistics__description-items">
-        <div class="post-statistics__description-title">Total Posts: {{ postsCounters.totalPosts }}</div>
+        <div class="post-statistics__description-title">Total Posts: {{ statisticsCounters.totalPosts }}</div>
         <div class="post-statistics__description-status">Published Posts: {{ getPublishedPostsCount() }}</div>
       </div>
 
       <div class="post-statistics__charts">
         <div class="post-statistics__chart">
           <canvas baseChart
-                  [datasets]="categoryChartData"
-                  [labels]="categoryChartLabels"
-                  [options]="categoryCartOptions"
+                  [datasets]="categoryPostsChartData"
+                  [labels]="categoryPostsChartLabels"
+                  [options]="categoryPostsCartOptions"
                   [legend]="true"
                   [type]="'doughnut'">
           </canvas>
@@ -22,22 +22,20 @@
 
         <div class="post-statistics__chart">
           <canvas baseChart
-                  [datasets]="roleChartData"
-                  [labels]="roleChartLabels"
-                  [options]="roleCartOptions"
+                  [datasets]="rolePostsChartData"
+                  [labels]="rolePostsChartLabels"
+                  [options]="rolePostsCartOptions"
                   [legend]="true"
                   [type]="'doughnut'">
           </canvas>
         </div>
       </div>
 
-      <div class="post-statistics__item"></div>
-
       <div class="post-statistics__chart">
         <canvas baseChart
-                [datasets]="userChartData"
-                [labels]="userChartLabels"
-                [options]="userCartOptions"
+                [datasets]="userPostsChartData"
+                [labels]="userPostsChartLabels"
+                [options]="userPostsCartOptions"
                 [legend]="true"
                 [type]="'bar'">
         </canvas>
@@ -45,6 +43,45 @@
     </mat-card-content>
   </mat-card>
 </div>
+
+
+<div>
+  <mat-card class="post-statistics">
+    <mat-card-header>
+      <mat-card-title>Users Statistics</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="post-statistics__description-items">
+        <div class="post-statistics__description-title">Total Users: {{ statisticsCounters.totalUser }}</div>
+<!--        <div class="post-statistics__description-status">Published Posts: {{ getPublishedPostsCount() }}</div>-->
+      </div>
+
+      <div class="post-statistics__charts">
+        <div class="post-statistics__chart">
+          <canvas baseChart
+                  [datasets]="usersByRoleChartData"
+                  [labels]="usersByRoleChartLabels"
+                  [options]="usersByRoleCartOptions"
+                  [legend]="true"
+                  [type]="'doughnut'">
+          </canvas>
+        </div>
+
+        <div class="post-statistics__chart">
+          <canvas baseChart
+                  [datasets]="usersByStatusChartData"
+                  [labels]="usersByStatusChartLabels"
+                  [options]="usersByStatusCartOptions"
+                  [legend]="true"
+                  [type]="'doughnut'">
+          </canvas>
+        </div>
+      </div>
+
+    </mat-card-content>
+  </mat-card>
+</div>
+
 
 <mat-progress-spinner
   *ngIf="dataLoading"
