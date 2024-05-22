@@ -4,29 +4,29 @@ import { NotificationService } from '../../../shared/services';
 import { HomeService } from '../home.service';
 
 import { tap } from 'rxjs';
-import { PostsCountsModel } from '../../../core/models';
-import { GetPostsCounts } from './posts-counts.action';
+import { StatisticsResponse } from '../../../core/models';
+import { GetStatisticsAction } from './dashboard.action';
 
 
 /**
- * Define the structure of the HomeStateModel
+ * Define the structure of the DashboardStateModel
  */
-export class HomeStateModel {
-  postsCounts: PostsCountsModel[];
+export class DashboardStateModel {
+  statisticsCounters: StatisticsResponse[];
 }
 
 /**
  * Decorator for defining a state class
  */
-@State<HomeStateModel>({
-  name: 'HomeState',
+@State<DashboardStateModel>({
+  name: 'DashboardState',
   defaults: {
-    postsCounts: [],
+    statisticsCounters: [],
   }
 })
 
 @Injectable()
-export class HomeState {
+export class DashboardState {
 
   constructor(
     private homeService: HomeService,
@@ -35,15 +35,15 @@ export class HomeState {
   }
 
   /**
-   * Action to get all posts counts
+   * Action to get all Statistics
    */
-  @Action(GetPostsCounts)
-  getAllPostsCounts({getState, setState}: StateContext<HomeStateModel>) {
-    return this.homeService.getPostsCounts().pipe(tap((result) => {
+  @Action(GetStatisticsAction)
+  getAllStatistics({getState, setState}: StateContext<DashboardStateModel>) {
+    return this.homeService.getStatistics().pipe(tap((result) => {
         const state = getState();
         setState({
           ...state,
-          postsCounts: result,
+          statisticsCounters: result,
         });
       },
       (error) => {

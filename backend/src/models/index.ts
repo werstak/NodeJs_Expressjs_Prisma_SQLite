@@ -1,6 +1,6 @@
 export * from './create-update-post.model';
 export * from './password-reset-token.model';
-export * from './post-count-response.model';
+export * from './statistics-response.model';
 export * from './posts-query-params.model';
 export * from './refresh-token.model';
 export * from './categories.model';

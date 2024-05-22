@@ -1,10 +1,11 @@
 .post-statistics {
   &__description {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
+    padding: 10px 20px 10px 0;
 
     &-title {
       font-size: 16px;
@@ -12,13 +13,10 @@
       padding: 10px 20px 10px 0;
     }
 
-    &-value {
+    &-status {
       font-size: 16px;
       font-weight: 600;
     }
-  }
-  &__item {
-
   }
 
   &__charts {

@@ -33,12 +33,27 @@ export class StatusPostCount {
   count: number;
 }
 
+// Interface for counting users by role
+export class RoleUserCount {
+  role: number;
+  count: number;
+}
+
+// Interface for counting users by status
+export class StatusUserCount {
+  status: boolean;
+  count: number;
+}
+
 // Main class for response
-export class PostsCountsModel {
+export class StatisticsResponse {
   totalPosts: number;
   postsByRole: RolePostCount[];
   postsByUser: UserPostCount[];
   postsByCategory: CategoryPostCount[];
   postsByStatus: StatusPostCount[];
+  totalUser: number;
+  usersByRole: RoleUserCount[];
+  usersByStatus: StatusUserCount[];
 }
 

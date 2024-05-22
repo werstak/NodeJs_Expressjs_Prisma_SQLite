@@ -5,6 +5,7 @@ import { body, validationResult } from 'express-validator';
 import * as fs from 'fs';
 import * as UserHandler from '../controllers/users.controller';
 import { PostsQueryParamsModel } from '../models';
+
 export const postsRouter = express.Router();
 
 
