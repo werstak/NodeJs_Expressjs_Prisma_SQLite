@@ -5,6 +5,7 @@ import { GetPostsCounts } from '../../store-home/posts-counts.action';
 import { Observable, Subject } from 'rxjs';
 import { PostsCountsModel } from '../../../../core/models';
 import { HomeSelectors } from '../../store-home/posts-counts.selectors';
+import { roleTransform } from '../../../../shared/utils/role-transform';
 
 @Component({
   selector: 'app-post-statistics',
@@ -12,6 +13,14 @@ import { HomeSelectors } from '../../store-home/posts-counts.selectors';
   styleUrls: ['./post-statistics.component.scss']
 })
 export class PostStatisticsComponent implements OnInit, OnDestroy {
+  constructor(
+    public store: Store
+  ) {
+  }
+  // Select the posts counts from the store
+  @Select(HomeSelectors.getPostsCounts) postsCounters$: Observable<PostsCountsModel>;
+
+  // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
 
   // Posts Counters Model to store the posts counts
@@ -22,27 +31,23 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
     postsByCategory: [],
     postsByStatus: []
   };
+
   // Flag to indicate if data is loading
   public dataLoading: boolean = false;
 
-  @Select(HomeSelectors.getPostsCounts) postsCounters$: Observable<PostsCountsModel>;
-
-  // Chart Options for the different charts in the component
-  public chartOptions: any = {
-    responsive: true,
-  };
-
-  // Chart Data and Labels for the different charts in the component
+  // Chart Data, Options and Labels for the different charts in the component
   public categoryChartLabels: string[] = [];
   public categoryChartData: any[] = [];
+  public categoryCartOptions: any = {};
 
   public roleChartLabels: string[] = [];
   public roleChartData: any[] = [];
+  public roleCartOptions: any = {};
 
   public userChartLabels: string[] = [];
   public userChartData: any[] = [];
+  public userCartOptions: any = {};
 
-  constructor(public store: Store) {}
 
   ngOnInit(): void {
     this.fetchPostsCounts();
@@ -70,10 +75,23 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Get the count of published posts
+   * @returns The count of published posts
+   */
+  getPublishedPostsCount(): number {
+    if (!this.postsCounters.postsByStatus) {
+      return 0;
+    }
+    const publishedStatus = this.postsCounters.postsByStatus.find(status => status.published);
+    return publishedStatus ? publishedStatus.count : 0;
+  }
+
+  /**
    * Update the charts with the new data values
    * @private
    */
   private updateCharts(): void {
+
     // Ensure the properties are defined and have default values
     const postsByCategory = this.postsCounters.postsByCategory || [];
     const postsByRole = this.postsCounters.postsByRole || [];
@@ -81,15 +99,50 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
 
     // Category Chart
     this.categoryChartLabels = postsByCategory.map(category => category.name);
-    this.categoryChartData = [{ data: postsByCategory.map(category => category._count.posts), label: 'Posts by Category' }];
+    this.categoryChartData = [{
+      data: postsByCategory.map(category => category._count.posts),
+      label: 'Posts by Category'
+    }];
+    this.categoryCartOptions = {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Posts by Category'
+        }
+      }
+    }
 
     // Role Chart
-    this.roleChartLabels = postsByRole.map(role => `Role ${role.role}`);
-    this.roleChartData = [{ data: postsByRole.map(role => role.count), label: 'Posts by Role' }];
+    this.roleChartLabels = postsByRole.map(role => roleTransform(role.role));
+    this.roleChartData = [{
+      data: postsByRole.map(role => role.count),
+      label: 'Posts by Role'
+    }];
+    this.roleCartOptions = {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Posts by Role'
+        }
+      }
+    }
 
     // User Chart
     this.userChartLabels = postsByUser.map(user => `${user.firstName} ${user.lastName}`);
-    this.userChartData = [{ data: postsByUser.map(user => user._count.posts), label: 'Posts by User' }];
+    this.userChartData = [{
+      data: postsByUser.map(user => user._count.posts),
+      label: 'Posts by User'
+    }];
+    this.userCartOptions = {
+      responsive: true,
+      plugins: {
+        colors: {
+          enabled: true,
+        }
+      }
+    }
   }
 
   ngOnDestroy(): void {

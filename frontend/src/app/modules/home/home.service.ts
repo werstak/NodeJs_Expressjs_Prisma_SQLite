@@ -15,7 +15,7 @@ export class HomeService {
    * @returns An observable with the post counts fetched from the API.
    */
   getPostsCounts(): Observable<any> {
-    return this.http.get(config.API_URL + `/`)
+    return this.http.get(config.API_URL + `/dashboard`)
       .pipe(
         catchError(error => {
           console.error('Error:', error.message);
