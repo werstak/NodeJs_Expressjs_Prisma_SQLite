@@ -1,3 +1,13 @@
-<app-post-statistics></app-post-statistics>
+<div class="container">
+  <app-post-statistics class="container__item"></app-post-statistics>
+  <app-user-statistics class="container__item"></app-user-statistics>
+</div>
 
-<app-dashboard></app-dashboard>
+
+<mat-progress-spinner
+  *ngIf="dataLoading"
+  color="primary"
+  diameter="70"
+  mode="indeterminate"
+  class="home-spinner">
+</mat-progress-spinner>
