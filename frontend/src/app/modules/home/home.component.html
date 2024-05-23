@@ -1,12 +1,13 @@
-<app-post-statistics></app-post-statistics>
-<app-user-statistics></app-user-statistics>
+<div class="container">
+  <app-post-statistics class="container__item"></app-post-statistics>
+  <app-user-statistics class="container__item"></app-user-statistics>
+</div>
 
-<app-dashboard></app-dashboard>
 
 <mat-progress-spinner
   *ngIf="dataLoading"
   color="primary"
   diameter="70"
   mode="indeterminate"
-  class="posts-spinner">
+  class="home-spinner">
 </mat-progress-spinner>

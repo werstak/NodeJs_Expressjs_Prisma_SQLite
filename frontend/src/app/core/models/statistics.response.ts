@@ -45,6 +45,12 @@ export class StatusUserCount {
   count: number;
 }
 
+// Interface for counting users by location
+export class LocationUserCount {
+  location: string;
+  count: number;
+}
+
 // Main class for response
 export class StatisticsResponse {
   totalPosts?: number;
@@ -55,5 +61,6 @@ export class StatisticsResponse {
   totalUser?: number;
   usersByRole?: RoleUserCount[];
   usersByStatus?: StatusUserCount[];
+  usersByLocation?: LocationUserCount[];
 }
 

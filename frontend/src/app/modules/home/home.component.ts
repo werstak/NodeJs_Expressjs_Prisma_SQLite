@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { HomeService } from './home.service';
 import { Subject } from 'rxjs';
 import { AuthUserModel } from '../../core/models';
 import { GetStatisticsAction } from './store-dashboard/dashboard.action';
@@ -19,7 +18,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {
   }
 
-
   // Flag to indicate if data is loading
   public dataLoading: boolean = false;
 
@@ -29,15 +27,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   data: AuthUserModel;
 
   ngOnInit(): void {
-    this.dataLoading = true;
     this.fetchStatistics();
-    this.dataLoading = false;
   }
 
-
-
-  private fetchStatistics() {
+  /**
+   * Fetch the statistics data for the dashboard
+   */
+  private fetchStatistics(): void{
+    this.dataLoading = true;
     this.store.dispatch(new GetStatisticsAction());
+    this.dataLoading = false;
   }
 
   ngOnDestroy(): void {

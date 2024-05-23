@@ -1,4 +1,4 @@
-.post-statistics {
+.users-statistics {
   &__description {
     display: flex;
     flex-direction: column;
@@ -6,6 +6,14 @@
     align-items: center;
     border-bottom: 1px solid #e0e0e0;
     padding: 10px 20px 10px 0;
+
+    &-items {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      width: 100%;
+    }
 
     &-title {
       font-size: 16px;
@@ -29,5 +37,16 @@
 
   &__chart {
     margin-top: 20px;
+    width: 50%;
+
+    &_full {
+      width: 100%;
+    }
   }
+}
+
+.users-spinner {
+  position: absolute;
+  left: 50%;
+  top: 10%;
 }

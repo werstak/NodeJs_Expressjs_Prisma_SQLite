@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { StatisticsResponse } from '../../../../core/models';
 import { takeUntil } from 'rxjs/operators';
 import { roleTransform } from '../../../../shared/utils/role-transform';
+import { ChartConfiguration } from 'chart.js';
 
 @Component({
   selector: 'app-user-statistics',
@@ -16,28 +17,33 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
   @Select(DashboardSelectors.getStatisticsAll) statisticsUsers$: Observable<StatisticsResponse>;
 
   // Subject to handle subscription cleanup
-  private destroy$: Subject<void> = new Subject<void>();
+  private destroy$ = new Subject<void>();
 
   // Flag to indicate if data is loading
-  public dataLoading: boolean = false;
+  public dataLoading = false;
 
   // Initialize with default values for the statistics data counters
   public statisticsUsers: StatisticsResponse = {
     totalUser: 0,
     usersByRole: [],
-    usersByStatus: []
+    usersByStatus: [],
+    usersByLocation: []
   };
 
   // User by Role Chart Data
   public usersByRoleChartLabels: string[] = [];
-  public usersByRoleChartData: any[] = [];
-  public usersByRoleCartOptions: any = {};
+  public usersByRoleChartData: ChartConfiguration<'doughnut'>['data']['datasets'] = [];
+  public usersByRoleChartOptions: ChartConfiguration<'doughnut'>['options'] = {};
 
   // User by Status Chart Data
   public usersByStatusChartLabels: string[] = [];
-  public usersByStatusChartData: any[] = [];
-  public usersByStatusCartOptions: any = {};
+  public usersByStatusChartData: ChartConfiguration<'doughnut'>['data']['datasets'] = [];
+  public usersByStatusChartOptions: ChartConfiguration<'doughnut'>['options'] = {};
 
+  // User by Location Chart Data
+  public usersByLocationChartLabels: string[] = [];
+  public usersByLocationChartData: ChartConfiguration<'bar'>['data']['datasets'] = [];
+  public usersByLocationChartOptions: ChartConfiguration<'bar'>['options'] = {};
 
   ngOnInit(): void {
     this.fetchUsersStatistics();
@@ -45,7 +51,6 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
 
   /**
    * Fetch the statistics data for users
-   * @private
    */
   private fetchUsersStatistics(): void {
     this.dataLoading = true;
@@ -53,7 +58,8 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
       this.statisticsUsers = resp || {
         totalUser: 0,
         usersByRole: [],
-        usersByStatus: []
+        usersByStatus: [],
+        usersByLocation: []
       };
       this.updateUsersCharts();
       this.dataLoading = false;
@@ -62,13 +68,12 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
 
   /**
    * Update the charts with the data from the statistics
-   * @private
    */
   private updateUsersCharts(): void {
-
     // Ensure the properties are defined and have default values
     const usersByRole = this.statisticsUsers.usersByRole || [];
     const usersByStatus = this.statisticsUsers.usersByStatus || [];
+    const usersByLocation = this.statisticsUsers.usersByLocation || [];
 
     // User by Role Chart Data
     this.usersByRoleChartLabels = usersByRole.map(role => roleTransform(role.role));
@@ -76,7 +81,7 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
       data: usersByRole.map(role => role.count),
       label: 'Users by Role'
     }];
-    this.usersByRoleCartOptions = {
+    this.usersByRoleChartOptions = {
       responsive: true,
       plugins: {
         title: {
@@ -84,7 +89,7 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
           text: 'Users by Role'
         }
       }
-    }
+    };
 
     // User by Status Chart Data
     this.usersByStatusChartLabels = usersByStatus.map(status => status.status ? 'Active' : 'Inactive');
@@ -92,7 +97,7 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
       data: usersByStatus.map(status => status.count),
       label: 'Users by Status'
     }];
-    this.usersByStatusCartOptions = {
+    this.usersByStatusChartOptions = {
       responsive: true,
       plugins: {
         title: {
@@ -100,7 +105,35 @@ export class UserStatisticsComponent implements OnInit, OnDestroy {
           text: 'Users by Status'
         }
       }
+    };
+
+    // User by Location Chart Data
+    this.usersByLocationChartLabels = usersByLocation.map(location => location.location);
+    this.usersByLocationChartData = [{
+      data: usersByLocation.map(location => location.count),
+      label: 'Users by Location'
+    }];
+    this.usersByLocationChartOptions = {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Users by Location'
+        }
+      }
+    };
+  }
+
+  /**
+   * Get the count of active users
+   * @returns The count of active users
+   */
+  public getActiveUsersCount(): number {
+    if (!this.statisticsUsers.usersByStatus) {
+      return 0;
     }
+    const activeUsers = this.statisticsUsers.usersByStatus.find(status => status.status);
+    return activeUsers ? activeUsers.count : 0;
   }
 
   ngOnDestroy(): void {

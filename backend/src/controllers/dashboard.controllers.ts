@@ -3,7 +3,7 @@ import { StatisticsResponse, RolePostCount } from '../models';
 
 /**
  * Retrieves post counts and user counts by various criteria.
- * @returns An object containing counts by total, role, user, category, and status.
+ * @returns An object containing counts by total, role, user, category, status, and location.
  */
 export const getStatisticsHandler = async (): Promise<StatisticsResponse> => {
     // Total number of posts
@@ -83,6 +83,14 @@ export const getStatisticsHandler = async (): Promise<StatisticsResponse> => {
         }
     });
 
+    // Number of users by location
+    const usersByLocation = await db.user.groupBy({
+        by: ['location'],
+        _count: {
+            _all: true
+        }
+    });
+
     return {
         // Add post counts
         totalPosts,
@@ -105,6 +113,10 @@ export const getStatisticsHandler = async (): Promise<StatisticsResponse> => {
             .map(status => ({
                 status: status.status as boolean,  // Cast status to boolean
                 count: status._count._all
-            }))
+            })),
+        usersByLocation: usersByLocation.map(location => ({
+            location: location.location,
+            count: location._count._all
+        }))
     };
 };

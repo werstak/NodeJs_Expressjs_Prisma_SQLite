@@ -46,6 +46,12 @@ export interface StatusUserCount {
     count: number;
 }
 
+// Interface for counting users by location
+export interface LocationUserCount {
+    location: string;
+    count: number;
+}
+
 // Main interface for response
 export interface StatisticsResponse {
     totalPosts: number;
@@ -56,4 +62,5 @@ export interface StatisticsResponse {
     totalUser: number;
     usersByRole: RoleUserCount[];
     usersByStatus: StatusUserCount[];
+    usersByLocation: LocationUserCount[];
 }
