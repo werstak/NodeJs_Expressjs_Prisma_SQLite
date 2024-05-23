@@ -45,42 +45,42 @@
 </div>
 
 
-<div>
-  <mat-card class="post-statistics">
-    <mat-card-header>
-      <mat-card-title>Users Statistics</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="post-statistics__description-items">
-        <div class="post-statistics__description-title">Total Users: {{ statisticsCounters.totalUser }}</div>
-<!--        <div class="post-statistics__description-status">Published Posts: {{ getPublishedPostsCount() }}</div>-->
-      </div>
+<!--<div>-->
+<!--  <mat-card class="post-statistics">-->
+<!--    <mat-card-header>-->
+<!--      <mat-card-title>Users Statistics</mat-card-title>-->
+<!--    </mat-card-header>-->
+<!--    <mat-card-content>-->
+<!--      <div class="post-statistics__description-items">-->
+<!--        <div class="post-statistics__description-title">Total Users: {{ statisticsCounters.totalUser }}</div>-->
+<!--&lt;!&ndash;        <div class="post-statistics__description-status">Published Posts: {{ getPublishedPostsCount() }}</div>&ndash;&gt;-->
+<!--      </div>-->
 
-      <div class="post-statistics__charts">
-        <div class="post-statistics__chart">
-          <canvas baseChart
-                  [datasets]="usersByRoleChartData"
-                  [labels]="usersByRoleChartLabels"
-                  [options]="usersByRoleCartOptions"
-                  [legend]="true"
-                  [type]="'doughnut'">
-          </canvas>
-        </div>
+<!--      <div class="post-statistics__charts">-->
+<!--        <div class="post-statistics__chart">-->
+<!--          <canvas baseChart-->
+<!--                  [datasets]="usersByRoleChartData"-->
+<!--                  [labels]="usersByRoleChartLabels"-->
+<!--                  [options]="usersByRoleCartOptions"-->
+<!--                  [legend]="true"-->
+<!--                  [type]="'doughnut'">-->
+<!--          </canvas>-->
+<!--        </div>-->
 
-        <div class="post-statistics__chart">
-          <canvas baseChart
-                  [datasets]="usersByStatusChartData"
-                  [labels]="usersByStatusChartLabels"
-                  [options]="usersByStatusCartOptions"
-                  [legend]="true"
-                  [type]="'doughnut'">
-          </canvas>
-        </div>
-      </div>
+<!--        <div class="post-statistics__chart">-->
+<!--          <canvas baseChart-->
+<!--                  [datasets]="usersByStatusChartData"-->
+<!--                  [labels]="usersByStatusChartLabels"-->
+<!--                  [options]="usersByStatusCartOptions"-->
+<!--                  [legend]="true"-->
+<!--                  [type]="'doughnut'">-->
+<!--          </canvas>-->
+<!--        </div>-->
+<!--      </div>-->
 
-    </mat-card-content>
-  </mat-card>
-</div>
+<!--    </mat-card-content>-->
+<!--  </mat-card>-->
+<!--</div>-->
 
 
 <mat-progress-spinner

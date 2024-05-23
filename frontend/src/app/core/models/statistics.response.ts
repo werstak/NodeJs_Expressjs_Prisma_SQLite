@@ -47,13 +47,13 @@ export class StatusUserCount {
 
 // Main class for response
 export class StatisticsResponse {
-  totalPosts: number;
-  postsByRole: RolePostCount[];
-  postsByUser: UserPostCount[];
-  postsByCategory: CategoryPostCount[];
-  postsByStatus: StatusPostCount[];
-  totalUser: number;
-  usersByRole: RoleUserCount[];
-  usersByStatus: StatusUserCount[];
+  totalPosts?: number;
+  postsByRole?: RolePostCount[];
+  postsByUser?: UserPostCount[];
+  postsByCategory?: CategoryPostCount[];
+  postsByStatus?: StatusPostCount[];
+  totalUser?: number;
+  usersByRole?: RoleUserCount[];
+  usersByStatus?: StatusUserCount[];
 }
 

@@ -79,7 +79,7 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
    */
   private fetchStatistics(): void {
     this.dataLoading = true;
-    this.store.dispatch(new GetStatisticsAction());
+    // this.store.dispatch(new GetStatisticsAction());
 
     // Subscribe to the statistics data
     this.statisticsCounters$.pipe(takeUntil(this.destroy$)).subscribe(resp => {
@@ -122,6 +122,8 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
     const postsByCategory = this.statisticsCounters.postsByCategory || [];
     const postsByRole = this.statisticsCounters.postsByRole || [];
     const postsByUser = this.statisticsCounters.postsByUser || [];
+    const usersByRole = this.statisticsCounters.usersByRole || [];
+    const usersByStatus = this.statisticsCounters.usersByStatus || [];
 
     // Category Chart Data
     this.categoryPostsChartLabels = postsByCategory.map(category => category.name);
@@ -171,9 +173,9 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
     }
 
     // User by Role Chart Data
-    this.usersByRoleChartLabels = this.statisticsCounters.usersByRole.map(role => roleTransform(role.role));
+    this.usersByRoleChartLabels = usersByRole.map(role => roleTransform(role.role));
     this.usersByRoleChartData = [{
-      data: this.statisticsCounters.usersByRole.map(role => role.count),
+      data: usersByRole.map(role => role.count),
       label: 'Users by Role'
     }];
     this.usersByRoleCartOptions = {
@@ -187,9 +189,9 @@ export class PostStatisticsComponent implements OnInit, OnDestroy {
     }
 
     // User by Status Chart Data
-    this.usersByStatusChartLabels = this.statisticsCounters.usersByStatus.map(status => status.status ? 'Active' : 'Inactive');
+    this.usersByStatusChartLabels = usersByStatus.map(status => status.status ? 'Active' : 'Inactive');
     this.usersByStatusChartData = [{
-      data: this.statisticsCounters.usersByStatus.map(status => status.count),
+      data: usersByStatus.map(status => status.count),
       label: 'Users by Status'
     }];
     this.usersByStatusCartOptions = {
