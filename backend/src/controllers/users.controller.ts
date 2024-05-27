@@ -16,6 +16,7 @@ export const getAllUsersHandler = async (params: any): Promise<{ totalCount: num
 
     // Calculate skip value for pagination
     const skip: number = pageIndex * pageSize;
+
     // Retrieve total count of users filtered by roles
     const totalCount: number = await db.user.count({
         where: {
@@ -27,7 +28,7 @@ export const getAllUsersHandler = async (params: any): Promise<{ totalCount: num
     });
 
     // Retrieve users based on parameters
-    const users: UsersModel[] = await db.user.findMany({
+    const users = await db.user.findMany({
         where: {
             role: { in: rolesArr },
             firstName: { startsWith: firstName },
@@ -36,7 +37,11 @@ export const getAllUsersHandler = async (params: any): Promise<{ totalCount: num
         },
         take: parseInt(pageSize),
         skip: skip,
-        orderBy: { [orderByColumn]: orderByDirection },
+        orderBy: orderByColumn === 'posts' ? {
+            posts: {
+                _count: orderByDirection
+            }
+        } : { [orderByColumn]: orderByDirection },
         select: {
             id: true,
             firstName: true,
@@ -49,14 +54,21 @@ export const getAllUsersHandler = async (params: any): Promise<{ totalCount: num
             status: true,
             birthAt: true,
             location: true,
-            posts: {
+            _count: {
                 select: {
-                    id: true
-                },
+                    posts: true
+                }
             }
         },
     });
-    return { totalCount, users };
+
+    // Map users to include the posts count directly
+    const usersWithPostCount = users.map(user => ({
+        ...user,
+        postsCount: user._count.posts
+    }));
+
+    return { totalCount, users: usersWithPostCount };
 };
 
 
