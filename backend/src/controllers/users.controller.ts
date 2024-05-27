@@ -1,6 +1,8 @@
 import db from '../utils/db';
 import { UserModel, UsersModel } from '../models';
 import { RoleTypesEnum } from '../enums/role-types.enum';
+import { HEAD_SUPER_ADMIN } from '../constants';
+import fs from 'fs';
 
 /**
  * Retrieves all users based on provided parameters.
@@ -200,12 +202,42 @@ export const updateUserPasswordHandler = async (userPassword: any, id: number): 
 };
 
 /**
- * Deletes a user by ID.
+ * Deletes a user by ID if the user does not have posts.
  * @param id - ID of the user to delete.
- * @returns Promise<void> A promise without any data.
+ * @param avatarPath - Path of the user's avatar to delete.
+ * @returns Promise<{ success: boolean, message: string }> A promise containing the success status and a message.
  */
-export const deleteUserHandler = async (id: number): Promise<void> => {
+export const deleteUserHandler = async (id: number, avatarPath: string): Promise<{ success: boolean, message: string }> => {
+    const user = await db.user.findUnique({
+        where: { id },
+        include: { posts: true },
+    });
+
+    if (!user) {
+        return { success: false, message: 'User not found' };
+    }
+
+    if (user.posts.length > 0) {
+        return { success: false, message: 'Cannot delete user with posts' };
+    }
+
+    if (user.id === HEAD_SUPER_ADMIN.id && user.role === HEAD_SUPER_ADMIN.role) {
+        return { success: false, message: 'Cannot delete the head Super Admin user' };
+    }
+
+    if (avatarPath) {
+        fs.stat(avatarPath, (err, stats) => {
+            if (!err && stats) {
+                fs.unlink(avatarPath, err => {
+                    if (err) console.error('Error deleting avatar:', err);
+                });
+            }
+        });
+    }
+
     await db.user.delete({ where: { id } });
+
+    return { success: true, message: 'User has been successfully deleted' };
 };
 
 /**
