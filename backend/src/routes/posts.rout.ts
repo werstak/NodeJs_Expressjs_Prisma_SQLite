@@ -9,6 +9,7 @@ import { PostsQueryParamsModel } from '../models';
 export const postsRouter = express.Router();
 
 const BASE_URL = process.env.BASE_URL as string;
+
 /**
  GET: List of all POSTS
  */
@@ -24,8 +25,8 @@ postsRouter.get('/', async (request: Request, response: Response) => {
             categories: String(request.query.categories)
         };
 
-        const posts = await PostHandler.getAllPostsHandler(params);
-        return response.status(200).json(posts);
+        const data = await PostHandler.getAllPostsHandler(params);
+        return response.status(200).json(data);
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
@@ -77,8 +78,11 @@ postsRouter.post(
             }
             post.picture = filename;
 
-            const newPost = await PostHandler.createPostHandler(post);
-            return response.status(201).json(newPost);
+            const data = await PostHandler.createPostHandler(post);
+            return response.status(201).json({
+                data,
+                message: `Post created successfully`
+            });
         } catch (error: any) {
             if (request.file?.filename) {
                 const path = `src/uploads/${request.file.filename}`;
@@ -159,8 +163,11 @@ postsRouter.put(
             }
 
             post.picture = fileUrl;
-            const updatedPost = await PostHandler.updatePostHandler(post, id);
-            return response.status(201).json(updatedPost);
+            const data = await PostHandler.updatePostHandler(post, id);
+            return response.status(201).json({
+                data,
+                message: `Post updated successfully`
+            });
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -190,7 +197,9 @@ postsRouter.delete('/:id', async (request: Request, response: Response) => {
             });
         });
 
-        return response.status(204).json('Post was successfully deleted');
+        return response.status(200).json({
+            message: `Post was successfully deleted`
+        });
     } catch (error: any) {
         return response.status(500).json(error.message);
     }

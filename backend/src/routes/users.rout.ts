@@ -16,13 +16,10 @@ const BASE_URL = process.env.BASE_URL as string;
  GET: all USERS
  */
 usersRouter.get('/', async (request: Request, response: Response) => {
-    console.log('Root GET - All USERS')
     const params = (request.query);
-    console.log('USERS', 'paginator', params)
-
     try {
-        const users = await UserHandler.getAllUsersHandler(params);
-        return response.status(200).json(users);
+        const data = await UserHandler.getAllUsersHandler(params);
+        return response.status(200).json(data);
     } catch (error: any) {
         return response.status(500).json(error.message);
     }
@@ -33,10 +30,6 @@ usersRouter.get('/', async (request: Request, response: Response) => {
  GET: List of all USERS
  */
 usersRouter.get('/list_all_users', async (request: Request, response: Response) => {
-    console.log('Root GET - LIST All USERS')
-    const req = (request);
-    console.log('USERS', req)
-
     try {
         const users = await UserHandler.getListAllUsersHandler();
         return response.status(200).json(users);
@@ -51,8 +44,6 @@ usersRouter.get('/list_all_users', async (request: Request, response: Response) 
  */
 usersRouter.get('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
-    console.log('Root GET - single USER')
-
     try {
         const user = await UserHandler.getUserHandler(id);
         if (user) {
@@ -78,8 +69,6 @@ usersRouter.post(
             return response.status(400).json({ errors: errors.array() });
         }
         try {
-            console.log('Root POST - Create USER = ', request.body);
-
             const user = JSON.parse(request.body.user_params);
             const existingUser = await AuthUserHandler.findUserByEmail(user.email);
             if (existingUser) {
@@ -98,8 +87,11 @@ usersRouter.post(
             user.password = hashPassword;
             user.avatar = filename;
 
-            const newUser = await UserHandler.createUserHandler(user);
-            return response.status(201).json(newUser);
+            const data = await UserHandler.createUserHandler(user);
+            return response.status(201).json({
+                data,
+                message: `User created successfully`
+            });
         } catch (error: any) {
 
             // Delete the uploaded file if an error occurs
@@ -121,6 +113,7 @@ usersRouter.post(
     }
 );
 
+
 /**
  PUT: Updating USER
  */
@@ -136,8 +129,6 @@ usersRouter.put(
         }
         const id: number = parseInt(request.params.id, 10);
         try {
-            console.log('Root PUT - Update USER = ', request.body.user_params)
-
             const user = JSON.parse(request.body.user_params);
             const imageOrUrl = JSON.parse(request.body.imageOrUrl);
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
@@ -188,9 +179,12 @@ usersRouter.put(
             }
 
             user.avatar = fileUrl;
-            // user.password = hashPassword;
+
             const updatedUser = await UserHandler.updateUserHandler(user, id);
-            return response.status(200).json(updatedUser);
+            return response.status(200).json({
+                data: updatedUser,
+                message: `User updated`
+            });
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -214,11 +208,13 @@ usersRouter.put(
         }
         const id: number = parseInt(request.params.id, 10);
         try {
-            console.log('Root PUT - Updating Password USER = ', request.body);
             const hashPassword = bcrypt.hashSync(request.body.password, 7);
             const newUserPassword: any = {password: hashPassword};
-            const updatedUserPassword = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
-            return response.status(200).json(updatedUserPassword);
+            const date = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
+            return response.status(200).json({
+                data: date,
+                message: `User password updated`
+            });
         } catch (error: any) {
             return response.status(500).json(error.message);
         }
@@ -232,8 +228,6 @@ usersRouter.put(
 usersRouter.delete('/:id', async (request: Request, response: Response) => {
     const id: number = parseInt(request.params.id, 10);
     try {
-        console.log('DELETE USER', 'request.query', request.query);
-
         const previousAvatarUrl = String(request.query.avatar);
         const pathRemovePicture = previousAvatarUrl.replace(`${BASE_URL}/`, '');
 
@@ -255,7 +249,9 @@ usersRouter.delete('/:id', async (request: Request, response: Response) => {
             });
         }
 
-        return response.status(204).json({ message: result.message });
+        return response.status(200).json({
+            message: result.message,
+        });
     } catch (error: any) {
         return response.status(500).json({ message: error.message });
     }
