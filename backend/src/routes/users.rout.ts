@@ -9,6 +9,9 @@ import * as AuthUserHandler from '../controllers/auth.controller';
 
 export const usersRouter = express.Router();
 
+const BASE_URL = process.env.BASE_URL as string;
+
+
 /**
  GET: all USERS
  */
@@ -87,7 +90,7 @@ usersRouter.post(
             let filename = '';
 
             if (request.file?.filename) {
-                filename = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+                filename = `${BASE_URL}/src/uploads/${request.file?.filename}`;
             } else {
                 filename = '';
             }
@@ -138,15 +141,13 @@ usersRouter.put(
             const user = JSON.parse(request.body.user_params);
             const imageOrUrl = JSON.parse(request.body.imageOrUrl);
             const previousImageUrl = JSON.parse(request.body.previousImageUrl);
-            // const hashPassword = bcrypt.hashSync(user.password, 7);
 
             let pathRemoveImage = '';
             if (previousImageUrl !== null) {
-                pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
+                pathRemoveImage = previousImageUrl.replace(`${BASE_URL}/`, '');
             } else {
                 pathRemoveImage = '';
             }
-            // const pathRemoveImage = previousImageUrl.replace('http://localhost:5000/', '');
 
             /** Adding, replacing and deleting photos in the database and folder (uploads) */
             let fileUrl = '';
@@ -183,7 +184,7 @@ usersRouter.put(
                 });
 
                 console.log('first image upload or replacement')
-                fileUrl = `http://localhost:5000/src/uploads/${request.file?.filename}`;
+                fileUrl = `${BASE_URL}/src/uploads/${request.file?.filename}`;
             }
 
             user.avatar = fileUrl;
@@ -224,6 +225,7 @@ usersRouter.put(
     }
 );
 
+
 /**
  * DELETE: Delete a USER based on the ID
  */
@@ -233,12 +235,24 @@ usersRouter.delete('/:id', async (request: Request, response: Response) => {
         console.log('DELETE USER', 'request.query', request.query);
 
         const previousAvatarUrl = String(request.query.avatar);
-        const pathRemovePicture = previousAvatarUrl.replace('http://localhost:5000/', '');
+        const pathRemovePicture = previousAvatarUrl.replace(`${BASE_URL}/`, '');
 
-        const result = await UserHandler.deleteUserHandler(id, pathRemovePicture);
+        const result = await UserHandler.deleteUserHandler(id);
 
         if (!result.success) {
             return response.status(409).json({ message: result.message });
+        }
+
+        // Delete the user's avatar if the user was successfully deleted
+        if (pathRemovePicture) {
+            fs.stat(pathRemovePicture, (err, stats) => {
+                if (!err && stats) {
+                    fs.unlink(pathRemovePicture, err => {
+                        if (err) console.error('Error deleting avatar:', err);
+                        else console.log('Avatar file deleted successfully');
+                    });
+                }
+            });
         }
 
         return response.status(204).json({ message: result.message });
