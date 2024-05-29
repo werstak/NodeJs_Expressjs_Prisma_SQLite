@@ -1,11 +1,11 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import { body, validationResult } from 'express-validator';
+import { body, validationResult, param } from 'express-validator';
 import * as UserHandler from '../controllers/users.controller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
 import * as AuthUserHandler from '../controllers/auth.controller';
-
+import { createUserValidator, getUsersValidator, parseUserParams } from '../validators';
 
 export const usersRouter = express.Router();
 
@@ -15,15 +15,23 @@ const BASE_URL = process.env.BASE_URL as string;
 /**
  GET: all USERS
  */
-usersRouter.get('/', async (request: Request, response: Response) => {
-    const params = (request.query);
-    try {
-        const data = await UserHandler.getAllUsersHandler(params);
-        return response.status(200).json(data);
-    } catch (error: any) {
-        return response.status(500).json(error.message);
+usersRouter.get(
+    '/',
+    getUsersValidator,
+    async (request: Request, response: Response) => {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({errors: errors.array()});
+        }
+        const params = request.query;
+        try {
+            const data = await UserHandler.getAllUsersHandler(params);
+            return response.status(200).json(data);
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
     }
-});
+);
 
 
 /**
@@ -42,44 +50,47 @@ usersRouter.get('/list_all_users', async (request: Request, response: Response) 
 /**
  GET: A single USER by ID
  */
-usersRouter.get('/:id', async (request: Request, response: Response) => {
-    const id: number = parseInt(request.params.id, 10);
-    try {
-        const user = await UserHandler.getUserHandler(id);
-        if (user) {
-            return response.status(200).json(user);
+usersRouter.get('/:id',
+    param('id').isInt().withMessage('ID must be an integer'),
+    async (request: Request, response: Response) => {
+        const id: number = parseInt(request.params.id, 10);
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            return response.status(400).json({errors: errors.array()});
         }
-        return response.status(404).json('User could not be found');
-    } catch (error: any) {
-        return response.status(500).json(error.message);
+        try {
+            const user = await UserHandler.getUserHandler(id);
+            if (user) {
+                return response.status(200).json(user);
+            }
+            return response.status(404).json('User could not be found');
+        } catch (error: any) {
+            return response.status(500).json(error.message);
+        }
     }
-});
+);
 
 
 /**
- POST: Create User
+ * POST: Create User
  */
 usersRouter.post(
     '/',
-    // body("firstName").isString(),
-    // body("lastName").isString(),
-    async (request: Request, response: Response) => {
-        const errors = validationResult(request);
-        if (!errors.isEmpty()) {
-            return response.status(400).json({ errors: errors.array() });
-        }
+    parseUserParams,
+    createUserValidator,
+    async (req: Request, res: Response) => {
         try {
-            const user = JSON.parse(request.body.user_params);
+            const user = req.body.user_params;
             const existingUser = await AuthUserHandler.findUserByEmail(user.email);
             if (existingUser) {
-                return response.status(409).json({ message: `Email already in use` });
+                return res.status(409).json({ message: 'Email already in use' });
             }
 
             const hashPassword = bcrypt.hashSync(user.password, 7);
             let filename = '';
 
-            if (request.file?.filename) {
-                filename = `${BASE_URL}/src/uploads/${request.file?.filename}`;
+            if (req.file?.filename) {
+                filename = `${BASE_URL}/src/uploads/${req.file?.filename}`;
             } else {
                 filename = '';
             }
@@ -88,15 +99,14 @@ usersRouter.post(
             user.avatar = filename;
 
             const data = await UserHandler.createUserHandler(user);
-            return response.status(201).json({
+            return res.status(201).json({
                 data,
-                message: `User created successfully`
+                message: 'User created successfully'
             });
         } catch (error: any) {
-
             // Delete the uploaded file if an error occurs
-            if (request.file?.filename) {
-                const avatarPath = `src/uploads/${request.file.filename}`;
+            if (req.file?.filename) {
+                const avatarPath = `src/uploads/${req.file.filename}`;
                 fs.stat(avatarPath, (err, stats) => {
                     if (err) {
                         console.error('Error checking avatar file:', err);
@@ -108,7 +118,7 @@ usersRouter.post(
                     }
                 });
             }
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
