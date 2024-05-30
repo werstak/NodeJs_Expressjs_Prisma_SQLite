@@ -1,15 +1,15 @@
 import express from 'express';
 import type { Request, Response } from 'express';
-import { body, validationResult, param } from 'express-validator';
-import * as UserHandler from '../controllers/users.controller';
+import { param, validationResult } from 'express-validator';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
+
+import * as UserHandler from '../controllers/users.controller';
 import * as AuthUserHandler from '../controllers/auth.controller';
 import {
-    createUserValidator,
     getUsersValidator,
-    parseUserCreateParams,
-    parseUserUpdateParams,
+    parseUserCreateParams, createUserValidator,
+    parseUserUpdateParams, updatePasswordValidator,
     updateUserValidator
 } from '../validators';
 
@@ -62,7 +62,7 @@ usersRouter.get('/:id',
         const id: number = parseInt(req.params.id, 10);
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
+            return res.status(400).json({ message: 'Validation Error', errors: errors.array() });
         }
         try {
             const user = await UserHandler.getUserHandler(id);
@@ -128,7 +128,6 @@ usersRouter.post(
         }
     }
 );
-
 
 
 /**
@@ -209,26 +208,19 @@ usersRouter.put(
  */
 usersRouter.put(
     '/update_password/:id',
-    // body("firstName").isString(),
-    // body("lastName").isString(),
-    // body("email").isString(),
+    updatePasswordValidator,
     async (req: Request, res: Response) => {
-        const errors = validationResult(req);
-
-        if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
-        }
         const id: number = parseInt(req.params.id, 10);
         try {
             const hashPassword = bcrypt.hashSync(req.body.password, 7);
-            const newUserPassword: any = {password: hashPassword};
+            const newUserPassword: any = { password: hashPassword };
             const date = await UserHandler.updateUserPasswordHandler(newUserPassword, id);
             return res.status(200).json({
                 data: date,
-                message: `User password updated`
+                message: 'User password updated'
             });
         } catch (error: any) {
-            return res.status(500).json(error.message);
+            return res.status(500).json({ message: error.message });
         }
     }
 );
@@ -237,8 +229,14 @@ usersRouter.put(
 /**
  * DELETE: Delete a USER based on the ID
  */
-usersRouter.delete('/:id', async (req: Request, res: Response) => {
+usersRouter.delete('/:id',
+    param('id').isInt().withMessage('ID must be an integer'),
+    async (req: Request, res: Response) => {
     const id: number = parseInt(req.params.id, 10);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ message: 'Validation Error', errors: errors.array() });
+    }
     try {
         const previousAvatarUrl = String(req.query.avatar);
         const pathRemovePicture = previousAvatarUrl.replace(`${BASE_URL}/`, '');

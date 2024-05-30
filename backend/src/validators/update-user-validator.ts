@@ -36,11 +36,11 @@ export const updateUserValidator = [
     body('user_params.status').isBoolean().withMessage('Status must be a boolean'),
     body('user_params.birthAt').isISO8601().withMessage('Birth date must be a valid date'),
     body('imageOrUrl').isBoolean().withMessage('ImageOrUrl must be a boolean'),
-    body('previousImageUrl').optional().isString().withMessage('PreviousImageUrl must be a string'),
+    body('previousImageUrl').optional({nullable: true, checkFalsy: true}).isString().withMessage('PreviousImageUrl must be a string'),
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors });
+            return res.status(400).json({ message: 'Validation Error', errors: errors.array() });
         }
         next();
     }

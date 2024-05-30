@@ -32,11 +32,11 @@ export const createUserValidator = [
     body('user_params.role').isInt().withMessage('Role must be an integer'),
     body('user_params.location').isString().withMessage('Location must be a string'),
     body('user_params.status').isBoolean().withMessage('Status must be a boolean'),
-    body('user_params.birthAt').optional().isISO8601().withMessage('Birth date must be a valid date'),
+    body('user_params.birthAt').isISO8601().withMessage('Birth date must be a valid date'),
     (req: Request, res: Response, next: NextFunction) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            return res.status(400).json({ message: 'Validation Error', errors: errors.array() });
         }
         next();
     }
