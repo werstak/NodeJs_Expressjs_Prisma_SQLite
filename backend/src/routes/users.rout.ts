@@ -5,7 +5,13 @@ import * as UserHandler from '../controllers/users.controller';
 import fs from 'fs';
 import bcrypt from 'bcrypt';
 import * as AuthUserHandler from '../controllers/auth.controller';
-import { createUserValidator, getUsersValidator, parseUserParams } from '../validators';
+import {
+    createUserValidator,
+    getUsersValidator,
+    parseUserCreateParams,
+    parseUserUpdateParams,
+    updateUserValidator
+} from '../validators';
 
 export const usersRouter = express.Router();
 
@@ -76,7 +82,7 @@ usersRouter.get('/:id',
  */
 usersRouter.post(
     '/',
-    parseUserParams,
+    parseUserCreateParams,
     createUserValidator,
     async (req: Request, res: Response) => {
         try {
@@ -124,24 +130,20 @@ usersRouter.post(
 );
 
 
+
 /**
- PUT: Updating USER
+ * PUT: Updating USER
  */
 usersRouter.put(
     '/:id',
-    // body("firstName").isString(),
-    // body("lastName").isString(),
-    // body("email").isString(),
+    parseUserUpdateParams,
+    updateUserValidator,
     async (req: Request, res: Response) => {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({errors: errors.array()});
-        }
         const id: number = parseInt(req.params.id, 10);
         try {
-            const user = JSON.parse(req.body.user_params);
-            const imageOrUrl = JSON.parse(req.body.imageOrUrl);
-            const previousImageUrl = JSON.parse(req.body.previousImageUrl);
+            const user = req.body.user_params;
+            const imageOrUrl = req.body.imageOrUrl;
+            const previousImageUrl = req.body.previousImageUrl;
 
             let pathRemoveImage = '';
             if (previousImageUrl !== null) {
@@ -153,13 +155,13 @@ usersRouter.put(
             /** Adding, replacing and deleting photos in the database and folder (uploads) */
             let fileUrl = '';
             if (!req.file?.filename) {
-                console.log('updating a user without a image and deleting a image')
+                console.log('updating a user without a image and deleting a image');
                 if (imageOrUrl) {
                     fileUrl = previousImageUrl;
-                    console.log('update a image path in base')
+                    console.log('update a image path in base');
                 } else {
                     fileUrl = '';
-                    console.log('deleting a image path in base')
+                    console.log('deleting a image path in base');
                     fs.stat(pathRemoveImage, (err, stats) => {
                         console.log('search for a deleted file in a folder (uploads)', stats);
                         if (err) {
@@ -172,7 +174,7 @@ usersRouter.put(
                     });
                 }
             } else {
-                console.log('deleting a image path in base')
+                console.log('deleting a image path in base');
                 fs.stat(pathRemoveImage, (err, stats) => {
                     console.log('search for a deleted file in a folder (uploads)', stats);
                     if (err) {
@@ -184,7 +186,7 @@ usersRouter.put(
                     });
                 });
 
-                console.log('first image upload or replacement')
+                console.log('first image upload or replacement');
                 fileUrl = `${BASE_URL}/src/uploads/${req.file?.filename}`;
             }
 
