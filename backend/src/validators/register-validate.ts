@@ -8,7 +8,7 @@ import { body, validationResult } from 'express-validator';
  * @param {Function} next - The next middleware function.
  * @returns {Response|undefined} - If validation fails, it sends a response with status 400 and the validation errors. Otherwise, it calls the next middleware function.
  */
-export const registerValidator = [
+export const registerUserValidator = [
     body('registerUserData.email').isEmail().withMessage('Email must be valid'),
     body('registerUserData.password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
     body('registerUserData.firstName').isString().notEmpty().withMessage('First name must be a non-empty string'),
