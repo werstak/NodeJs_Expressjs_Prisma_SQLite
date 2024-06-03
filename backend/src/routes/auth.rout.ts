@@ -6,13 +6,17 @@ import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import * as AuthUserHandler from '../controllers/auth.controller';
 import * as UserHandler from '../controllers/users.controller';
-import { check } from 'express-validator';
 
 import { generateTokens } from '../utils/jwt';
 import { handlerEmailSending } from '../utils/sendEmail';
 import { hashToken } from '../utils/hashToken';
 import { UserModel } from '../models';
-import { registerValidator } from '../validators';
+import {
+    loginUserValidator, currentPasswordValidator,
+    refreshTokenValidator,
+    registerUserValidator,
+    revokeRefreshTokenValidator, verifyEmailValidator, resetPasswordLinkValidator, changePasswordValidator,
+} from '../validators';
 
 
 export const authRouter = express.Router();
@@ -24,7 +28,7 @@ const urlClient = process.env.BASE_URL_CLIENT as string;
  */
 authRouter.post(
     '/register',
-    registerValidator,
+    registerUserValidator,
     async (request: Request, response: Response) => {
         try {
             const { email, password } = request.body.registerUserData;
@@ -73,16 +77,13 @@ authRouter.post(
     }
 );
 
+
 /**
  POST: Login
  */
 authRouter.post(
     '/login',
-    // [
-    //     check('username', 'Username cannot be empty').notEmpty(),
-    //     check('password', 'The password must be more than 3 and less than 50 characters').isLength({min: 3, max: 50})
-    // ],
-
+    loginUserValidator,
     async (request: Request, response: Response) => {
         try {
             const {email, password} = request.body.loginUserData;
@@ -143,6 +144,7 @@ authRouter.post(
  */
 authRouter.post(
     '/refreshToken',
+    refreshTokenValidator,
     async (request: Request, response: Response) => {
         try {
             const {refreshToken} = request.body;
@@ -183,9 +185,12 @@ authRouter.post(
     }
 );
 
-
+/**
+ * POST: Revoke Refresh Tokens
+ */
 authRouter.post(
     '/revokeRefreshTokens',
+    revokeRefreshTokenValidator,
     async (request: Request, response: Response) => {
         try {
             const {refreshToken} = request.body;
@@ -209,43 +214,47 @@ authRouter.post(
 );
 
 
-
 /**
  GET: Valid Password
  */
-authRouter.post('/valid_password', async (request: Request, response: Response) => {
-    const {email, password} = request.body.validPasswordData;
+authRouter.post(
+    '/valid_password',
+    currentPasswordValidator,
+    async (request: Request, response: Response) => {
+        const {email, password} = request.body.validPasswordData;
 
-    /** Check existence User */
-    if (!email || !password) {
-        return response.status(400).json({message: `You must provide an email and a password`})
+        /** Check existence User */
+        if (!email || !password) {
+            return response.status(400).json({message: `You must provide an email and a password`})
+        }
+        const existingUser: UserModel | null = await AuthUserHandler.findUserByEmail(email);
+        if (!existingUser) {
+            return response.status(400).json({message: `User - (${email}) not found`})
+        }
+        /** Check the validity of the current password */
+        const validPassword: boolean = bcrypt.compareSync(password, existingUser.password)
+        return response.status(201).json({validPassword});
     }
-    const existingUser: UserModel | null = await AuthUserHandler.findUserByEmail(email);
-    if (!existingUser) {
-        return response.status(400).json({message: `User - (${email}) not found`})
-    }
-    /** Check the validity of the password */
-    const validPassword: boolean = bcrypt.compareSync(password, existingUser.password)
-    return response.status(201).json({validPassword});
-});
+);
 
 
 /**
- GET: Checking whether the Email exists in the database
+ GET: Checking whether the Email exists in the database for password recovery
  */
 authRouter.post(
     '/verify_email',
+    verifyEmailValidator,
     async (request: Request, response: Response) => {
         try {
             const {email} = request.body.verifyEmail;
             if (!email) {
-                return response.status(400).json({message: `You must provide an email`})
+                return response.status(400).json({message: `You must provide an email`});
             }
 
-            /** Chek existence User */
+            /** Check existence User */
             const existingUser = await AuthUserHandler.findUserInfoByEmail(email);
             if (!existingUser) {
-                return response.status(400).json({message: `User (${email}) not found!`})
+                return response.status(400).json({message: `User (${email}) not found!`});
             }
 
             const existingUserId: number = existingUser.id;
@@ -256,7 +265,7 @@ authRouter.post(
                 await AuthUserHandler.deletePreviousPasswordResetTokens(existingUserId);
             }
 
-            /** Generate PasswordResetToke */
+            /** Generate PasswordResetToken */
             const generatedPasswordResetToken = crypto.randomBytes(32);
             if (!generatedPasswordResetToken) {
                 return response.status(500).json({
@@ -274,13 +283,13 @@ authRouter.post(
             await AuthUserHandler.addPasswordResetToken(convertPasswordResetToken, existingUserId, expireTimeReset.toISOString());
 
             /** Generate a link to reset the token */
-            const resetLink = `${urlClient}/auth/reset-password?id=${existingUser.id}&token=${convertPasswordResetToken}`
+            const resetLink = `${urlClient}/auth/reset-password?id=${existingUser.id}&token=${convertPasswordResetToken}`;
 
             /** SEND a link to reset your password by e-mail */
             /* Set transporter options:*/
             const subject = 'Reset password!'
-            const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`
-            const text = `To set a new password, follow this link ${resetLink}`
+            const htmlContent = `<h2>Hi ${existingUser.firstName}</h2> <p>To set a new password, follow this link ${resetLink}</p>`;
+            const text = `To set a new password, follow this link ${resetLink}`;
 
             /* Start send E-MAIL*/
             await handlerEmailSending(existingUser, email, subject, htmlContent, text);
@@ -296,58 +305,66 @@ authRouter.post(
 /**
  POST: Reset Password link
  */
-authRouter.post('/reset_password_link', async (request: Request, response: Response) => {
-    const {passwordResetToken} = request.body;
-    if (!passwordResetToken) {
-        return response.status(400).json({message: `Missing password reset token.`})
+authRouter.post(
+    '/reset_password_link',
+    resetPasswordLinkValidator,
+    async (request: Request, response: Response) => {
+        const {passwordResetToken} = request.body;
+        if (!passwordResetToken) {
+            return response.status(400).json({message: `Missing password reset token.`})
+        }
+
+        /** Chek existence PasswordResetToken */
+        const userId: number = passwordResetToken.id;
+        const requestResetToken = passwordResetToken.token;
+        const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
+
+        /** Checking the validity and expiration time of the PasswordResetToken */
+        if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
+            return response.status(400).json({message: `Invalid or Expired Token!`});
+        }
+
+        /** Checking the expiration time of the PasswordResetToken */
+        const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
+        if (!expireResetTokenTime || expireResetTokenTime.getTime() < Date.now()) {
+            return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
+        }
+
+        const lifetimePasswordResetToken = Math.round((expireResetTokenTime.getTime() - Date.now()) / 60 / 1000);
+        return response.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
     }
-
-    /** Chek existence PasswordResetToken */
-    const userId: number = passwordResetToken.id;
-    const requestResetToken = passwordResetToken.token;
-    const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
-
-    /** Checking the validity and expiration time of the PasswordResetToken */
-    if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
-        return response.status(400).json({message: `Invalid or Expired Token!`});
-    }
-
-    /** Checking the expiration time of the PasswordResetToken */
-    const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
-    if (!expireResetTokenTime || expireResetTokenTime.getTime() < Date.now()) {
-        return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
-    }
-
-    const lifetimePasswordResetToken = Math.round((expireResetTokenTime.getTime() - Date.now()) / 60 / 1000);
-    return response.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
-});
+);
 
 
 /**
  POST: Change Password
  */
-authRouter.put('/change_password', async (request: Request, response: Response) => {
-    const {password, passwordResetToken} = request.body;
-    if (!passwordResetToken || !password) {
-        return response.status(400).json({message: `Missing password or password reset token.`})
-    }
-    /** Check existence PasswordResetToken */
-    const userId: number = Number(passwordResetToken.id);
-    const requestResetToken = passwordResetToken.token;
-    const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
+authRouter.put(
+    '/change_password',
+    changePasswordValidator,
+    async (request: Request, response: Response) => {
+        const {password, passwordResetToken} = request.body;
+        if (!passwordResetToken || !password) {
+            return response.status(400).json({message: `Missing password or password reset token.`});
+        }
+        /** Check existence PasswordResetToken */
+        const userId: number = Number(passwordResetToken.id);
+        const requestResetToken = passwordResetToken.token;
+        const existingPasswordResetToken = await AuthUserHandler.findPasswordResetToken(userId);
 
-    /** Checking the validity and expiration time of the PasswordResetToken */
-    if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
-        return response.status(400).json({message: `Invalid or Expired Token!`});
-    }
-    /** Checking the expiration time of the PasswordResetToken */
-    if (!existingPasswordResetToken[0].expireTime || existingPasswordResetToken[0].expireTime.getTime() < Date.now()) {
-        return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
-    }
-    /** Update the password of an existing user */
-    const hashNewPassword = bcrypt.hashSync(password, 7);
-    await AuthUserHandler.changePasswordHandler({password: hashNewPassword}, userId);
-    await AuthUserHandler.deletePreviousPasswordResetTokens(userId);
+        /** Checking the validity and expiration time of the PasswordResetToken */
+        if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
+            return response.status(400).json({message: `Invalid or Expired Token!`});
+        }
+        /** Checking the expiration time of the PasswordResetToken */
+        if (!existingPasswordResetToken[0].expireTime || existingPasswordResetToken[0].expireTime.getTime() < Date.now()) {
+            return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
+        }
+        /** Update the password of an existing user */
+        const hashNewPassword = bcrypt.hashSync(password, 7);
+        await AuthUserHandler.changePasswordHandler({password: hashNewPassword}, userId);
+        await AuthUserHandler.deletePreviousPasswordResetTokens(userId);
 
-    return response.status(201).json({message: `Password changed successfully!`});
-});
+        return response.status(201).json({message: `Password changed successfully!`});
+    }
+);
