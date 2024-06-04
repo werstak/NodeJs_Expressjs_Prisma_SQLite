@@ -12,10 +12,15 @@ import { handlerEmailSending } from '../utils/sendEmail';
 import { hashToken } from '../utils/hashToken';
 import { UserModel } from '../models';
 import {
-    loginUserValidator, currentPasswordValidator,
+    loginUserValidator,
+    currentPasswordValidator,
     refreshTokenValidator,
     registerUserValidator,
-    revokeRefreshTokenValidator, verifyEmailValidator, resetPasswordLinkValidator, changePasswordValidator,
+    revokeRefreshTokenValidator,
+    verifyEmailValidator,
+    resetPasswordLinkValidator,
+    changePasswordValidator,
+    handleErrorsValidator,
 } from '../validators';
 
 
@@ -29,19 +34,20 @@ const urlClient = process.env.BASE_URL_CLIENT as string;
 authRouter.post(
     '/register',
     registerUserValidator,
-    async (request: Request, response: Response) => {
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
         try {
-            const { email, password } = request.body.registerUserData;
-            const user = request.body.registerUserData;
+            const { email, password } = req.body.registerUserData;
+            const user = req.body.registerUserData;
             const hashPassword = bcrypt.hashSync(user.password, 7);
 
             if (!email || !password) {
-                return response.status(400).json({ message: `You must provide an email and a password` });
+                return res.status(400).json({ message: `You must provide an email and a password` });
             }
 
             const existingUser = await AuthUserHandler.findUserByEmail(email);
             if (existingUser) {
-                return response.status(409).json({ message: `Email already in use` });
+                return res.status(409).json({ message: `Email already in use` });
             }
 
             user.password = hashPassword;
@@ -66,13 +72,13 @@ authRouter.post(
             /* Start send E-MAIL*/
             await handlerEmailSending(existingUser, email, subject, htmlContent, text);
 
-            return response.status(201).json({
+            return res.status(201).json({
                 message: `Registration successful!`,
                 accessToken,
                 refreshToken
             });
         } catch (error: any) {
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
@@ -84,12 +90,13 @@ authRouter.post(
 authRouter.post(
     '/login',
     loginUserValidator,
-    async (request: Request, response: Response) => {
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
         try {
-            const {email, password} = request.body.loginUserData;
+            const {email, password} = req.body.loginUserData;
 
             if (!email || !password) {
-                return response.status(400).json({message: `You must provide an email and a password`})
+                return res.status(400).json({message: `You must provide an email and a password`})
             }
 
             // Check existence User
@@ -97,7 +104,7 @@ authRouter.post(
             let userId = null;
             let userStatus = null;
             if (!existingUser) {
-                return response.status(400).json({message: `User - (${email}) not found`})
+                return res.status(400).json({message: `User - (${email}) not found`})
             } else {
                 userStatus = existingUser.status;
                 userId = existingUser.id;
@@ -105,13 +112,13 @@ authRouter.post(
 
             // Check if the user is active
             if (!userStatus) {
-                return response.status(400).json({message: `User - (${email}) is inactive`})
+                return res.status(400).json({message: `User - (${email}) is inactive`})
             }
 
             // Check the validity of the password
             const validPassword = bcrypt.compareSync(password, existingUser.password)
             if (!validPassword) {
-                return response.status(400).json({message: `Incorrect password entered`})
+                return res.status(400).json({message: `Incorrect password entered`})
             }
 
             // Generate tokens
@@ -127,13 +134,13 @@ authRouter.post(
             };
 
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken, userId});
-            return response.status(201).json({
+            return res.status(201).json({
                 userInfo,
                 accessToken,
                 refreshToken
             });
         } catch (error: any) {
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
@@ -145,28 +152,29 @@ authRouter.post(
 authRouter.post(
     '/refreshToken',
     refreshTokenValidator,
-    async (request: Request, response: Response) => {
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
         try {
-            const {refreshToken} = request.body;
+            const {refreshToken} = req.body;
 
             if (!refreshToken) {
-                return response.status(400).json({message: `Missing refresh token.`})
+                return res.status(400).json({message: `Missing refresh token.`})
             }
             const payload: JwtPayload | any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
             const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
 
             if (!savedRefreshToken) {
-                return response.status(401).json({message: `Unauthorized`})
+                return res.status(401).json({message: `Unauthorized`})
             }
 
             const hashedToken = hashToken(refreshToken);
             if (hashedToken !== savedRefreshToken.hashedToken) {
-                return response.status(401).json({message: `Unauthorized`})
+                return res.status(401).json({message: `Unauthorized`})
             }
 
             const user = await UserHandler.findUserById(payload.userId);
             if (!user) {
-                return response.status(401).json({message: `Unauthorized`})
+                return res.status(401).json({message: `Unauthorized`})
             }
 
             await AuthUserHandler.revokeTokens(savedRefreshToken.id);
@@ -175,12 +183,12 @@ authRouter.post(
             const {accessToken, refreshToken: newRefreshToken} = generateTokens(user, jti);
             await AuthUserHandler.addRefreshTokenToWhitelist({jti, refreshToken: newRefreshToken, userId: user.id});
 
-            return response.status(201).json({
+            return res.status(201).json({
                 accessToken,
                 refreshToken: newRefreshToken
             });
         } catch (error: any) {
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
@@ -191,24 +199,25 @@ authRouter.post(
 authRouter.post(
     '/revokeRefreshTokens',
     revokeRefreshTokenValidator,
-    async (request: Request, response: Response) => {
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
         try {
-            const {refreshToken} = request.body;
+            const {refreshToken} = req.body;
 
             if (!refreshToken) {
-                return response.status(400).json({message: `Missing refresh token.`})
+                return res.status(400).json({message: `Missing refresh token.`})
             }
             const payload: JwtPayload | any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string);
             const savedRefreshToken = await AuthUserHandler.findRefreshTokenById(payload.jti);
 
             if (!savedRefreshToken) {
-                return response.status(401).json({message: `Unauthorized`})
+                return res.status(401).json({message: `Unauthorized`})
             }
 
             await AuthUserHandler.revokeTokens(savedRefreshToken.id);
-            return response.status(201).json({message: `Tokens revoked for user`});
+            return res.status(201).json({message: `Tokens revoked for user`});
         } catch (error: any) {
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
@@ -220,20 +229,21 @@ authRouter.post(
 authRouter.post(
     '/valid_password',
     currentPasswordValidator,
-    async (request: Request, response: Response) => {
-        const {email, password} = request.body.validPasswordData;
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
+        const {email, password} = req.body.validPasswordData;
 
         /** Check existence User */
         if (!email || !password) {
-            return response.status(400).json({message: `You must provide an email and a password`})
+            return res.status(400).json({message: `You must provide an email and a password`})
         }
         const existingUser: UserModel | null = await AuthUserHandler.findUserByEmail(email);
         if (!existingUser) {
-            return response.status(400).json({message: `User - (${email}) not found`})
+            return res.status(400).json({message: `User - (${email}) not found`})
         }
         /** Check the validity of the current password */
         const validPassword: boolean = bcrypt.compareSync(password, existingUser.password)
-        return response.status(201).json({validPassword});
+        return res.status(201).json({validPassword});
     }
 );
 
@@ -244,17 +254,18 @@ authRouter.post(
 authRouter.post(
     '/verify_email',
     verifyEmailValidator,
-    async (request: Request, response: Response) => {
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
         try {
-            const {email} = request.body.verifyEmail;
+            const {email} = req.body.verifyEmail;
             if (!email) {
-                return response.status(400).json({message: `You must provide an email`});
+                return res.status(400).json({message: `You must provide an email`});
             }
 
             /** Check existence User */
             const existingUser = await AuthUserHandler.findUserInfoByEmail(email);
             if (!existingUser) {
-                return response.status(400).json({message: `User (${email}) not found!`});
+                return res.status(400).json({message: `User (${email}) not found!`});
             }
 
             const existingUserId: number = existingUser.id;
@@ -268,7 +279,7 @@ authRouter.post(
             /** Generate PasswordResetToken */
             const generatedPasswordResetToken = crypto.randomBytes(32);
             if (!generatedPasswordResetToken) {
-                return response.status(500).json({
+                return res.status(500).json({
                     message: 'An error occurred. Please try again later.',
                     status: 'error',
                 });
@@ -294,9 +305,9 @@ authRouter.post(
             /* Start send E-MAIL*/
             await handlerEmailSending(existingUser, email, subject, htmlContent, text);
 
-            return response.status(201).json({message: `Password reset link sent to your email account - (${email})`});
+            return res.status(201).json({message: `Password reset link sent to your email account - (${email})`});
         } catch (error: any) {
-            return response.status(500).json(error.message);
+            return res.status(500).json(error.message);
         }
     }
 );
@@ -308,10 +319,11 @@ authRouter.post(
 authRouter.post(
     '/reset_password_link',
     resetPasswordLinkValidator,
-    async (request: Request, response: Response) => {
-        const {passwordResetToken} = request.body;
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
+        const {passwordResetToken} = req.body;
         if (!passwordResetToken) {
-            return response.status(400).json({message: `Missing password reset token.`})
+            return res.status(400).json({message: `Missing password reset token.`})
         }
 
         /** Chek existence PasswordResetToken */
@@ -321,17 +333,17 @@ authRouter.post(
 
         /** Checking the validity and expiration time of the PasswordResetToken */
         if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
-            return response.status(400).json({message: `Invalid or Expired Token!`});
+            return res.status(400).json({message: `Invalid or Expired Token!`});
         }
 
         /** Checking the expiration time of the PasswordResetToken */
         const expireResetTokenTime = existingPasswordResetToken[0].expireTime;
         if (!expireResetTokenTime || expireResetTokenTime.getTime() < Date.now()) {
-            return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
+            return res.status(400).json({message: `Time to change password has expired. Submit a new req to change your password!`});
         }
 
         const lifetimePasswordResetToken = Math.round((expireResetTokenTime.getTime() - Date.now()) / 60 / 1000);
-        return response.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
+        return res.status(201).json({message: `Password reset page is available for another - (${lifetimePasswordResetToken}) minutes`});
     }
 );
 
@@ -342,10 +354,11 @@ authRouter.post(
 authRouter.put(
     '/change_password',
     changePasswordValidator,
-    async (request: Request, response: Response) => {
-        const {password, passwordResetToken} = request.body;
+    handleErrorsValidator,
+    async (req: Request, res: Response) => {
+        const {password, passwordResetToken} = req.body;
         if (!passwordResetToken || !password) {
-            return response.status(400).json({message: `Missing password or password reset token.`});
+            return res.status(400).json({message: `Missing password or password reset token.`});
         }
         /** Check existence PasswordResetToken */
         const userId: number = Number(passwordResetToken.id);
@@ -354,17 +367,17 @@ authRouter.put(
 
         /** Checking the validity and expiration time of the PasswordResetToken */
         if (!existingPasswordResetToken || !existingPasswordResetToken.length || requestResetToken !== existingPasswordResetToken[0].resetToken) {
-            return response.status(400).json({message: `Invalid or Expired Token!`});
+            return res.status(400).json({message: `Invalid or Expired Token!`});
         }
         /** Checking the expiration time of the PasswordResetToken */
         if (!existingPasswordResetToken[0].expireTime || existingPasswordResetToken[0].expireTime.getTime() < Date.now()) {
-            return response.status(400).json({message: `Time to change password has expired. Submit a new request to change your password!`});
+            return res.status(400).json({message: `Time to change password has expired. Submit a new req to change your password!`});
         }
         /** Update the password of an existing user */
         const hashNewPassword = bcrypt.hashSync(password, 7);
         await AuthUserHandler.changePasswordHandler({password: hashNewPassword}, userId);
         await AuthUserHandler.deletePreviousPasswordResetTokens(userId);
 
-        return response.status(201).json({message: `Password changed successfully!`});
+        return res.status(201).json({message: `Password changed successfully!`});
     }
 );
