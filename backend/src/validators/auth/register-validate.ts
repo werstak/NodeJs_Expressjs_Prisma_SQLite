@@ -10,9 +10,13 @@ import { body, validationResult } from 'express-validator';
  */
 export const registerUserValidator = [
     body('registerUserData.email').isEmail().withMessage('Email must be valid'),
-    body('registerUserData.password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('registerUserData.firstName').isString().notEmpty().withMessage('First name must be a non-empty string'),
-    body('registerUserData.lastName').isString().notEmpty().withMessage('Last name must be a non-empty string'),
+    body('registerUserData.password').isLength({ min: 6, max: 50 }).withMessage('Password must be at least 6 characters'),
+    body('registerUserData.firstName')
+        .isString().withMessage('First name must be a string')
+        .notEmpty().withMessage('First name must be a non-empty string'),
+    body('registerUserData.lastName')
+        .isString().withMessage('Last name must be a string')
+        .notEmpty().withMessage('Last name must be a non-empty string'),
     body('registerUserData.role').isInt().withMessage('Role must be an integer'),
     body('registerUserData.location').isString().withMessage('Location must be a string'),
     body('registerUserData.status').isBoolean().withMessage('Status must be a boolean'),

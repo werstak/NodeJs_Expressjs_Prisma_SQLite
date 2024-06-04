@@ -26,9 +26,13 @@ export const parseUserCreateParams = (req: Request, res: Response, next: NextFun
  */
 export const createUserValidator = [
     body('user_params.email').isEmail().withMessage('Email must be valid'),
-    body('user_params.password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-    body('user_params.firstName').isString().notEmpty().withMessage('First name must be a non-empty string'),
-    body('user_params.lastName').isString().notEmpty().withMessage('Last name must be a non-empty string'),
+    body('user_params.password').isLength({ min: 6, max: 50 }).withMessage('Password must be at least 6 characters'),
+    body('user_params.firstName')
+        .isString().withMessage('First name must be a string')
+        .notEmpty().withMessage('First name must be a non-empty string'),
+    body('user_params.lastName')
+        .isString().withMessage('Last name must be a string')
+        .notEmpty().withMessage('Last name must be a non-empty string'),
     body('user_params.role').isInt().withMessage('Role must be an integer'),
     body('user_params.location').isString().withMessage('Location must be a string'),
     body('user_params.status').isBoolean().withMessage('Status must be a boolean'),

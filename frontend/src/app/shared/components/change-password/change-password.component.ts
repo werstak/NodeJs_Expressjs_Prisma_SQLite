@@ -69,17 +69,17 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     this.changePasswordForm = this.fb.group({
       currentPassword: [null, Validators.compose([
         Validators.required,
-        Validators.minLength(3),
+        Validators.minLength(6),
         Validators.maxLength(50)])
       ],
       newPassword: [null, Validators.compose([
         Validators.required,
-        Validators.minLength(3),
+        Validators.minLength(6),
         Validators.maxLength(50)])
       ],
       confirmPassword: [null, Validators.compose([
         Validators.required,
-        Validators.minLength(3),
+        Validators.minLength(6),
         Validators.maxLength(50)])
       ]
     }, {
