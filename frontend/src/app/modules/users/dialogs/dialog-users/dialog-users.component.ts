@@ -9,6 +9,7 @@ import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
 import { futureDateValidator } from '../../../../shared/custom-validators/future-date.validator';
+import { countryValidator } from '../../../../shared/custom-validators/country.validator';
 import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
@@ -122,7 +123,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ],
       location: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        countryValidator()])],
       birthAt: [null, Validators.compose([
         Validators.required,
         futureDateValidator

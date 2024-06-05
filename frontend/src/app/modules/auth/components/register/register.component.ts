@@ -11,6 +11,7 @@ import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { NotificationService } from '../../../../shared/services';
 import { CountriesModel, UserModel } from '../../../../core/models';
+import { countryValidator } from '../../../../shared/custom-validators/country.validator';
 
 @Component({
   selector: 'app-register',
@@ -95,7 +96,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
       role: this.defaultRole, // Default role is 'Client'
 
       location: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        countryValidator()])],
       password: [null, Validators.compose([
         Validators.required,
         Validators.minLength(6),
