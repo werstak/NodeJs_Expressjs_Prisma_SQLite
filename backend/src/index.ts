@@ -1,7 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import { router } from './routes';
-
+import { errorHandler } from './middleware';
 
 const PORT = process.env.PORT || '5000';
 
@@ -19,8 +19,10 @@ app.use('/src/uploads/', express.static('src/uploads/'));
 // Mounting router for handling API routes
 app.use(router);
 
+// Error handling middleware (should be last middleware)
+app.use(errorHandler);
+
 // Starting the server and listening on the specified port
 app.listen(PORT, () => {
     console.log(`Server was started on port ${PORT}`);
 });
-
