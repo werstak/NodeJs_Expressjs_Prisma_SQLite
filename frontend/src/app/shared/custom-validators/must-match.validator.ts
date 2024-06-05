@@ -6,7 +6,7 @@ import { AbstractControl } from '@angular/forms';
  * @param matchingControlName The name of the control to match against
  * @returns A validation function
  */
-export function MustMatch(controlName: string, matchingControlName: string) {
+export function mustMatchValidator(controlName: string, matchingControlName: string) {
   return (group: AbstractControl) => {
     // Get the form controls from the form group
     const control = group.get(controlName);

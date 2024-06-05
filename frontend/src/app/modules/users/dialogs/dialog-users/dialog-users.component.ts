@@ -7,7 +7,9 @@ import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
-import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
+import { futureDateValidator } from '../../../../shared/custom-validators/future-date.validator';
+import { countryValidator } from '../../../../shared/custom-validators/country.validator';
 import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
@@ -121,9 +123,12 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ],
       location: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        countryValidator()])],
       birthAt: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        futureDateValidator
+      ])],
       status: '',
     });
   }
@@ -146,7 +151,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ]
     }, {
-      validator: MustMatch('password', 'confirmPassword')
+      validator: mustMatchValidator('password', 'confirmPassword')
     });
   }
 
@@ -308,13 +313,14 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
    */
   openDialogNewPassword(currentUser: UserModel) {
     console.log('openDialogNewPassword - currentUser', currentUser)
-    const {id, email} = currentUser;
+    const {id, email, role} = currentUser;
     const dialogRef = this.dialog.open(DialogNewPasswordComponent, {
       width: '375px',
       panelClass: 'dialog-new-password',
       data: {
         userId: id,
         email,
+        role,
         title: 'Change Password',
         okText: 'Submit',
         cancelText: 'Cancel'

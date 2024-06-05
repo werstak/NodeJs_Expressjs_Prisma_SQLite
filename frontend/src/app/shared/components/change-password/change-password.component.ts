@@ -2,14 +2,14 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../modules/auth/auth.service';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { MustMatch } from '../../../core/helpers/must-match.validator';
+import { mustMatchValidator } from '../../custom-validators/must-match.validator';
 import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
 import { Store } from '@ngxs/store';
 import { UsersService } from '../../../modules/users/users.service';
-import { AppRouteEnum } from '../../../core/enums';
+import { AppRouteEnum, RoleEnum } from '../../../core/enums';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../services';
-import { DialogNewPasswordModel, ValidResetTokenModel } from '../../../core/models';
+import { AuthUserModel, DialogNewPasswordModel, ValidResetTokenModel } from '../../../core/models';
 
 @Component({
   selector: 'app-change-password',
@@ -28,6 +28,10 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
   @Input() userData: DialogNewPasswordModel; // Input: Data for changing password
   @Output() closeDialogDialogNewPassword: EventEmitter<any> = new EventEmitter(); // Output: Event emitter to close the dialog
+
+  // Enum for user roles
+  protected readonly RoleEnum = RoleEnum;
+
   AppRouteEnum = AppRouteEnum; // Enum for accessing route names
   private destroy$: Subject<void> = new Subject<void>(); // Subject to handle subscription cleanup
   dataLoading: boolean = false; // Flag to indicate data loading state
@@ -38,6 +42,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   hideCurrentPassword = true; // Flag to toggle visibility of current password
   hideNewPassword = true; // Flag to toggle visibility of new password
   hideConfirmPassword = true; // Flag to toggle visibility of confirm password
+
+  authUser: AuthUserModel | undefined = this.authService.accountSubject$.value?.userInfo;
 
   ngOnInit() {
     this.buildChangePasswordForm(); // Initialize the change password form
@@ -83,7 +89,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ]
     }, {
-      validator: MustMatch('newPassword', 'confirmPassword') // Custom validator to ensure new and confirm passwords match
+      validator: mustMatchValidator('newPassword', 'confirmPassword') // Custom validator to ensure new and confirm passwords match
     });
   }
 
@@ -135,7 +141,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
    * Enable/disable form controls based on current password validity and reset token validity
    */
   private toggleStateControls() {
-    if (this.validCurrentPassword?.validPassword || this.validResetToken.valid) {
+    if (this.validCurrentPassword?.validPassword || this.validResetToken.valid || this.authUser?.role === RoleEnum.SuperAdmin) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();
     } else {
@@ -148,8 +154,11 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   /**
    * Check if the form is allowed to be submitted
    */
+
   public allowedSubmit(): boolean {
-    if (this.userData) {
+    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+      return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid);
+    } else if (this.userData) {
       return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
     } else {
       return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid || !this.validResetToken.valid);
@@ -157,11 +166,34 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
 
+  // public allowedSubmit(): boolean {
+  //   if (this.userData) {
+  //     return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
+  //   } else {
+  //     return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid || !this.validResetToken.valid);
+  //   }
+  // }
+
+
   /**
    * Submit the change password request
    */
   onSubmitChangePassword(): void {
-    if (this.userData) {
+    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+      if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
+        this.dataLoading = true;
+        const id = this.userData.userId;
+        const params = {
+          password: this.changePasswordForm.value.newPassword
+        }
+        this.store.dispatch(new UpdateUserPassword(id, params)); // Dispatch action to update user password
+        this.dataLoading = false;
+        this.closeClick(); // Close the dialog after successful submission
+      } else {
+        return;
+      }
+
+    } else if (this.userData) {
       if (this.changePasswordForm.valid) {
         this.dataLoading = true;
         const id = this.userData.userId;
@@ -195,6 +227,43 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       }
     }
   }
+
+
+  // onSubmitChangePassword(): void {
+  //   if (this.userData) {
+  //     if (this.changePasswordForm.valid) {
+  //       this.dataLoading = true;
+  //       const id = this.userData.userId;
+  //       const params = {
+  //         password: this.changePasswordForm.value.newPassword
+  //       }
+  //       this.store.dispatch(new UpdateUserPassword(id, params)); // Dispatch action to update user password
+  //       this.dataLoading = false;
+  //       this.closeClick(); // Close the dialog after successful submission
+  //     } else {
+  //       return;
+  //     }
+  //   } else {
+  //     if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
+  //       this.dataLoading = true;
+  //       this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken)
+  //         .pipe(takeUntil(this.destroy$))
+  //         .subscribe(resp => {
+  //             if (resp) {
+  //               this.notificationService.showSuccess(resp.message);
+  //               this.router.navigate(['auth/login']); // Navigate to login page after successful password change
+  //             }
+  //           },
+  //           error => {
+  //             console.error(error);
+  //             this.notificationService.showError(error);
+  //           });
+  //       this.dataLoading = false;
+  //     } else {
+  //       return;
+  //     }
+  //   }
+  // }
 
   /**
    * Emit event to close the dialog
