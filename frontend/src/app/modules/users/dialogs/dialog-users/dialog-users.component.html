@@ -146,9 +146,10 @@
           <input matInput [matDatepicker]="picker" placeholder="Choose a birth date" formControlName="birthAt">
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="userForm.controls['birthAt'].hasError('required')">Birth date <strong>required</strong>
-          </mat-error>
+          <mat-error *ngIf="userForm.controls['birthAt'].hasError('required')">Birth date <strong>required</strong></mat-error>
+          <mat-error *ngIf="userForm.controls['birthAt'].hasError('futureDate')">Birth date cannot be in the future</mat-error>
         </mat-form-field>
+
 
       </ng-container>
 

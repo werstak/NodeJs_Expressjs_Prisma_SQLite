@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../modules/auth/auth.service';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
-import { MustMatch } from '../../../core/helpers/must-match.validator';
+import { mustMatchValidator } from '../../custom-validators/must-match.validator';
 import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
 import { Store } from '@ngxs/store';
 import { UsersService } from '../../../modules/users/users.service';
@@ -83,7 +83,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ]
     }, {
-      validator: MustMatch('newPassword', 'confirmPassword') // Custom validator to ensure new and confirm passwords match
+      validator: mustMatchValidator('newPassword', 'confirmPassword') // Custom validator to ensure new and confirm passwords match
     });
   }
 

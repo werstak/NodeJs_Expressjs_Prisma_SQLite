@@ -7,7 +7,8 @@ import { Store } from '@ngxs/store';
 import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
-import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
+import { futureDateValidator } from '../../../../shared/custom-validators/future-date.validator';
 import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
@@ -123,7 +124,9 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       location: [null, Validators.compose([
         Validators.required])],
       birthAt: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        futureDateValidator
+      ])],
       status: '',
     });
   }
@@ -146,7 +149,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ]
     }, {
-      validator: MustMatch('password', 'confirmPassword')
+      validator: mustMatchValidator('password', 'confirmPassword')
     });
   }
 

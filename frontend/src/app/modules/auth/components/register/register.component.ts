@@ -3,7 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subject, Subscription } from 'rxjs';
 import { takeUntil, startWith, map } from 'rxjs/operators';
 import { COUNTRIES } from '../../../../shared/constants/countries';
-import { MustMatch } from '../../../../core/helpers/must-match.validator';
+import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
+import { futureDateValidator } from '../../../../shared/custom-validators/future-date.validator';
 import { AuthService } from '../../auth.service';
 import { Router } from '@angular/router';
 import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
@@ -106,10 +107,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
         Validators.maxLength(50)])
       ],
       birthAt: [null, Validators.compose([
-        Validators.required])],
+        Validators.required,
+        futureDateValidator
+      ])],
       status: false,
     }, {
-      validator: MustMatch('password', 'confirmPassword') // Custom validator for password match
+      validator: mustMatchValidator('password', 'confirmPassword') // Custom validator for password match
     });
   }
 
