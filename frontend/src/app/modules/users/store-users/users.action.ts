@@ -39,7 +39,9 @@ export class UpdateUser {
 export class UpdateUserPassword {
   static readonly type = '[Users] UpdatePassword';
 
-  constructor(public id: number, public params: any) {}
+  constructor(public id: number, public params: any) {
+    console.log('Action updateUserPassword() - params', params);
+  }
 }
 
 /**
