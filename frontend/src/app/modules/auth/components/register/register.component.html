@@ -118,6 +118,7 @@
           <mat-error *ngIf="registerForm.controls['birthAt'].hasError('required')">
             Birth date <strong>required</strong>
           </mat-error>
+          <mat-error *ngIf="registerForm.controls['birthAt'].hasError('futureDate')">Birth date cannot be in the future</mat-error>
         </mat-form-field>
 
       </div>

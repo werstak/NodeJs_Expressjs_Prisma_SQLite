@@ -318,6 +318,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       width: '375px',
       panelClass: 'dialog-new-password',
       data: {
+        editProfile: this.data.editProfile,
         userId: id,
         email,
         role,

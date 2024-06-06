@@ -46,6 +46,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   authUser: AuthUserModel | undefined = this.authService.accountSubject$.value?.userInfo;
 
   ngOnInit() {
+    console.log(111, this.userData)
     this.buildChangePasswordForm(); // Initialize the change password form
     if (this.userData) {
       this.changesControlCurrentPassword(); // Set up control for current password field
@@ -136,12 +137,72 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   * Display the change password form based on user role
+   */
+  public handlerDisplay(): boolean {
+    if (this.userData) {
+      if (this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin) {
+        return true;
+      } else {
+        return !this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin && this.authUser?.role !== RoleEnum.ProjectAdmin;
+      }
+    } else {
+      return false;
+    }
+
+
+
+    // if (this.userData) {
+    //   if (this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin) {
+    //     return true;
+    //   } else if (!this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin && this.authUser?.role !== RoleEnum.ProjectAdmin) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // } else {
+    //   return false;
+    // }
+
+
+
+  // if (this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin) {
+  //   return true;
+  // } else if (!this.userData?.editProfile && this.authUser?.role !== RoleEnum.SuperAdmin && this.authUser?.role !== RoleEnum.ProjectAdmin) {
+  //   return true;
+  // }
+  // return false;
+
+}
+
+  // public handlerDisplay() {
+  //   if (this.userData?.editProfile) {
+  //
+  //     if (this.authUser?.role === RoleEnum.SuperAdmin) {
+  //       return false;
+  //     } else if (this.authUser?.role === RoleEnum.ProjectAdmin || this.authUser?.role === RoleEnum.Manager || this.authUser?.role === RoleEnum.Client) {
+  //       return true;
+  //     } else {
+  //       return true;
+  //     }
+  //   } else if (!this.userData?.editProfile) {
+  //     if (this.authUser?.role === RoleEnum.SuperAdmin || this.authUser?.role === RoleEnum.ProjectAdmin) {
+  //       return false;
+  //     } else {
+  //       return true;
+  //     }
+  //
+  //   } else {
+  //     return true;
+  //   }
+  // }
 
   /**
    * Enable/disable form controls based on current password validity and reset token validity
    */
   private toggleStateControls() {
-    if (this.validCurrentPassword?.validPassword || this.validResetToken.valid || this.authUser?.role === RoleEnum.SuperAdmin) {
+    if (this.validCurrentPassword?.validPassword || this.validResetToken.valid || this.authUser?.role === RoleEnum.SuperAdmin || this.authUser?.role === RoleEnum.ProjectAdmin && !this.userData?.editProfile) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();
     } else {
@@ -156,7 +217,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
    */
 
   public allowedSubmit(): boolean {
-    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin || this.userData && this.authUser?.role === RoleEnum.ProjectAdmin) {
       return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid);
     } else if (this.userData) {
       return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
@@ -179,7 +240,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
    * Submit the change password request
    */
   onSubmitChangePassword(): void {
-    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin || this.userData && this.authUser?.role === RoleEnum.ProjectAdmin) {
       if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
         this.dataLoading = true;
         const id = this.userData.userId;
