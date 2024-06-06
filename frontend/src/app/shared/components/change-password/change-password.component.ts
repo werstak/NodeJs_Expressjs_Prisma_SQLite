@@ -8,7 +8,7 @@ import { Store } from '@ngxs/store';
 import { UsersService } from '../../../modules/users/users.service';
 import { AppRouteEnum, RoleEnum } from '../../../core/enums';
 import { Router } from '@angular/router';
-import { NotificationService } from '../../services';
+import { NotificationService, PermissionService } from '../../services';
 import { AuthUserModel, DialogNewPasswordModel, ValidResetTokenModel } from '../../../core/models';
 
 @Component({
@@ -24,6 +24,7 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     private usersService: UsersService,
     private authService: AuthService,
     private notificationService: NotificationService,
+    public permissionService: PermissionService,
   ) {}
 
   @Input() userData: DialogNewPasswordModel; // Input: Data for changing password
@@ -46,6 +47,8 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   authUser: AuthUserModel | undefined = this.authService.accountSubject$.value?.userInfo;
 
   ngOnInit() {
+    console.log(111, this.userData)
+
     this.buildChangePasswordForm(); // Initialize the change password form
     if (this.userData) {
       this.changesControlCurrentPassword(); // Set up control for current password field
@@ -136,12 +139,23 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
       );
   }
 
+  /**
+   * Display the change password form based on user role and data availability for the user being edited or the user resetting the password (if any)
+   */
+  public handlerDisplay(): boolean {
+    return this.permissionService.displayFieldCurrentPassword(this.userData, this.authUser);
+  }
 
   /**
    * Enable/disable form controls based on current password validity and reset token validity
    */
   private toggleStateControls() {
-    if (this.validCurrentPassword?.validPassword || this.validResetToken.valid || this.authUser?.role === RoleEnum.SuperAdmin) {
+    if (
+      this.validCurrentPassword?.validPassword ||
+      this.validResetToken.valid ||
+      this.authUser?.role === RoleEnum.SuperAdmin ||
+      this.authUser?.role === RoleEnum.ProjectAdmin && !this.userData?.editProfile
+    ) {
       this.changePasswordForm.controls['newPassword'].enable();
       this.changePasswordForm.controls['confirmPassword'].enable();
     } else {
@@ -152,11 +166,13 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
 
 
   /**
-   * Check if the form is allowed to be submitted
+   * Check if the form is allowed to be submitted based on the current user role and data availability for the user being edited or the user resetting the password (if any)
    */
-
   public allowedSubmit(): boolean {
-    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+    if (
+      this.userData && this.authUser?.role === RoleEnum.SuperAdmin ||
+      this.userData && this.authUser?.role === RoleEnum.ProjectAdmin
+    ) {
       return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid);
     } else if (this.userData) {
       return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
@@ -166,48 +182,82 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
   }
 
 
-  // public allowedSubmit(): boolean {
-  //   if (this.userData) {
-  //     return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
-  //   } else {
-  //     return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid || !this.validResetToken.valid);
-  //   }
-  // }
-
-
   /**
    * Submit the change password request
    */
   onSubmitChangePassword(): void {
-    if (this.userData && this.authUser?.role === RoleEnum.SuperAdmin) {
+
+    if (
+      this.userData && this.authUser?.role === RoleEnum.SuperAdmin ||
+      this.userData && this.authUser?.role === RoleEnum.ProjectAdmin
+    ) {
+
+      console.log(22)
+
       if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
+        console.log(222)
+
         this.dataLoading = true;
         const id = this.userData.userId;
         const params = {
           password: this.changePasswordForm.value.newPassword
         }
-        this.store.dispatch(new UpdateUserPassword(id, params)); // Dispatch action to update user password
+
+
+        this.store.dispatch(new UpdateUserPassword(id, params));
+
+
+
+        // this.usersService.updateUserPassword(id, params)
+        //   .pipe(takeUntil(this.destroy$))
+        //   .subscribe(
+        //     resp => {
+        //       this.dataLoading = false;
+        //       this.notificationService.showSuccess(resp.message);
+        //     },
+        //     error => {
+        //       this.dataLoading = false;
+        //       console.error(error);
+        //       this.notificationService.showError(error);
+        //     }
+        //   );
+
+
+
         this.dataLoading = false;
-        this.closeClick(); // Close the dialog after successful submission
+        this.closeClick();
       } else {
         return;
       }
 
     } else if (this.userData) {
+
+      console.log(33)
+
       if (this.changePasswordForm.valid) {
+
+        console.log(333)
         this.dataLoading = true;
         const id = this.userData.userId;
         const params = {
           password: this.changePasswordForm.value.newPassword
         }
-        this.store.dispatch(new UpdateUserPassword(id, params)); // Dispatch action to update user password
+
+        this.store.dispatch(new UpdateUserPassword(id, params));
+
         this.dataLoading = false;
         this.closeClick(); // Close the dialog after successful submission
       } else {
         return;
       }
     } else {
+
+      console.log(44)
+
+      // Reset password for user who forgot password
       if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
+
+        console.log(444)
         this.dataLoading = true;
         this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken)
           .pipe(takeUntil(this.destroy$))
