@@ -5,8 +5,7 @@ import {
   GetUsers,
   SetAuthUser,
   SetSelectedUser,
-  UpdateUser,
-  UpdateUserPassword
+  UpdateUser
 } from './users.action';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
@@ -165,22 +164,22 @@ export class UsersState {
     ));
   }
 
-  /**
-   * Action to update a user's password
-   */
-  @Action(UpdateUserPassword)
-  updateUserPassword({getState}: StateContext<UsersStateModel>, {
-    id, params
-  }: UpdateUserPassword) {
-    return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
-        this.notificationService.showSuccess(result.message);
-      },
-      (error) => {
-        console.error(error);
-        this.notificationService.showError(error);
-      }
-    ));
-  }
+  // /**
+  //  * Action to update a user's password
+  //  */
+  // @Action(UpdateUserPassword)
+  // updateUserPassword({getState}: StateContext<UsersStateModel>, {
+  //   id, params
+  // }: UpdateUserPassword) {
+  //   return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
+  //       this.notificationService.showSuccess(result.message);
+  //     },
+  //     (error) => {
+  //       console.error(error);
+  //       this.notificationService.showError(error);
+  //     }
+  //   ));
+  // }
 
   /**
    * Action to delete a user

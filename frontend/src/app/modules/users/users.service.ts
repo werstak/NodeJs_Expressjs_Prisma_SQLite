@@ -54,7 +54,6 @@ export class UsersService {
    * @param params Password parameters.
    */
   updateUserPassword(id: number, params: any): Observable<any> {
-    console.log(555, 'updateUserPassword() - params', params, 'id', id)
     return this.http.put(config.API_URL + `/users/update_password/` + id, params);
   }
 

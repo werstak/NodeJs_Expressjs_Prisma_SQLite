@@ -33,16 +33,16 @@ export class UpdateUser {
   ) {}
 }
 
-/**
- * Action to update a user's password
- */
-export class UpdateUserPassword {
-  static readonly type = '[Users] UpdatePassword';
-
-  constructor(public id: number, public params: any) {
-    console.log('Action updateUserPassword() - params', params);
-  }
-}
+// /**
+//  * Action to update a user's password
+//  */
+// export class UpdateUserPassword {
+//   static readonly type = '[Users] UpdatePassword';
+//
+//   constructor(public id: number, public params: any) {
+//     console.log('Action updateUserPassword() - params', params);
+//   }
+// }
 
 /**
  * Action to delete a user
