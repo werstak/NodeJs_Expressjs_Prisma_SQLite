@@ -5,7 +5,8 @@ import {
   GetUsers,
   SetAuthUser,
   SetSelectedUser,
-  UpdateUser
+  UpdateUser,
+  UpdateProfile
 } from './users.action';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
@@ -149,6 +150,7 @@ export class UsersState {
           this.authService.accountSubject$.next(account);
         }
 
+        // TODO 2: Replace setState with patchState
         // Update the user in the list
         usersList[userIndex] = result.data;
         setState({
@@ -164,22 +166,78 @@ export class UsersState {
     ));
   }
 
-  // /**
-  //  * Action to update a user's password
-  //  */
-  // @Action(UpdateUserPassword)
-  // updateUserPassword({getState}: StateContext<UsersStateModel>, {
-  //   id, params
-  // }: UpdateUserPassword) {
-  //   return this.usersService.updateUserPassword(id, params).pipe(tap((result) => {
-  //       this.notificationService.showSuccess(result.message);
-  //     },
-  //     (error) => {
-  //       console.error(error);
-  //       this.notificationService.showError(error);
-  //     }
-  //   ));
-  // }
+  /**
+   * Action to update the user's profile
+   */
+  @Action(UpdateProfile)
+  updateProfile({ getState, patchState }: StateContext<UsersStateModel>, { data }: UpdateProfile) {
+    const state = getState();
+    const usersList = [...state.users];
+    const userIndex = usersList.findIndex(item => item.id === data.id);
+
+    const currentAccount = this.authService.accountValue;
+    const authUser: AuthUserModel = {
+      id: data.id,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      role: data.role,
+      avatar: data.avatar,
+    }
+
+    // TODO 1: In this process of saving the user in Localstorage, move the updateUser() function to the DialogUsersComponent
+    if (authUser.id === currentAccount!.userInfo.id) {
+      localStorage.setItem(LocalStorageEnum.ACCOUNT, JSON.stringify(authUser));
+      const account: AuthModel = {
+        userInfo: authUser,
+        refreshToken: currentAccount!.refreshToken,
+        accessToken: currentAccount!.accessToken
+      }
+      this.authService.accountSubject$.next(account);
+    }
+
+    usersList[userIndex] = data;
+    patchState({
+      ...state,
+      users: usersList,
+      authUser,
+    });
+
+    // usersList[userIndex] = data;
+    // setState({
+    //   ...state,
+    //   users: usersList,
+    //   authUser,
+    // });
+
+
+
+    // const currentAccount = this.authService.accountValue;
+    // if (currentAccount && currentAccount.id === data.id) {
+    //   const authUser: AuthUserModel = {
+    //     id: data.id,
+    //     firstName: data.firstName,
+    //     lastName: data.lastName,
+    //     email: data.email,
+    //     role: data.role,
+    //     avatar: data.avatar,
+    //   };
+    //
+    //   patchState({
+    //     users: usersList,
+    //     authUser: authUser,
+    //   });
+    // } else {
+    //   patchState({
+    //     users: usersList,
+    //   });
+    // }
+
+
+
+
+
+  }
 
   /**
    * Action to delete a user

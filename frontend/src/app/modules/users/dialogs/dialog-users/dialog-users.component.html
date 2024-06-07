@@ -175,7 +175,7 @@
     <!-- Dialog Actions -->
     <div mat-dialog-actions class="dialog__actions">
       <!-- Submit Button -->
-      <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.valid" [mat-dialog-close]="true">
+      <button mat-raised-button color="primary" type="submit" [disabled]="!userForm.valid">
         {{ this.data.newUser ? 'Create' : 'Update' }}
       </button>
       <!-- Cancel Button -->
