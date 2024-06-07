@@ -34,14 +34,12 @@ export class UpdateUser {
 }
 
 /**
- * Action to update a user's password
+ * Action to update a profile
  */
-export class UpdateUserPassword {
-  static readonly type = '[Users] UpdatePassword';
+export class UpdateProfile {
+  static readonly type = '[Users] UpdateProfile';
 
-  constructor(public id: number, public params: any) {
-    console.log('Action updateUserPassword() - params', params);
-  }
+  constructor(public data: UserModel) {}
 }
 
 /**

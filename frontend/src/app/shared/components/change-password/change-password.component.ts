@@ -3,8 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../../modules/auth/auth.service';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
 import { mustMatchValidator } from '../../custom-validators/must-match.validator';
-import { UpdateUserPassword } from '../../../modules/users/store-users/users.action';
-import { Store } from '@ngxs/store';
 import { UsersService } from '../../../modules/users/users.service';
 import { AppRouteEnum, RoleEnum } from '../../../core/enums';
 import { Router } from '@angular/router';
@@ -19,7 +17,6 @@ import { AuthUserModel, DialogNewPasswordModel, ValidResetTokenModel } from '../
 export class ChangePasswordComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
-    private store: Store,
     private router: Router,
     private usersService: UsersService,
     private authService: AuthService,
@@ -164,156 +161,94 @@ export class ChangePasswordComponent implements OnInit, OnDestroy {
     }
   }
 
-
   /**
-   * Check if the form is allowed to be submitted based on the current user role and data availability for the user being edited or the user resetting the password (if any)
+   * Check if the form is allowed to be submitted based on the current user role and data availability
+   * for the user being edited or the user resetting the password (if any)
    */
   public allowedSubmit(): boolean {
-    if (
-      this.userData && this.authUser?.role === RoleEnum.SuperAdmin ||
-      this.userData && this.authUser?.role === RoleEnum.ProjectAdmin
-    ) {
-      return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid);
-    } else if (this.userData) {
-      return !(!this.changePasswordForm.valid || !this.validCurrentPassword?.validPassword);
-    } else {
-      return !(!this.changePasswordForm.controls['newPassword'].valid || !this.changePasswordForm.controls['confirmPassword'].valid || !this.validResetToken.valid);
+    const isSuperAdmin = this.authUser?.role === RoleEnum.SuperAdmin;
+    const isProjectAdmin = this.authUser?.role === RoleEnum.ProjectAdmin;
+
+    // Case 1: SuperAdmin or ProjectAdmin with userData
+    if (this.userData && (isSuperAdmin || isProjectAdmin)) {
+      return this.isNewPasswordAndConfirmValid();
     }
+    // Case 2: Other roles with userData
+    if (this.userData) {
+      return this.isFormValidWithCurrentPassword();
+    }
+    // Case 3: No userData (password reset)
+    return this.isFormValidWithResetToken();
+  }
+
+  /** Check if newPassword and confirmPassword fields are valid */
+  private isNewPasswordAndConfirmValid(): boolean {
+    return this.changePasswordForm.controls['newPassword'].valid &&
+      this.changePasswordForm.controls['confirmPassword'].valid;
+  }
+  /** Check if the entire form is valid and current password is valid */
+  private isFormValidWithCurrentPassword(): boolean {
+    return this.changePasswordForm.valid && this.validCurrentPassword?.validPassword;
+  }
+  /** Check if newPassword and confirmPassword fields are valid and reset token is valid */
+  private isFormValidWithResetToken(): boolean {
+    return this.isNewPasswordAndConfirmValid() && !!this.validResetToken.valid;
   }
 
 
   /**
-   * Submit the change password request
+   * Submit the change password request based on the current user role and data availability
+   * for the user being edited or the user resetting the password (if any)
    */
-  onSubmitChangePassword(): void {
+  public onSubmitChangePassword(): void {
+    if (this.allowedSubmit()) {
+      this.dataLoading = true;
 
-    if (
-      this.userData && this.authUser?.role === RoleEnum.SuperAdmin ||
-      this.userData && this.authUser?.role === RoleEnum.ProjectAdmin
-    ) {
-
-      console.log(22)
-
-      if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
-        console.log(222)
-
-        this.dataLoading = true;
-        const id = this.userData.userId;
-        const params = {
-          password: this.changePasswordForm.value.newPassword
-        }
-
-
-        this.store.dispatch(new UpdateUserPassword(id, params));
-
-
-
-        // this.usersService.updateUserPassword(id, params)
-        //   .pipe(takeUntil(this.destroy$))
-        //   .subscribe(
-        //     resp => {
-        //       this.dataLoading = false;
-        //       this.notificationService.showSuccess(resp.message);
-        //     },
-        //     error => {
-        //       this.dataLoading = false;
-        //       console.error(error);
-        //       this.notificationService.showError(error);
-        //     }
-        //   );
-
-
-
-        this.dataLoading = false;
-        this.closeClick();
+      if (this.userData) {
+        this.updatePasswordForUser();
       } else {
-        return;
-      }
-
-    } else if (this.userData) {
-
-      console.log(33)
-
-      if (this.changePasswordForm.valid) {
-
-        console.log(333)
-        this.dataLoading = true;
-        const id = this.userData.userId;
-        const params = {
-          password: this.changePasswordForm.value.newPassword
-        }
-
-        this.store.dispatch(new UpdateUserPassword(id, params));
-
-        this.dataLoading = false;
-        this.closeClick(); // Close the dialog after successful submission
-      } else {
-        return;
-      }
-    } else {
-
-      console.log(44)
-
-      // Reset password for user who forgot password
-      if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
-
-        console.log(444)
-        this.dataLoading = true;
-        this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe(resp => {
-              if (resp) {
-                this.notificationService.showSuccess(resp.message);
-                this.router.navigate(['auth/login']); // Navigate to login page after successful password change
-              }
-            },
-            error => {
-              console.error(error);
-              this.notificationService.showError(error);
-            });
-        this.dataLoading = false;
-      } else {
-        return;
+        this.resetPassword();
       }
     }
   }
 
+  /** Update password for a user (SuperAdmin, ProjectAdmin, or regular user) */
+  private updatePasswordForUser(): void {
+    const id = this.userData.userId;
+    const params = { password: this.changePasswordForm.value.newPassword };
 
-  // onSubmitChangePassword(): void {
-  //   if (this.userData) {
-  //     if (this.changePasswordForm.valid) {
-  //       this.dataLoading = true;
-  //       const id = this.userData.userId;
-  //       const params = {
-  //         password: this.changePasswordForm.value.newPassword
-  //       }
-  //       this.store.dispatch(new UpdateUserPassword(id, params)); // Dispatch action to update user password
-  //       this.dataLoading = false;
-  //       this.closeClick(); // Close the dialog after successful submission
-  //     } else {
-  //       return;
-  //     }
-  //   } else {
-  //     if (this.changePasswordForm.controls['newPassword'].valid && this.changePasswordForm.controls['confirmPassword'].valid) {
-  //       this.dataLoading = true;
-  //       this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken)
-  //         .pipe(takeUntil(this.destroy$))
-  //         .subscribe(resp => {
-  //             if (resp) {
-  //               this.notificationService.showSuccess(resp.message);
-  //               this.router.navigate(['auth/login']); // Navigate to login page after successful password change
-  //             }
-  //           },
-  //           error => {
-  //             console.error(error);
-  //             this.notificationService.showError(error);
-  //           });
-  //       this.dataLoading = false;
-  //     } else {
-  //       return;
-  //     }
-  //   }
-  // }
+    this.usersService.updateUserPassword(id, params)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        resp => this.handleSuccess(resp.message),
+        error => this.handleError(error)
+      );
+  }
+  /** Reset password for a user who forgot their password */
+  private resetPassword(): void {
+    this.authService.onChangePassword(this.changePasswordForm.value.newPassword, this.validResetToken)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        resp => this.handleSuccess(resp.message, true),
+        error => this.handleError(error)
+      );
+  }
+  /** Handle successful password update/reset */
+  private handleSuccess(message: string, navigateToLogin: boolean = false): void {
+    this.dataLoading = false;
+    this.notificationService.showSuccess(message);
+    this.closeClick();
+    if (navigateToLogin) {
+      this.router.navigate(['auth/login']);
+    }
+  }
+  /** Handle errors during password update/reset */
+  private handleError(error: any): void {
+    this.dataLoading = false;
+    console.error(error);
+    this.notificationService.showError(error);
+    this.closeClick();
+  }
 
   /**
    * Emit event to close the dialog

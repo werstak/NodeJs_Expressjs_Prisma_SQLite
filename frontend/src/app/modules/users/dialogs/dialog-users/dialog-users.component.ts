@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, SetSelectedUser, UpdateUser } from '../../store-users/users.action';
+import { AddUser, SetSelectedUser, UpdateUser, UpdateProfile} from '../../store-users/users.action';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
@@ -14,7 +14,7 @@ import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
 import { AuthUserModel, CountriesModel, UserModel } from '../../../../core/models';
-import { PermissionService, RoleService } from '../../../../shared/services';
+import { NotificationService, PermissionService, RoleService } from '../../../../shared/services';
 import { AuthService } from '../../../auth/auth.service';
 
 // Default profile image path
@@ -32,6 +32,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     public dialogRefUsersComponent: MatDialogRef<DialogUsersComponent>,
     private fb: FormBuilder,
     @Inject(MAT_DIALOG_DATA) public data: any,
+    private notificationService: NotificationService,
     public permissionService: PermissionService,
     public usersService: UsersService,
     public authService: AuthService,
@@ -286,9 +287,11 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
    * Update existing user
    */
   private updateUser(): void {
+    this.dataLoading = true;
     if (this.userForm.invalid) {
       return;
     }
+
     let {id} = this.currentUser
     const avatar = this.avatarFile;
     const previousImageUrl = this.previousImageUrl;
@@ -305,7 +308,31 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       birthAt: this.userForm.value.birthAt,
       avatar: '',
     };
-    this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
+
+    if (this.data.editProfile) {
+      console.log(1, 'Edit Profile');
+      this.usersService.updateUser(id, params, avatar, imageOrUrl, previousImageUrl).pipe(
+        takeUntil(this.destroy$))
+        .subscribe(resp => {
+            console.log('Edit Profile - update user password', resp)
+            if (resp) {
+              this.dataLoading = false;
+              this.store.dispatch(new UpdateProfile(resp.data));
+              this.notificationService.showSuccess(resp.message);
+              this.closeClick();
+            }
+          },
+          (error) => {
+            console.error(error);
+            this.dataLoading = false;
+            this.notificationService.showError(error);
+            this.closeClick();
+          });
+    } else {
+      this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
+      this.dataLoading = false;
+      this.closeClick();
+    }
   }
 
   /**

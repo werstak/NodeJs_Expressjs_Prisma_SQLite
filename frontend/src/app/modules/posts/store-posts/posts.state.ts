@@ -115,6 +115,8 @@ export class PostsState {
         const state = getState();
         const postsList = [...state.posts];
         const postIndex = postsList.findIndex(item => item.id === id);
+
+        // TODO 3: Replace setState with patchState
         postsList[postIndex] = result.data;
         setState({
           ...state,
