@@ -34,15 +34,6 @@ export class UpdateUser {
 }
 
 /**
- * Action to update a profile
- */
-export class UpdateProfile {
-  static readonly type = '[Users] UpdateProfile';
-
-  constructor(public data: UserModel) {}
-}
-
-/**
  * Action to delete a user
  */
 export class DeleteUser {

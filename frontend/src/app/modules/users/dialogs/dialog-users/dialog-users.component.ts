@@ -4,16 +4,16 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, SetSelectedUser, UpdateUser, UpdateProfile} from '../../store-users/users.action';
+import { AddUser, SetSelectedUser, UpdateUser} from '../../store-users/users.actions';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';
 import { futureDateValidator } from '../../../../shared/custom-validators/future-date.validator';
 import { countryValidator } from '../../../../shared/custom-validators/country.validator';
-import { AppRouteEnum, RoleEnum } from '../../../../core/enums';
+import { AppRouteEnum, LocalStorageEnum, RoleEnum } from '../../../../core/enums';
 import { DialogNewPasswordComponent } from '../dialog-new-password/dialog-new-password.component';
 import { EMAIL_VALIDATION_PATTERN } from '../../../../shared/validation-patterns/pattern-email';
-import { AuthUserModel, CountriesModel, UserModel } from '../../../../core/models';
+import { AuthModel, AuthUserModel, CountriesModel, UserModel } from '../../../../core/models';
 import { NotificationService, PermissionService, RoleService } from '../../../../shared/services';
 import { AuthService } from '../../../auth/auth.service';
 
@@ -297,6 +297,7 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
     const previousImageUrl = this.previousImageUrl;
     let imageOrUrl: boolean;
     imageOrUrl = !!this.avatarUrl;
+
     const params: any = {
       id: id,
       email: this.userForm.value.email,
@@ -309,15 +310,34 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
       avatar: '',
     };
 
+    // Update Profile
     if (this.data.editProfile) {
-      console.log(1, 'Edit Profile');
       this.usersService.updateUser(id, params, avatar, imageOrUrl, previousImageUrl).pipe(
         takeUntil(this.destroy$))
         .subscribe(resp => {
-            console.log('Edit Profile - update user password', resp)
-            if (resp) {
+           if (resp) {
               this.dataLoading = false;
-              this.store.dispatch(new UpdateProfile(resp.data));
+
+              const currentAccount = this.authService.accountValue;
+              const updatedProfile: AuthUserModel = {
+                id: resp.data.id,
+                firstName: resp.data.firstName,
+                lastName: resp.data.lastName,
+                email: resp.data.email,
+                role: resp.data.role,
+                avatar: resp.data.avatar,
+              }
+
+              // Update the current account if the user is the same as the current account
+              if (updatedProfile.id === currentAccount!.userInfo.id) {
+                localStorage.setItem(LocalStorageEnum.ACCOUNT, JSON.stringify(updatedProfile));
+                const account: AuthModel = {
+                  userInfo: updatedProfile,
+                  refreshToken: currentAccount!.refreshToken,
+                  accessToken: currentAccount!.accessToken
+                }
+                this.authService.accountSubject$.next(account);
+              }
               this.notificationService.showSuccess(resp.message);
               this.closeClick();
             }
@@ -329,6 +349,8 @@ export class DialogUsersComponent implements OnInit, OnDestroy {
             this.closeClick();
           });
     } else {
+
+      // Update User
       this.store.dispatch(new UpdateUser(id, params, avatar, imageOrUrl, previousImageUrl));
       this.dataLoading = false;
       this.closeClick();

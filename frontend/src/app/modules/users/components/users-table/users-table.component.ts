@@ -6,7 +6,7 @@ import { DialogUsersComponent } from '../../dialogs/dialog-users/dialog-users.co
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { MatTable } from '@angular/material/table';
 import { Select, Store } from '@ngxs/store';
-import { DeleteUser, GetUsers } from '../../store-users/users.action';
+import { DeleteUser, GetUsers } from '../../store-users/users.actions';
 import { UsersSelectors } from '../../store-users/users.selectors';
 import { PageEvent } from '@angular/material/paginator';
 import { MatSort, SortDirection } from '@angular/material/sort';

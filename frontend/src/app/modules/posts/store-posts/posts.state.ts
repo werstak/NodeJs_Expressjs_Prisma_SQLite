@@ -12,7 +12,7 @@ import {
   GetPosts,
   SetSelectedPost, UpdateCategory,
   UpdatePost
-} from './posts.action';
+} from './posts.actions';
 import * as _ from 'lodash';
 import { CategoriesModel, PostModel, UserListModel } from '../../../core/models';
 
