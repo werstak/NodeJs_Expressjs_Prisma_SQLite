@@ -4,7 +4,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
 import { UsersService } from '../../users.service';
 import { Observable, startWith, Subject, takeUntil } from 'rxjs';
 import { Store } from '@ngxs/store';
-import { AddUser, SetSelectedUser, UpdateUser} from '../../store-users/users.action';
+import { AddUser, SetSelectedUser, UpdateUser} from '../../store-users/users.actions';
 import { COUNTRIES } from '../../../../shared/constants/countries';
 import { map } from 'rxjs/operators';
 import { mustMatchValidator } from '../../../../shared/custom-validators/must-match.validator';

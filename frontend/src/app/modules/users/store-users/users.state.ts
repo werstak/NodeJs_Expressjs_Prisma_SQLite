@@ -6,7 +6,7 @@ import {
   SetAuthUser,
   SetSelectedUser,
   UpdateUser
-} from './users.action';
+} from './users.actions';
 import { UsersService } from '../users.service';
 import { tap } from 'rxjs';
 import { Injectable } from '@angular/core';
