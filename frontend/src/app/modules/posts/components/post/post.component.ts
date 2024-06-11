@@ -1,16 +1,18 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngxs/store';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { Store } from '@ngxs/store';
 
-import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
-import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
-import { DeletePost } from '../../store-posts/posts.actions';
-import { PostModel } from '../../../../core/models';
-import { RoleEnum } from '../../../../core/enums';
+import { DeletePost, SetSelectedPost } from '../../store-posts/posts.actions';
+import { PostsService } from '../../posts.service';
+import { CategoriesModel, PostModel } from '../../../../core/models';
+import { NotificationService, PermissionService } from '../../../../shared/services';
 import { AuthorPostModel } from '../../../../core/models/author-post.model';
-import { PermissionService } from '../../../../shared/services';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
+import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.component';
+import { AppRouteEnum } from '../../../../core/enums';
 
 @Component({
   selector: 'app-post',
@@ -18,20 +20,71 @@ import { PermissionService } from '../../../../shared/services';
   styleUrls: ['./post.component.scss']
 })
 export class PostComponent implements OnInit, OnDestroy {
-  @Input() post: PostModel;
-
-  // Subject to handle subscription cleanup
   private destroy$: Subject<void> = new Subject<void>();
-  // Enum for user roles
-  protected readonly RoleEnum = RoleEnum;
+  dataLoading: boolean = false;
+  post: PostModel | null = null;
+  initCategories: CategoriesModel[] = [];
+  pictureUrl: string | null = null;
+  previousPictureUrl: string | null = null;
+  postId: number | null = null;
 
   constructor(
-    public store: Store,
+    private notificationService: NotificationService,
+    public permissionService: PermissionService,
+    public postsService: PostsService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router,
     public dialog: MatDialog,
-    public permissionService: PermissionService
+    public store: Store,
   ) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
+    this.getPostId();
+    this.fetchPost();
+  }
+
+  /**
+   * Get post ID from the route
+   * @private
+   */
+  private getPostId() {
+    this.activatedRoute.params.subscribe(params => {
+      this.postId = +params['id'];
+    });
+  }
+
+  /**
+   * Fetch post by ID from the server and set it to the store state
+   * @private
+   */
+  private fetchPost() {
+    if (this.postId !== null) {
+      this.dataLoading = true;
+      this.postsService.getPost(this.postId).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(data => {
+          this.post = data;
+          this.initCategories = data.categories;
+          this.previousPictureUrl = data.picture;
+          this.pictureUrl = data.picture;
+          this.store.dispatch(new SetSelectedPost(data));
+          this.dataLoading = false;
+        },
+        (error) => {
+          this.dataLoading = false;
+          console.error(error);
+          this.notificationService.showError(error);
+        }
+      );
+    }
+  }
+
+  /**
+   * Check if the current user has permission to edit or delete a post
+   * @param author Author of the post
+   */
+  public hasActionPermission(author: AuthorPostModel): boolean {
+    return this.permissionService.checkActionPostPermission(author);
   }
 
   /**
@@ -55,13 +108,15 @@ export class PostComponent implements OnInit, OnDestroy {
    * @param post Post to delete
    */
   openDialogDeletePost(post: PostModel): void {
+    if (!post) return;
+
     const { id, title, picture } = post;
     const params = { picture };
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
       data: {
         subtitle: title,
-        title: 'Delete post - ',
+        title: 'Delete preview-post - ',
         okText: 'Delete'
       }
     });
@@ -71,20 +126,15 @@ export class PostComponent implements OnInit, OnDestroy {
     ).subscribe(result => {
       if (result === true) {
         this.store.dispatch(new DeletePost(id, params));
+        this.router.navigate([AppRouteEnum.Posts]);
       }
     });
-  }
-
-  /**
-   * Check if the current user has permission to edit or delete a post
-   * @param author Author of the post
-   */
-  public hasActionPermission(author: AuthorPostModel): boolean {
-    return this.permissionService.checkActionPostPermission(author);
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  protected readonly AppRouteEnum = AppRouteEnum;
 }
