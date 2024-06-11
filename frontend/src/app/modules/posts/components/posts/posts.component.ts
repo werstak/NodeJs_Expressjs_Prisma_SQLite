@@ -45,7 +45,7 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   // Pagination variables
   length = 0; // Total number of items
-  pageSize = 2; // Number of items per page
+  pageSize = 6; // Number of items per page
   pageIndex = 0; // Current page index
   pageSizeOptions = [2, 3, 5, 10, 15, 20, 25];
   previousPageIndex = 0;

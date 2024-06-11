@@ -1,3 +1,7 @@
+.wrap-post {
+  padding: 20px;
+}
+
 .post {
   padding: 20px;
   margin: 0 0 20px;
@@ -14,7 +18,7 @@
   }
 
   &__title {
-
+    text-decoration: none;
   }
 
   &__subTitle {
@@ -41,10 +45,29 @@
       width: auto;
       height: 100%;
     }
+  }
 
+  &__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__actionsBtn {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: row;
   }
 }
 
 ::ng-deep .mat-mdc-card-header-text {
   display: none !important;
+}
+
+.post-spinner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%,-50%)
 }
