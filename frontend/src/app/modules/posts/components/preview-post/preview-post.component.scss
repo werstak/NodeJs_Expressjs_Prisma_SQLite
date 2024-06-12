@@ -1,4 +1,4 @@
-@import '../../../../styles/variables';
+@import '../../../../styles/color-variables';
 
 .preview-post {
   padding: 0;
@@ -46,11 +46,6 @@
     -webkit-line-clamp: 3;
   }
 
-  //&__text {
-  //  text-align: justify;
-  //}
-
-
   &__img {
     width: 100%;
     height: auto;
@@ -63,6 +58,12 @@
     }
 
   }
+
+  &__inactive {
+    filter: grayscale(1);
+    opacity: 0.3;
+  }
+
 }
 
 ::ng-deep .mat-mdc-card-header-text {

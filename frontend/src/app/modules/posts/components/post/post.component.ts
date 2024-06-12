@@ -1,13 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { Store } from '@ngxs/store';
 
+import { Select, Store } from '@ngxs/store';
 import { DeletePost, SetSelectedPost } from '../../store-posts/posts.actions';
+import { PostsSelectors } from '../../store-posts/posts.selectors';
+
 import { PostsService } from '../../posts.service';
-import { CategoriesModel, PostModel } from '../../../../core/models';
+import { PostModel } from '../../../../core/models';
 import { NotificationService, PermissionService } from '../../../../shared/services';
 import { AuthorPostModel } from '../../../../core/models/author-post.model';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
@@ -23,9 +25,6 @@ export class PostComponent implements OnInit, OnDestroy {
   private destroy$: Subject<void> = new Subject<void>();
   dataLoading: boolean = false;
   post: PostModel | null = null;
-  initCategories: CategoriesModel[] = [];
-  pictureUrl: string | null = null;
-  previousPictureUrl: string | null = null;
   postId: number | null = null;
 
   constructor(
@@ -38,9 +37,13 @@ export class PostComponent implements OnInit, OnDestroy {
     public store: Store,
   ) {}
 
+  // Select post from the store
+  @Select(PostsSelectors.getSelectedPost) post$: Observable<PostModel>;
+
   ngOnInit() {
     this.getPostId();
     this.fetchPost();
+    this.setPost();
   }
 
   /**
@@ -63,10 +66,6 @@ export class PostComponent implements OnInit, OnDestroy {
       this.postsService.getPost(this.postId).pipe(
         takeUntil(this.destroy$)
       ).subscribe(data => {
-          this.post = data;
-          this.initCategories = data.categories;
-          this.previousPictureUrl = data.picture;
-          this.pictureUrl = data.picture;
           this.store.dispatch(new SetSelectedPost(data));
           this.dataLoading = false;
         },
@@ -77,6 +76,18 @@ export class PostComponent implements OnInit, OnDestroy {
         }
       );
     }
+  }
+
+  /**
+   * Set post from the store
+   * @private
+   */
+  public setPost(): void {
+    this.post$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((data) => {
+      this.post = data;
+    });
   }
 
   /**
@@ -93,6 +104,7 @@ export class PostComponent implements OnInit, OnDestroy {
    */
   openDialogEditPost(id: number): void {
     const dialogRef = this.dialog.open(DialogPostsComponent, {
+      width: 'auto',
       data: { id, newPost: false },
     });
 
@@ -114,9 +126,10 @@ export class PostComponent implements OnInit, OnDestroy {
     const params = { picture };
 
     const dialogRef = this.dialog.open(DialogConfirmComponent, {
+      width: '375px',
       data: {
         subtitle: title,
-        title: 'Delete preview-post - ',
+        title: 'Delete - ',
         okText: 'Delete'
       }
     });
