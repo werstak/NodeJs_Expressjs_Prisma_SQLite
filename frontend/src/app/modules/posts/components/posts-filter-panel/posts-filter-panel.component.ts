@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, Observable, pairwise, Subject } from 'rxjs';
+import { BehaviorSubject, filter, Observable, pairwise, Subject } from 'rxjs';
 import { debounceTime, map, startWith, takeUntil } from 'rxjs/operators';
 import { Select, Store } from '@ngxs/store';
 import { PostsService } from '../../posts.service';
@@ -11,6 +11,7 @@ import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.co
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 import { CategoriesModel, UserListModel } from '../../../../core/models';
 import { RoleEnum } from '../../../../core/enums';
+import { ROLES_LIST } from '../../../../shared/constants/roles-list';
 
 @Component({
   selector: 'app-posts-filter-panel',
@@ -54,17 +55,27 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   // Arrays to store selected values
   selectedValuesAuthors: any = [];
   selectedValuesCategories: any = [];
+  selectedValuesPublished: any = [];
 
   // Observables for filtering options
   filteredOptions$: Observable<any[]>;
   filteredOptionsCategories$: Observable<any[]>;
+  filteredOptionsPublished$= new BehaviorSubject<any>([]);
 
   // Clear All option label
   clearAllOption: string = 'Clear All';
 
+  // Enum for post status
+  statusPublished = [
+    {id: 1, name: 'Published', published: true},
+    {id: 2, name: 'Not Published', published: false},
+    // {id: 3, name: 'All', published: undefined}
+  ];
+
   ngOnInit() {
     this.fetchAllUsers();
     this.fetchCategories();
+    this.initPublished()
     this.buildForm();
     this.onChangesControlAuthors();
     this.onChangesControlCategories();
@@ -104,7 +115,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   private buildForm() {
     this.postFilterForm = this.fb.group({
       authors: [],
-      categories: []
+      categories: [],
+      published: [],
     });
   }
 
@@ -273,6 +285,16 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Handles selection change in the published dropdown
+   */
+  selectionChangePublished(event: any) {
+    if (event.isUserInput && !event.source.selected) {
+      const index = this.selectedValuesPublished.indexOf(event.source.value);
+      this.selectedValuesPublished.splice(index, 1);
+    }
+  }
+
+  /**
    * Focuses on search input when dropdown is opened
    */
   openedChangeCategories(e: any) {
@@ -359,8 +381,21 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.selectedValuesCategories = [];
   }
 
+  /**
+   * Clear all published
+   */
+  clearAllPublished() {
+    this.postFilterForm.patchValue({ published: [] });
+    this.selectedValuesPublished = [];
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private initPublished() {
+    this.filteredOptionsPublished$.next(this.statusPublished);
+    // this.postFilterForm.controls['published'].setValue([true, false, undefined]);
   }
 }

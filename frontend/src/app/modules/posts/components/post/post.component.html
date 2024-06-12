@@ -1,24 +1,24 @@
+<!-- Post page -->
 <div class="wrap-post" *ngIf="post">
   <mat-card class="post">
     <mat-card-header class="post__header">
-      <div class="post__details">
-        <!-- Post details -->
-        <h2 class="post__title">{{ post.title }}</h2>
 
-        <div class="post__subTitle">
-          Author: {{ post.user ? post.user.firstName : '' }} {{ post.user ? post.user.lastName : '' }}
+      <h2 class="post__title">{{ post.title }}</h2>
+
+      <!-- Post details -->
+      <div class="post__details">
+
+        <div class="post__subTitle post__subTitle_primary ">
+          <span class="bold-600">{{ post.user ? post.user.firstName : '' }} {{ post.user ? post.user.lastName : '' }}</span>
         </div>
-        <div class="post__subTitle">
-          Role: {{ post.user ? (post.user.role | roles) : '' }}
-        </div>
-        <div class="post__subTitle" *ngIf="post.categories">
-          Categories:
+<!--        <div class="post__subTitle">Role: {{ post.user ? (post.user.role | roles) : '' }}</div>-->
+        <div class="post__subTitle post__subTitle_accent" *ngIf="post.categories">
           <span *ngFor="let category of post.categories">
             {{ category.name }},
           </span>
         </div>
-        <div class="post__subTitle">Created: {{ post.createdAt | date: "d/M/yy" }}</div>
-        <div class="post__subTitle">Updated: {{ post.updatedAt | date: "d/M/yy" }}</div>
+        <div class="post__subTitle">{{ post.createdAt | date: "d/M/yy" }}</div>
+
       </div>
 
       <!-- Post image -->

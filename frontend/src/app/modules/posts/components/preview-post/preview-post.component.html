@@ -1,4 +1,6 @@
-<mat-card class="preview-post" *ngIf="post">
+<!-- This component is used to display a preview of a post. -->
+<mat-card class="preview-post" *ngIf="post"
+          [ngClass]="{'preview-post__inactive': !post.published}">
   <mat-card-header class="preview-post__header">
     <a [routerLink]="['/posts', post.id]" class="preview-post__link" title="View post">
       <!-- Post image -->
@@ -13,9 +15,6 @@
           </span>
         </div>
         <h2 class="preview-post__title">{{ post.title }}</h2>
-<!--        <div class="preview-post__subTitle">-->
-<!--          Author: {{ post.user ? post.user.firstName : '' }} {{ post.user ? post.user.lastName : '' }}-->
-<!--        </div>-->
         <p class="preview-post__description">{{ post.description }}</p>
       </div>
     </a>

@@ -23,7 +23,7 @@ import { CategoriesModel, PostModel, UserListModel } from '../../../core/models'
 export class PostsStateModel {
   posts: PostModel[];
   postsCounter?: any;
-  selectedPost?: any;
+  selectedPost?: PostModel | null | undefined;
   usersList: UserListModel[];
   categories: CategoriesModel[];
 }
@@ -121,6 +121,7 @@ export class PostsState {
         setState({
           ...state,
           posts: postsList,
+          selectedPost: result.data
         });
       },
       (error) => {

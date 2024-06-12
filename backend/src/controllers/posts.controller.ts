@@ -41,7 +41,10 @@ export const getAllPostsHandler = async (params: PostsQueryParamsModel): Promise
                 some: {
                     id: { in: categoriesArr }
                 }
-            }
+            },
+            // published: {
+            //     equals: undefined
+            // }
         },
         take: Number(pageSize),
         skip: skip,
