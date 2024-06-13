@@ -50,7 +50,7 @@
 
             <!-- Option for each author -->
             <mat-option
-              (onSelectionChange)="selectionChange($event)"
+              (onSelectionChange)="selectionChangeAuthors($event)"
               *ngFor="let option of filteredOptions$ | async"
               [value]="option">
               {{option.firstName}}
@@ -117,11 +117,6 @@
         </mat-select>
       </mat-form-field>
 
-
-
-
-
-
       <!-- Select input for published -->
       <mat-form-field class="filters__field">
         <mat-select class="filters__select"
@@ -140,9 +135,7 @@
             </span>
           </mat-select-trigger>
 
-
           <div class="select-container">
-
             <!-- Clear all published button -->
             <mat-option
               class="filters__option_clearAll"
@@ -156,7 +149,7 @@
             <mat-option
               (onSelectionChange)="selectionChangePublished($event)"
               *ngFor="let option of filteredOptionsPublished$ | async"
-              [value]="option.id">
+              [value]="option">
               {{option.name}}
             </mat-option>
           </div>

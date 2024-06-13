@@ -11,7 +11,6 @@ import { DialogPostsComponent } from '../../dialogs/dialog-posts/dialog-posts.co
 import { DialogCategoriesPostComponent } from '../../dialogs/dialog-categories-post/dialog-categories-post.component';
 import { CategoriesModel, UserListModel } from '../../../../core/models';
 import { RoleEnum } from '../../../../core/enums';
-import { ROLES_LIST } from '../../../../shared/constants/roles-list';
 
 @Component({
   selector: 'app-posts-filter-panel',
@@ -79,6 +78,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.buildForm();
     this.onChangesControlAuthors();
     this.onChangesControlCategories();
+    this.onChangesControlPublished();
   }
 
   /**
@@ -166,7 +166,7 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   /**
    * Handles selection change in the user dropdown
    */
-  selectionChange(event: any) {
+  selectionChangeAuthors(event: any) {
     if (event.isUserInput && !event.source.selected) {
       const index = this.selectedValuesAuthors.indexOf(event.source.value);
       this.selectedValuesAuthors.splice(index, 1);
@@ -349,8 +349,8 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
    * Checks if all roles are selected
    */
   public isFilterFieldsPosts(): boolean {
-    const { authors, categories } = this.postFilterForm.value;
-    return [authors?.length, categories?.length].filter(Boolean).length > 1;
+    const { authors, categories, published } = this.postFilterForm.value;
+    return [authors?.length, categories?.length, published?.length].filter(Boolean).length > 1;
   }
 
   /**
@@ -359,10 +359,12 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
   public clearAllFields(): void {
     this.postFilterForm.setValue({
       authors: [],
-      categories: []
+      categories: [],
+      published: []
     });
     this.selectedValuesAuthors = [];
     this.selectedValuesCategories = [];
+    this.selectedValuesPublished = [];
   }
 
   /**
@@ -389,13 +391,51 @@ export class PostsFilterPanelComponent implements OnInit, OnDestroy {
     this.selectedValuesPublished = [];
   }
 
+  /**
+   * Set published filter
+   * @private
+   */
+  private initPublished() {
+    this.filteredOptionsPublished$.next(this.statusPublished);
+  }
+
+  /**
+   * Subscribes to changes in the published control
+   */
+  private onChangesControlPublished() {
+    this.postFilterForm.controls['published'].valueChanges.pipe(
+      debounceTime(250),
+      map(val => {
+        let arrPublished = [];
+
+        if (val?.length) {
+          for (let i = 0; i < val.length; i++) {
+            arrPublished.push(val[i].published);
+          }
+        }
+
+        if (arrPublished.length > 0) {
+          this.filterData.published = arrPublished;
+          this.postsService.postsFilters$.next(this.filterData);
+        }
+
+        return arrPublished;
+      }),
+      pairwise(),
+      filter(([prev, curr]) => prev?.length > 0 && curr.length === 0),
+      takeUntil(this.destroy$)
+    ).subscribe(([prev, curr]) => {
+      if (prev.length > 0 && curr.length === 0) {
+        this.filterData.published = [];
+        this.postsService.postsFilters$.next(this.filterData);
+      }
+    });
+  }
+
   ngOnDestroy(): void {
+    this.postsService.postsFilters$.next({ authors: [], categories: [], published: []});
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private initPublished() {
-    this.filteredOptionsPublished$.next(this.statusPublished);
-    // this.postFilterForm.controls['published'].setValue([true, false, undefined]);
-  }
 }

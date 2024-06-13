@@ -167,9 +167,7 @@ export class PostsState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
@@ -188,9 +186,7 @@ export class PostsState {
       },
       (error) => {
         console.error(error);
-        const firstErrorAttempt: string = _.get(error, 'error.error.message', 'An error occurred');
-        const secondErrorAttempt: string = _.get(error, 'error.message', firstErrorAttempt);
-        this.notificationService.showError(secondErrorAttempt);
+        this.notificationService.showError(error);
       }
     ));
   }
