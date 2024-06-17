@@ -3,20 +3,22 @@
   <!-- Post Header -->
   <div class="dialog-post__header">
     <div class="dialog-post__title">
-      <p>{{this.currentPost ? this.currentPost.title : 'Add Post'}}</p>
+      <!-- Displaying post title or 'Add Post' if new -->
+      <p>{{ this.currentPost ? this.currentPost.title : 'Add Post' }}</p>
+      <!-- Displaying author's name if editing an existing post -->
       <p *ngIf="this.currentPost" class="dialog-post__subTitle">
         Author:
-        {{this.currentPost ? this.currentPost.user.firstName : ''}}
-        {{this.currentPost ? this.currentPost.user.lastName : ''}}
+        {{ this.currentPost.user.firstName }} {{ this.currentPost.user.lastName }}
       </p>
+      <!-- Displaying author's role if editing an existing post -->
       <p *ngIf="this.currentPost" class="dialog-post__subTitle">
-        Role: {{ this.currentPost ? (this.currentPost.user.role | roles) : '' }}
+        Role: {{ this.currentPost.user.role | roles }}
       </p>
     </div>
 
     <!-- Avatar -->
     <div class="dialog-post__avatar">
-      <!-- Avatar image -->
+      <!-- Avatar image selection -->
       <label class="hoverable" for="fileInput">
         <img [src]="pictureUrl ? pictureUrl : pictureDefault">
         <div class="hover-text">Choose file</div>
@@ -68,40 +70,29 @@
       <!-- Select Categories -->
       <mat-form-field class="example-full-width">
         <mat-label>Select categories</mat-label>
-        <mat-select formControlName="categories" placeholder="Favorite food" multiple [compareWith]="isSameCategory">
-          <mat-option *ngFor="let category of listAllCategories trackBy: trackByFn; let i = index" [value]="category">
-            {{category.name}}
+        <mat-select formControlName="categories" multiple [compareWith]="isSameCategory">
+
+          <!-- Display selected categories as chips -->
+          <mat-select-trigger>
+            <mat-chip-listbox>
+              <mat-chip-option *ngFor="let category of postForm.value.categories"
+                               [value]="category"
+                               [selected]="true"
+                               [removable]="true"
+                               (removed)="onToppingRemoved(category)">
+                {{ category.name }}
+                <mat-icon matChipRemove>cancel</mat-icon>
+              </mat-chip-option>
+            </mat-chip-listbox>
+          </mat-select-trigger>
+
+          <!-- Display all available categories to select from -->
+          <mat-option *ngFor="let category of listAllCategories; trackBy: trackByFn" [value]="category">
+            {{ category.name }}
           </mat-option>
+
         </mat-select>
       </mat-form-field>
-
-
-      <!--      <mat-form-field class="example-full-width">-->
-      <!--        <mat-label>Select categories</mat-label>-->
-      <!--        <mat-select formControlName="categories" multiple [compareWith]="isSameCategory">-->
-
-      <!--          <mat-select-trigger>-->
-      <!--            <mat-chip-listbox>-->
-      <!--              <mat-chip-option *ngFor="let category of postForm.controls['categories'].value"-->
-      <!--                               [value]="category"-->
-      <!--                               [selected]="true"-->
-      <!--                               [removable]="true"-->
-      <!--                               (removed)="onToppingRemoved(category)">-->
-      <!--                {{ category.name }}-->
-      <!--                <mat-icon matChipRemove>cancel</mat-icon>-->
-      <!--              </mat-chip-option>-->
-      <!--            </mat-chip-listbox>-->
-      <!--          </mat-select-trigger>-->
-
-      <!--          <mat-option *ngFor="let category of listAllCategories; trackBy: trackByFn; let i = index"-->
-      <!--                      [value]="category">{{category.name}}</mat-option>-->
-
-      <!--        </mat-select>-->
-      <!--      </mat-form-field>-->
-
-      <!--      <br/>-->
-      <!--      {{  postForm.controls['categories'].value | json }}-->
-
 
     </div>
 
@@ -117,7 +108,7 @@
               type="submit"
               [disabled]="!postForm.valid"
               [mat-dialog-close]="true">
-        {{this.data.newPost ? 'Create' : 'Update'}}
+        {{ this.data.newPost ? 'Create' : 'Update' }}
       </button>
       <!-- Cancel Button -->
       <button mat-raised-button color="accent"
