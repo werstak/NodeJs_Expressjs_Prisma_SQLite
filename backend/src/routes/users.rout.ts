@@ -13,6 +13,7 @@ import {
     parseUserUpdateParams, updateUserValidator,
     updatePasswordValidator,
 } from '../validators';
+import { requireRoleMiddleware } from '../middleware';
 
 export const usersRouter = express.Router();
 
@@ -60,6 +61,7 @@ usersRouter.get(
 usersRouter.get('/:id',
     param('id').isInt().withMessage('ID must be an integer'),
     handleErrorsValidator,
+    requireRoleMiddleware([2]),
     async (req: Request, res: Response) => {
         const id: number = parseInt(req.params.id, 10);
         try {

@@ -9,8 +9,8 @@ import { categoriesRouter } from './categories.rout';
 import { dashboardRouter } from './dashboard.rout';
 
 // Import middleware
-import upload from '../middleware/upload';
-import { isAuthenticated } from '../middleware';
+import upload from '../middleware/upload-middleware';
+import { isAuthenticatedMiddleware } from '../middleware';
 
 
 // Create an instance of Express Router
@@ -18,10 +18,10 @@ export const router = express.Router();
 
 // Route definitions
 router.use('/auth', authRouter);
-router.use('/posts', isAuthenticated, upload, postsRouter);
-router.use('/categories', isAuthenticated, categoriesRouter);
-router.use('/users', isAuthenticated, upload, usersRouter);
-router.use('/dashboard', isAuthenticated, dashboardRouter);
+router.use('/posts', isAuthenticatedMiddleware, upload, postsRouter);
+router.use('/categories', isAuthenticatedMiddleware, categoriesRouter);
+router.use('/users', isAuthenticatedMiddleware, upload, usersRouter);
+router.use('/dashboard', isAuthenticatedMiddleware, dashboardRouter);
 
 // Root route
 router.use('/', rootRouter);

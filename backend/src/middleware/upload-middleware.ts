@@ -30,7 +30,7 @@ const fileFilter = (req: any, file: any, cb: any) => {
 };
 
 /**
- *Define upload limits for multer
+ *Define uploadMiddleware limits for multer
  */
 const limits = {
     fileSize: 1024 * 1024 * 5 // 5MB file size limit
@@ -39,10 +39,10 @@ const limits = {
 /**
  *Create multer instance with defined settings
  */
-let upload = multer({
+let uploadMiddleware = multer({
     storage: storage,
     fileFilter: fileFilter,
     limits: limits
 });
 
-export default upload.single('ProfilePicture');
+export default uploadMiddleware.single('ProfilePicture');

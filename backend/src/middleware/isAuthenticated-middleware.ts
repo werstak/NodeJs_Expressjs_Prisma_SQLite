@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from 'express';
  * verifies the JWT token, and adds the token payload to the request object.
  * Throws an error if authentication fails.
  */
-export function isAuthenticated(req: any, res: Response, next: NextFunction) {
+export function isAuthenticatedMiddleware(req: any, res: Response, next: NextFunction) {
     const { authorization } = req.headers; // Get authorization header from request
 
     if (!authorization) {
