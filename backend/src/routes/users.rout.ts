@@ -14,7 +14,7 @@ import {
     updatePasswordValidator,
 } from '../validators';
 import { RoleTypesEnum } from '../enums/role-types.enum';
-import { allowedRoleMiddleware } from '../middleware';
+import { allowedRoleMiddleware, currentRoleMiddleware } from '../middleware';
 
 export const usersRouter = express.Router();
 
@@ -28,6 +28,7 @@ usersRouter.get(
     '/',
     getUsersValidator,
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
     async (req: Request, res: Response) => {
         const params = req.query;
@@ -86,6 +87,7 @@ usersRouter.post(
     parseUserCreateParams,
     createUserValidator,
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin]),
     async (req: Request, res: Response) => {
         try {
@@ -238,6 +240,7 @@ usersRouter.delete(
     '/:id',
     param('id').isInt().withMessage('ID must be an integer'),
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin]),
     async (req: Request, res: Response) => {
         const id: number = parseInt(req.params.id, 10);
