@@ -8,7 +8,7 @@ import {
 } from '../validators';
 import { param } from 'express-validator';
 import { RoleTypesEnum } from '../enums/role-types.enum';
-import { allowedRoleMiddleware } from '../middleware';
+import { allowedRoleMiddleware, currentRoleMiddleware } from '../middleware';
 
 export const categoriesRouter = express.Router();
 
@@ -34,6 +34,7 @@ categoriesRouter.post(
     '/',
     createCategoryValidator,
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
     async (req: Request, res: Response): Promise<Response> => {
         try {
@@ -55,6 +56,7 @@ categoriesRouter.put(
     '/:id',
     updateCategoryValidator,
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
     async (req: Request, res: Response): Promise<Response> => {
         const id: number = parseInt(req.params.id, 10);
@@ -77,6 +79,7 @@ categoriesRouter.delete(
     '/:id',
     param('id').isInt().withMessage('ID must be an integer'),
     handleErrorsValidator,
+    currentRoleMiddleware(),
     allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
     async (req: Request, res: Response): Promise<Response> => {
         const id: number = parseInt(req.params.id, 10);

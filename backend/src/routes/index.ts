@@ -10,7 +10,7 @@ import { dashboardRouter } from './dashboard.rout';
 
 // Import middleware
 import upload from '../middleware/upload-middleware';
-import { isAuthenticatedMiddleware } from '../middleware';
+import { currentRoleMiddleware, isAuthenticatedMiddleware } from '../middleware';
 
 
 // Create an instance of Express Router
@@ -18,10 +18,10 @@ export const router = express.Router();
 
 // Route definitions
 router.use('/auth', authRouter);
-router.use('/posts', isAuthenticatedMiddleware, upload, postsRouter);
-router.use('/categories', isAuthenticatedMiddleware, categoriesRouter);
-router.use('/users', isAuthenticatedMiddleware, upload, usersRouter);
-router.use('/dashboard', isAuthenticatedMiddleware, dashboardRouter);
+router.use('/posts', isAuthenticatedMiddleware, currentRoleMiddleware(), upload, postsRouter);
+router.use('/categories', isAuthenticatedMiddleware, currentRoleMiddleware(), categoriesRouter);
+router.use('/users', isAuthenticatedMiddleware, currentRoleMiddleware(), upload, usersRouter);
+router.use('/dashboard', isAuthenticatedMiddleware, currentRoleMiddleware(), dashboardRouter);
 
 // Root route
 router.use('/', rootRouter);
