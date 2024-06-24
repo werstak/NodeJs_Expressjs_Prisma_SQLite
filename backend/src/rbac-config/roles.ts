@@ -1,39 +1,30 @@
-interface IPermission {
-  name: string;
-}
+import { RoleTypesEnum } from '../enums/role-types.enum';
 
-interface IRole {
-  name: string;
-  permissions: IPermission[];
-}
+/**
+ * Object that maps each role to an array of permissions.
+ * The key is the role, and the value is an array of permissions granted to that role.
+ * A permission of '*' indicates that the role has access to all actions.
+ */
+export const roles: { [key in RoleTypesEnum]: string[] } = {
+    [RoleTypesEnum.SuperAdmin]: ['*'],
+    [RoleTypesEnum.ProjectAdmin]: [
+        'GET_USERS',
+        'CREATE_USER',
+        'UPDATE_USER',
+        'DELETE_USER',
 
-const roles: { roles: any[] } = {
-  "roles": [
-    {
-      "name": "admin",
-      "permissions": [
-        "create_record",
-        "read_record",
-        "update_record",
-        "delete_record"
-      ]
-    },
-    {
-      "name": "manager",
-      "permissions": [
-        "create_record",
-        "read_record",
-        "update_record"
-      ]
-    },
-    {
-      "name": "employee",
-      "permissions": [
-        "create_record",
-        "read_record"
-      ]
-    }
-  ]
-}
+        'CREATE_CATEGORY',
+        'UPDATE_CATEGORY',
+        'DELETE_CATEGORY'
+    ],
+    [RoleTypesEnum.Manager]: [
+        'GET_USERS',
 
-export default roles;
+        'CREATE_CATEGORY',
+        'UPDATE_CATEGORY',
+        'DELETE_CATEGORY'
+    ],
+    [RoleTypesEnum.Client]: [
+
+    ]
+};

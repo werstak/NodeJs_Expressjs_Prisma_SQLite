@@ -10,7 +10,8 @@ import { dashboardRouter } from './dashboard.rout';
 
 // Import middleware
 import upload from '../middleware/upload-middleware';
-import { currentRoleMiddleware, isAuthenticatedMiddleware } from '../middleware';
+import { isAuthenticatedMiddleware } from '../middleware';
+import { currentRoleMiddleware } from '../rbac-config';
 
 
 // Create an instance of Express Router

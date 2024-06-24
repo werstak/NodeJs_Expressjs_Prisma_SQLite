@@ -13,8 +13,8 @@ import {
     parseUserUpdateParams, updateUserValidator,
     updatePasswordValidator,
 } from '../validators';
-import { RoleTypesEnum } from '../enums/role-types.enum';
-import { allowedRoleMiddleware, currentRoleMiddleware } from '../middleware';
+import { checkPermissionMiddleware, currentRoleMiddleware } from '../rbac-config';
+
 
 export const usersRouter = express.Router();
 
@@ -29,7 +29,7 @@ usersRouter.get(
     getUsersValidator,
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
+    checkPermissionMiddleware('GET_USERS'),
     async (req: Request, res: Response) => {
         const params = req.query;
         try {
@@ -88,7 +88,7 @@ usersRouter.post(
     createUserValidator,
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin]),
+    checkPermissionMiddleware('CREATE_USER'),
     async (req: Request, res: Response) => {
         try {
             const user = req.body.user_params;
@@ -241,7 +241,7 @@ usersRouter.delete(
     param('id').isInt().withMessage('ID must be an integer'),
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin]),
+    checkPermissionMiddleware('DELETE_USER'),
     async (req: Request, res: Response) => {
         const id: number = parseInt(req.params.id, 10);
         try {
