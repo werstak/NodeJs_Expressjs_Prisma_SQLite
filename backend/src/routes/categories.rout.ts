@@ -7,8 +7,7 @@ import {
     updateCategoryValidator
 } from '../validators';
 import { param } from 'express-validator';
-import { RoleTypesEnum } from '../enums/role-types.enum';
-import { allowedRoleMiddleware, currentRoleMiddleware } from '../middleware';
+import { checkPermissionMiddleware, currentRoleMiddleware } from '../rbac-config';
 
 export const categoriesRouter = express.Router();
 
@@ -35,7 +34,7 @@ categoriesRouter.post(
     createCategoryValidator,
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
+    checkPermissionMiddleware('CREATE_CATEGORY'),
     async (req: Request, res: Response): Promise<Response> => {
         try {
             const data: NewCategoryModel = await CategoryHandler.createCategoryHandler(req.body);
@@ -57,7 +56,7 @@ categoriesRouter.put(
     updateCategoryValidator,
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
+    checkPermissionMiddleware('UPDATE_CATEGORY'),
     async (req: Request, res: Response): Promise<Response> => {
         const id: number = parseInt(req.params.id, 10);
         try {
@@ -80,7 +79,7 @@ categoriesRouter.delete(
     param('id').isInt().withMessage('ID must be an integer'),
     handleErrorsValidator,
     currentRoleMiddleware(),
-    allowedRoleMiddleware([RoleTypesEnum.SuperAdmin, RoleTypesEnum.ProjectAdmin, RoleTypesEnum.Manager]),
+    checkPermissionMiddleware('DELETE_CATEGORY'),
     async (req: Request, res: Response): Promise<Response> => {
         const id: number = parseInt(req.params.id, 10);
         try {
