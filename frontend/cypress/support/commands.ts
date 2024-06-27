@@ -35,3 +35,36 @@
 //     }
 //   }
 // }
+
+
+
+
+
+
+
+import { Method } from 'cypress/types/net-stubbing';
+
+Cypress.Commands.add('login', (email: string, password: string) => {
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:5000/auth/login',
+    body: { email, password }
+  }).then((response) => {
+    const { accessToken } = response.body;
+    localStorage.setItem('accessToken', accessToken);
+    cy.wrap(accessToken).as('accessToken');
+  });
+});
+
+Cypress.Commands.add('setTokenInLocalStorage', (token: string) => {
+  cy.window().then((window) => {
+    window.localStorage.setItem('accessToken', token);
+  });
+});
+
+Cypress.Commands.add('interceptWithToken', (alias: string, method: Method, url: string, token: string, response: any) => {
+  cy.intercept(method, url, (req) => {
+    req.headers['Authorization'] = `Bearer ${token}`;
+    req.reply(response);
+  }).as(alias);
+});

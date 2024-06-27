@@ -1,4 +1,4 @@
-import { CypressEnum } from '../enums/cypress.enum';
+import { CypressEnum } from '../../enums/cypress.enum';
 
 describe('ForgotPasswordComponent', () => {
   const testExampleEmail = CypressEnum.TestExampleEmail;
