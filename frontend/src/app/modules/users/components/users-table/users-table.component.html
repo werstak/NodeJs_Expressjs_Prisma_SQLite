@@ -94,6 +94,7 @@
         <th mat-header-cell class="header-btn" *matHeaderCellDef>
           <!-- Button to add a new user -->
           <button *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin]" mat-icon-button color="primary"
+                  data-test="addUser-button"
                   matTooltip="Add new user" (click)="addUser()">
             <mat-icon aria-label="Add">add</mat-icon>
           </button>
@@ -104,6 +105,7 @@
           <ng-container *ngIf="isPermissionHeadSuperAdmin(element)">
             <ng-container *appAllowAccess="[RoleEnum.SuperAdmin, RoleEnum.ProjectAdmin, RoleEnum.Manager]">
               <button
+                data-test="editUser-button"
                 mat-icon-button
                 color="primary"
                 (click)="editUser(element.id)"

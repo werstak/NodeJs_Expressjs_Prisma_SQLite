@@ -39,30 +39,61 @@
 
 
 
+// import { Method } from 'cypress/types/net-stubbing';
+//
+// Cypress.Commands.add('login', (email: string, password: string) => {
+//   const loginUserData = {email, password}
+//   cy.request({
+//     method: 'POST',
+//     url: Cypress.env('api_server') + '/auth/login',
+//     // url: 'http://localhost:5000/auth/login',
+//     body: { loginUserData },
+//     // body: { email, password }
+//   }).then((response) => {
+//     const { accessToken } = response.body;
+//     // cy.log('123=====', accessToken);
+//
+//     localStorage.setItem('accessToken', accessToken);
+//     cy.wrap(accessToken).as('accessToken');
+//   });
+// });
+//
+// Cypress.Commands.add('setTokenInLocalStorage', (token: string) => {
+//   cy.window().then((window) => {
+//     window.localStorage.setItem('accessToken', token);
+//   });
+// });
+//
+// Cypress.Commands.add('interceptWithToken', (alias: string, method: Method, url: string, token: string, response: any) => {
+//   cy.intercept(method, url, (req) => {
+//     req.headers['Authorization'] = `Bearer ${token}`;
+//     req.reply(response);
+//   }).as(alias);
+// });
 
 
 
-import { Method } from 'cypress/types/net-stubbing';
 
-Cypress.Commands.add('login', (email: string, password: string) => {
-  cy.request({
-    method: 'POST',
-    url: 'http://localhost:5000/auth/login',
-    body: { email, password }
+
+
+Cypress.Commands.add('login', (email, password) => {
+  const loginUserData = {email, password}
+
+  cy.request('POST', `${Cypress.env('api_server')}/auth/login`, {
+    loginUserData
   }).then((response) => {
     const { accessToken } = response.body;
-    localStorage.setItem('accessToken', accessToken);
     cy.wrap(accessToken).as('accessToken');
   });
 });
 
-Cypress.Commands.add('setTokenInLocalStorage', (token: string) => {
+Cypress.Commands.add('setTokenInLocalStorage', (token) => {
   cy.window().then((window) => {
     window.localStorage.setItem('accessToken', token);
   });
 });
 
-Cypress.Commands.add('interceptWithToken', (alias: string, method: Method, url: string, token: string, response: any) => {
+Cypress.Commands.add('interceptWithToken', (alias, method, url, token, response) => {
   cy.intercept(method, url, (req) => {
     req.headers['Authorization'] = `Bearer ${token}`;
     req.reply(response);

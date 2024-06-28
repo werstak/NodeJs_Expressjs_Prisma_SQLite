@@ -12,6 +12,9 @@ describe('LoginComponent', () => {
 
   // Test to ensure the login form is displayed correctly
   it('should display the login form', () => {
+
+    // cy.log(loginEmail, password);
+
     cy.get('mat-card-title').contains('Login Account');
     cy.get('input[formControlName="email"]').should('be.visible');
     cy.get('input[formControlName="password"]').should('be.visible');
