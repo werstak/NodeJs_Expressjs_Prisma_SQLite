@@ -41,6 +41,7 @@
       <div class="post__actionsBtn">
         <!-- Edit post button -->
         <button mat-icon-button class="material-icons app-toolbar-menu save-button"
+                data-test="edit-button"
                 [disabled]="!hasActionPermission(post.user)"
                 matTooltip="Edit" color="primary"
                 (click)="openDialogEditPost(post.id)">
