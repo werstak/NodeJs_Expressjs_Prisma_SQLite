@@ -56,14 +56,13 @@ describe('LoginComponent', () => {
 
   // Test to simulate a successful login attempt and navigation to the home page
   it('should log in the user and navigate to the home page on successful login', () => {
-    cy.intercept('POST', '/api/auth/login', {
-      statusCode: 200,
-      body: { token: 'fake-jwt-token' },
-    });
+    cy.intercept('POST', Cypress.env('api_server') + '/auth/login').as('login');
 
     cy.get('input[formControlName="email"]').type(loginEmail);
     cy.get('input[formControlName="password"]').type(password);
     cy.get('button[type="submit"]').click();
+
+    cy.wait('@login').its('response.statusCode').should('eq', 200);
 
     // Check URL change to ensure navigation to the home page
     cy.url().should('eq', Cypress.config().baseUrl + '/');
