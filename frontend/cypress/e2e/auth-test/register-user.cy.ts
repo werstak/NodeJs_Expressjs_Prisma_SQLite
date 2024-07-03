@@ -85,7 +85,8 @@ describe('RegisterComponent', () => {
     cy.get('form').submit();
 
     // Check message availability
-    // cy.wait('@registerUser').its('response.statusCode').should('eq', 200);
+    // cy.wait('@registerUser').its('response.statusCode').should('eq', 201);
+
     cy.url().should('include', '/auth/login'); // Adjust the URL check if necessary
     cy.get('mat-snack-bar-container').should('be.visible');
   });
