@@ -75,45 +75,13 @@
 
 
 
-// Cypress.Commands.add('login', (email, password) => {
-//   const loginUserData = {email, password}
-//
-//   cy.request('POST', `${Cypress.env('api_server')}/auth/login`, {
-//     loginUserData
-//   }).then((response) => {
-//     const { accessToken } = response.body;
-//     cy.wrap(accessToken).as('accessToken');
-//   });
-// });
-//
-// Cypress.Commands.add('setTokenInLocalStorage', (token) => {
-//   cy.window().then((window) => {
-//     window.localStorage.setItem('accessToken', token);
-//   });
-// });
-//
-// Cypress.Commands.add('interceptWithToken', (alias, method, url, token, response) => {
-//   cy.intercept(method, url, (req) => {
-//     req.headers['Authorization'] = `Bearer ${token}`;
-//     req.reply(response);
-//   }).as(alias);
-// });
-
-
-
-
-
-
-
-
 Cypress.Commands.add('login', (email, password) => {
-  const loginUserData = {email, password};
+  const loginUserData = {email, password}
 
   cy.request('POST', `${Cypress.env('api_server')}/auth/login`, {
     loginUserData
   }).then((response) => {
     const { accessToken } = response.body;
-    cy.setTokenInLocalStorage(accessToken);
     cy.wrap(accessToken).as('accessToken');
   });
 });
@@ -124,20 +92,52 @@ Cypress.Commands.add('setTokenInLocalStorage', (token) => {
   });
 });
 
-Cypress.Commands.add('visitWithToken', (url) => {
-  cy.window().then((window) => {
-    const token = window.localStorage.getItem('accessToken');
-    cy.visit(url, {
-      onBeforeLoad(win) {
-        win.localStorage.setItem('accessToken', token);
-      },
-    });
-  });
-});
-
 Cypress.Commands.add('interceptWithToken', (alias, method, url, token, response) => {
   cy.intercept(method, url, (req) => {
     req.headers['Authorization'] = `Bearer ${token}`;
     req.reply(response);
   }).as(alias);
 });
+
+
+
+
+
+
+
+
+// Cypress.Commands.add('login', (email, password) => {
+//   const loginUserData = {email, password};
+//
+//   cy.request('POST', `${Cypress.env('api_server')}/auth/login`, {
+//     loginUserData
+//   }).then((response) => {
+//     const { accessToken } = response.body;
+//     cy.setTokenInLocalStorage(accessToken);
+//     cy.wrap(accessToken).as('accessToken');
+//   });
+// });
+//
+// Cypress.Commands.add('setTokenInLocalStorage', (token) => {
+//   cy.window().then((window) => {
+//     window.localStorage.setItem('accessToken', token);
+//   });
+// });
+//
+// Cypress.Commands.add('visitWithToken', (url) => {
+//   cy.window().then((window) => {
+//     const token = window.localStorage.getItem('accessToken');
+//     cy.visit(url, {
+//       onBeforeLoad(win) {
+//         win.localStorage.setItem('accessToken', token);
+//       },
+//     });
+//   });
+// });
+//
+// Cypress.Commands.add('interceptWithToken', (alias, method, url, token, response) => {
+//   cy.intercept(method, url, (req) => {
+//     req.headers['Authorization'] = `Bearer ${token}`;
+//     req.reply(response);
+//   }).as(alias);
+// });

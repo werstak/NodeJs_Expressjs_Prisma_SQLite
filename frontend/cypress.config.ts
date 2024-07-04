@@ -18,5 +18,6 @@ export default defineConfig({
   },
   env: {
     api_server: 'http://localhost:5000',
+    // accessToken: '',
   }
 })
