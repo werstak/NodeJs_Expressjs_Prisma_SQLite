@@ -37,24 +37,6 @@
 // }
 
 
-import { CypressEnum } from '../enums/cypress.enum';
-
-Cypress.Commands.add('login', () => {
-  const loginEmail = CypressEnum.LoginEmail;
-  const password = CypressEnum.Password;
-
-  cy.visit('/auth/login');
-
-  cy.intercept('POST', Cypress.env('api_server') + '/auth/login').as('login');
-
-  cy.get('input[formControlName="email"]').type(loginEmail);
-  cy.get('input[formControlName="password"]').type(password);
-  cy.get('button[type="submit"]').click();
-
-  cy.url().should('eq', Cypress.config().baseUrl + '/');
-});
-
-
 
 
 
@@ -158,3 +140,62 @@ Cypress.Commands.add('login', () => {
 
 
 
+
+import { CypressEnum } from '../enums/cypress.enum';
+
+Cypress.Commands.add('login', () => {
+  const loginEmail = CypressEnum.LoginEmail;
+  const password = CypressEnum.Password;
+
+  cy.visit('/auth/login');
+
+  cy.intercept('POST', Cypress.env('api_server') + '/auth/login').as('login');
+
+  cy.get('input[formControlName="email"]').type(loginEmail);
+  cy.get('input[formControlName="password"]').type(password);
+  cy.get('button[type="submit"]').click();
+
+  cy.url().should('eq', Cypress.config().baseUrl + '/');
+});
+
+
+
+// import { CypressEnum } from '../enums/cypress.enum';
+//
+// Cypress.Commands.add('login', () => {
+//   const loginEmail = CypressEnum.LoginEmail;
+//   const password = CypressEnum.Password;
+//
+//   const loginUserData = {loginEmail, password};
+//
+//   cy.visit('/auth/login');
+//
+//   cy.intercept('POST', Cypress.env('api_server') + '/auth/login').as('login');
+//
+//   // cy.request('POST', Cypress.env('api_server') + '/auth/login', {
+//   //   loginUserData
+//   // }).then((response) => {
+//   //   const { accessToken } = response.body;
+//   //   cy.setTokenInLocalStorage(accessToken);
+//   //   cy.wrap(accessToken).as('accessToken');
+//   // });
+//
+//   cy.get('input[formControlName="email"]').type(loginEmail);
+//   cy.get('input[formControlName="password"]').type(password);
+//   cy.get('button[type="submit"]').click();
+//
+//   cy.url().should('eq', Cypress.config().baseUrl + '/');
+// });
+//
+// Cypress.Commands.add('setTokenInLocalStorage', (accessToken) => {
+//   cy.window().then((window) => {
+//     window.localStorage.setItem('accessToken', accessToken);
+//   });
+// });
+//
+// Cypress.Commands.add('interceptWithToken', (method, url, accessToken) => {
+//   console.log(444, accessToken)
+//   cy.intercept(method, url, (req) => {
+//     req.headers['Authorization'] = `Bearer ${accessToken}`;
+//   });
+// });
