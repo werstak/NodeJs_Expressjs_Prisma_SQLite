@@ -3,22 +3,19 @@ import { CypressEnum } from '../../enums/cypress.enum';
 describe('RegisterComponent', () => {
   const registerEmail = CypressEnum.RegisterEmail;
   const password = CypressEnum.Password;
-  const firstName = CypressEnum.firstName;
-  const lastName = CypressEnum.lastName;
-  const country = CypressEnum.country;
-  const birthDate = CypressEnum.birthDate;
+  const firstName = CypressEnum.LoginFirstName;
+  const lastName = CypressEnum.LoginLastName;
+  const country = CypressEnum.Country;
+  const birthDate = CypressEnum.BirthDate;
 
-  // Navigate to the registration page before each test
   beforeEach(() => {
     cy.visit('/auth/registration'); // Adjust the route if necessary
   });
 
-  // Test to ensure the registration form is displayed correctly
   it('should display the registration form', () => {
     cy.get('mat-card-title').contains('Register Account');
   });
 
-  // Test to ensure validation errors are displayed for required fields
   it('should display validation errors for required fields', () => {
     cy.get('input[formControlName="email"]').focus().blur();
     cy.get('mat-error').contains('Email required');
@@ -44,7 +41,6 @@ describe('RegisterComponent', () => {
     cy.get('mat-error').contains('Birth date required');
   });
 
-  // Test to ensure a validation error is displayed for mismatched passwords
   it('should display validation error for mismatched passwords', () => {
     cy.get('input[formControlName="password"]').type(password);
     cy.get('input[formControlName="confirmPassword"]').type('wrongPassword');
@@ -53,7 +49,6 @@ describe('RegisterComponent', () => {
     cy.get('mat-error').contains('Passwords must match');
   });
 
-  // Test to ensure a validation error is displayed for a future birth date
   it('should display validation error for future birth date', () => {
     cy.get('input[formControlName="birthAt"]').type('3000-01-01');
     cy.get('form').submit();
@@ -61,7 +56,6 @@ describe('RegisterComponent', () => {
     cy.get('mat-error').contains('Birth date cannot be in the future');
   });
 
-  // Test to fill out and submit the registration form successfully
   it('should fill out and submit the registration form successfully', () => {
     cy.get('input[formControlName="email"]').type(registerEmail);
     cy.get('input[formControlName="firstName"]').type(firstName);
