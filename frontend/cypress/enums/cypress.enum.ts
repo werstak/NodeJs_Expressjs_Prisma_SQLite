@@ -1,5 +1,7 @@
 export enum CypressEnum {
   LoginEmail = 'andypetrov114@gmail.com',
+  // LoginEmail = 'andypetrov114+Client-Keanu@gmail.com',
+
   LoginFirstName = 'Andy',
   LoginLastName = 'Petrov',
 
@@ -14,6 +16,8 @@ export enum CypressEnum {
   TestExampleEmail = 'test@example.com',
 
   Password = 'test123456',
+  CurrentPassword = 'test123456',
+  NewPassword = 'test123456',
 
   Country = 'United States',
   BirthDate = '2000-01-01',

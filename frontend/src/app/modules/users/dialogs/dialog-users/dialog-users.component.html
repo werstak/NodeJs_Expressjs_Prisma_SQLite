@@ -169,7 +169,7 @@
         <!-- Change Password Link (if not new user) -->
         <!-- Do not show if Role of manager -->
         <ng-container *ngIf="isPermissionsManager(authUser, currentUser)">
-          <a *ngIf="!data.newUser" class="dialog__actions_link" (click)="openDialogNewPassword(currentUser)">
+          <a *ngIf="!data.newUser" class="dialog__actions_link" data-test="link-change-password" (click)="openDialogNewPassword(currentUser)">
             <span>Change password</span>
           </a>
         </ng-container>
