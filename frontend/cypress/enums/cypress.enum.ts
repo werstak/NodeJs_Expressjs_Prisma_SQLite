@@ -21,4 +21,9 @@ export enum CypressEnum {
 
   Country = 'United States',
   BirthDate = '2000-01-01',
+
+  SuperAdmin = 'Super Admin',
+  ProjectAdmin = 'Project Admin',
+  Manager = 'Manager',
+  Client = 'Client'
 }
