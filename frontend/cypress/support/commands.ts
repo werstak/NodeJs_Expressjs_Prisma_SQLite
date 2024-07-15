@@ -154,7 +154,10 @@ Cypress.Commands.add('login', () => {
   cy.get('input[formControlName="email"]').type(loginEmail);
   cy.get('input[formControlName="password"]').type(password);
   cy.get('button[type="submit"]').click();
-
+  cy.wait('@login').then((interception) => {
+    expect(interception.response.statusCode).to.eq(200);
+    // console.log(222, interception.response)
+  });
   cy.url().should('eq', Cypress.config().baseUrl + '/');
 });
 

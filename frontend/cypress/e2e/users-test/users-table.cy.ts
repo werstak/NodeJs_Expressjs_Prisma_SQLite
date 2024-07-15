@@ -2,7 +2,6 @@ describe('UsersTableComponent', () => {
   beforeEach(() => {
     cy.login();
     cy.visit('/users');
-    cy.wait('@login');
   });
 
   it('should display a page with a table of users', () => {
