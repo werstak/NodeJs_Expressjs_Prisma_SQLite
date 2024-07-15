@@ -8,7 +8,6 @@ describe('AccountSettingsDialog', () => {
 
   beforeEach(() => {
     cy.login();
-    cy.wait('@login');
     cy.visit('/');
 
     cy.url().should('eq', Cypress.config().baseUrl + '/');
@@ -37,7 +36,8 @@ describe('AccountSettingsDialog', () => {
     cy.get('mat-calendar').should('be.visible');
     cy.get('mat-calendar').contains('3').click();
 
-    // // Submit the form
+    /** Uncomment the code if necessary */
+        // // Submit the form
     // cy.get('button[type="submit"]').click();
 
     // Verify the user was updated (mock or real response verification)

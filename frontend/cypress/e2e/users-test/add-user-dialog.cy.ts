@@ -10,7 +10,6 @@ describe('AddUserDialog', () => {
 
   beforeEach(() => {
     cy.login();
-    cy.wait('@login');
     cy.visit('/users');
 
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
