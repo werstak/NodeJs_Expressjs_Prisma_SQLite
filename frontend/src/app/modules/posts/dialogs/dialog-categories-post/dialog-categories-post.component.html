@@ -6,7 +6,7 @@
   <mat-form-field class="category__field"
                   (keydown.enter)="$event.preventDefault(); addFlag ? addCategory(): updateCategory()">
     <mat-label>{{ addFlag ? 'Create a new category' : 'Update Category'}}</mat-label>
-    <input matInput [formControl]="category">
+    <input matInput [formControl]="category" data-test="input-category">
     <mat-error *ngIf="category.hasError('required')">
       Category <strong>required</strong>
     </mat-error>
@@ -36,6 +36,7 @@
     color="primary"
     aria-label="Add"
     matTooltip="Add new Category"
+    data-test="add-category-button"
     (click)="displayFields()"
   >
     <mat-icon>add</mat-icon>
