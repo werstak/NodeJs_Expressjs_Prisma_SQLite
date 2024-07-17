@@ -25,5 +25,8 @@ export enum CypressEnum {
   SuperAdmin = 'Super Admin',
   ProjectAdmin = 'Project Admin',
   Manager = 'Manager',
-  Client = 'Client'
+  Client = 'Client',
+
+  NewCategory = 'New Category',
+  UpdatedCategory = 'Updated Category'
 }

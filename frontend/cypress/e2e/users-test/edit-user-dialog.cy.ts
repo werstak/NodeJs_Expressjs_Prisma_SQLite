@@ -35,7 +35,7 @@ describe('EditUserDialog', () => {
     cy.get('[data-test="userForm"] input[formControlName="location"]').clear().type(country);
     cy.get('mat-option').contains(country).click();
 
-    // Update birth date field by selecting a date in the datepicker
+    // Update birthdate field by selecting a date in the datepicker
     cy.get('[data-test="userForm"] mat-datepicker-toggle button').click();
     cy.get('mat-calendar').should('be.visible');
     cy.get('mat-calendar').contains('3').click();
