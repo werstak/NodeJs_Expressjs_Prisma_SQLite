@@ -52,6 +52,7 @@
         <button mat-icon-button class="material-icons app-toolbar-menu delete-button"
                 [disabled]="!hasActionPermission(post.user)"
                 matTooltip="Delete" color="warn"
+                data-test="delete-button"
                 (click)="openDialogDeletePost(post)">
           <mat-icon>delete</mat-icon>
         </button>

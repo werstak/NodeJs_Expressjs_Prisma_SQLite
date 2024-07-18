@@ -68,7 +68,7 @@ describe('ManagePostCategories', () => {
       .click();
 
     // Confirm deletion in the dialog
-    cy.get('[data-test="ok-button"]').click();
+    cy.get('[data-test="confirm-ok-button"]').click();
     cy.get('mat-snack-bar-container').should('be.visible');
 
     // Verify the category is deleted
