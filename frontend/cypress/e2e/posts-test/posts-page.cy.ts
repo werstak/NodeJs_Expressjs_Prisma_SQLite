@@ -28,7 +28,7 @@ describe('PostsComponent', () => {
     cy.get('.mat-mdc-paginator-navigation-next').click();
     cy.get('.mat-mdc-paginator-navigation-first').click();
     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
-       cy.get('.mat-mdc-paginator-navigation-last').click();
+    cy.get('.mat-mdc-paginator-navigation-last').click();
     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
   });
 });
