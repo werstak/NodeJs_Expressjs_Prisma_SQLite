@@ -6,33 +6,114 @@ describe('PostsComponent', () => {
   });
 
   it('should display the posts page', () => {
-    cy.get('app-posts').should('be.visible');
-    cy.get('app-posts-filter-panel').should('be.visible');
-    cy.get('[data-test="posts-grid"]').should('be.visible');
+    verifyPostsPageIsVisible();
+    verifyFilterPanelIsVisible();
+    verifyPostsGridIsVisible();
   });
 
   it('should display the paginator', () => {
-    cy.get('mat-paginator').should('be.visible');
+    verifyPaginatorIsVisible();
   });
 
   it('should display the correct number of posts in the grid', () => {
-    cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // assuming pageSize is 5
+    verifyNumberOfPostsInGrid(5); // assuming pageSize is 5
   });
 
   it('should navigate to the next page when paginator is used', () => {
-    cy.get('.mat-mdc-paginator-navigation-next').click();
-    cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
+    navigateToNextPage();
+    verifyNumberOfPostsInGrid(5); // check the number of posts on the next page
   });
 
-  it('should navigate to the next page when paginator is used', () => {
+  it('should navigate to different pages using paginator', () => {
+    navigateToNextPage();
+    navigateToFirstPage();
+    verifyNumberOfPostsInGrid(5); // check the number of posts on the first page
+    navigateToLastPage();
+    verifyNumberOfPostsInGrid(5); // check the number of posts on the last page
+  });
+
+  // Verify the posts page is visible
+  const verifyPostsPageIsVisible = () => {
+    cy.get('app-posts').should('be.visible');
+  };
+
+  // Verify the filter panel is visible
+  const verifyFilterPanelIsVisible = () => {
+    cy.get('app-posts-filter-panel').should('be.visible');
+  };
+
+  // Verify the posts grid is visible
+  const verifyPostsGridIsVisible = () => {
+    cy.get('[data-test="posts-grid"]').should('be.visible');
+  };
+
+  // Verify the paginator is visible
+  const verifyPaginatorIsVisible = () => {
+    cy.get('mat-paginator').should('be.visible');
+  };
+
+  // Verify the correct number of posts in the grid
+  const verifyNumberOfPostsInGrid = (expectedCount) => {
+    cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', expectedCount);
+  };
+
+  // Navigate to the next page using the paginator
+  const navigateToNextPage = () => {
     cy.get('.mat-mdc-paginator-navigation-next').click();
+  };
+
+  // Navigate to the first page using the paginator
+  const navigateToFirstPage = () => {
     cy.get('.mat-mdc-paginator-navigation-first').click();
-    cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
+  };
+
+  // Navigate to the last page using the paginator
+  const navigateToLastPage = () => {
     cy.get('.mat-mdc-paginator-navigation-last').click();
-    cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
-  });
+  };
 });
 
+
+
+
+
+
+
+// describe('PostsComponent', () => {
+//   beforeEach(() => {
+//     cy.login();
+//     cy.visit('/posts');
+//     cy.url().should('eq', Cypress.config().baseUrl + '/posts');
+//   });
+//
+//   it('should display the posts page', () => {
+//     cy.get('app-posts').should('be.visible');
+//     cy.get('app-posts-filter-panel').should('be.visible');
+//     cy.get('[data-test="posts-grid"]').should('be.visible');
+//   });
+//
+//   it('should display the paginator', () => {
+//     cy.get('mat-paginator').should('be.visible');
+//   });
+//
+//   it('should display the correct number of posts in the grid', () => {
+//     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // assuming pageSize is 5
+//   });
+//
+//   it('should navigate to the next page when paginator is used', () => {
+//     cy.get('.mat-mdc-paginator-navigation-next').click();
+//     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
+//   });
+//
+//   it('should navigate to the next page when paginator is used', () => {
+//     cy.get('.mat-mdc-paginator-navigation-next').click();
+//     cy.get('.mat-mdc-paginator-navigation-first').click();
+//     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
+//     cy.get('.mat-mdc-paginator-navigation-last').click();
+//     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', 5); // check the number of posts on the next page
+//   });
+// });
+//
 
 
 

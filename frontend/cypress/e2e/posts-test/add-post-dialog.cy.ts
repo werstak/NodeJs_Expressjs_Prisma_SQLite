@@ -1,10 +1,7 @@
 import { DataPost } from '../../constants/data-post';
 
 describe('AddPostDialog', () => {
-  const title = DataPost.title;
-  const description = DataPost.description;
-  const content = DataPost.content;
-
+  const { title, description, content } = DataPost;
   let selectedCategories = '';
 
   beforeEach(() => {
@@ -31,45 +28,46 @@ describe('AddPostDialog', () => {
     cy.get('.mat-mdc-paginator-navigation-last').click();
   });
 
-  // Function to open the Add Post dialog
-  function openAddPostDialog() {
+  // Open the Add Post dialog
+  const openAddPostDialog = () => {
     cy.get('[data-test="add-post-button"]').should('be.visible').click();
     cy.get('mat-dialog-container').should('be.visible');
-  }
+  };
 
-  // Function to fill in the post details
-  function fillPostDetails(title, description, content) {
+  // Fill in the post details
+  const fillPostDetails = (title, description, content) => {
     cy.get('[data-test="post-title-input"]').type(`${title} Updated`);
     cy.get('[data-test="post-description-input"]').type(`${description} Updated`);
     cy.get('[data-test="post-content-input"]').type(`${content} Updated`);
-  }
+  };
 
-  // Function to select the first category in the dropdown
-  function selectFirstCategory() {
+  // Select the first category in the dropdown
+  const selectFirstCategory = () => {
     cy.get('[data-test="categories-field"]').click();
     cy.get('mat-option[data-test="categories-title-option"]').first().click().then(option => {
       selectedCategories = option.text().trim();
       cy.wrap(option).should('have.attr', 'aria-selected', 'true');
       cy.get('mat-option[data-test="categories-title-option"]').should('contain.text', selectedCategories);
     });
-  }
+  };
 
-  // Function to close the dropdown
-  function closeDropdown() {
+  // Close the dropdown
+  const closeDropdown = () => {
     cy.get('body').type('{esc}');
     cy.wait(100);
-  }
+  };
 
-  // Function to save the post
-  function savePost() {
+  // Save the post
+  const savePost = () => {
     cy.get('[data-test="save-post-button"]').click();
-  }
+  };
 
-  // Function to verify the success message
-  function verifySuccessMessage() {
+  // Verify the success message
+  const verifySuccessMessage = () => {
     cy.get('mat-snack-bar-container').should('be.visible');
-  }
+  };
 });
+
 
 
 
