@@ -15,19 +15,3 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands';
-
-
-
-
-// import { CypressEnum } from '../enums/cypress.enum';
-//
-// before(() => {
-//   cy.login(CypressEnum.LoginEmail, CypressEnum.Password).then((accessToken) => {
-//     Cypress.env('accessToken', accessToken);
-//     cy.setTokenInLocalStorage(Cypress.env('accessToken'));
-//   });
-// });
-//
-// beforeEach(() => {
-//   cy.setTokenInLocalStorage(Cypress.env('accessToken'));
-// });
