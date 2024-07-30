@@ -8,70 +8,72 @@ describe('ManagePostCategories', () => {
     cy.login();
     cy.visit('/posts');
     cy.url().should('eq', Cypress.config().baseUrl + '/posts');
-    cy.get('[data-test="manage-categories-button"]').should('be.visible');
+  });
 
-    // Open manage categories dialog
-    cy.get('[data-test="manage-categories-button"]').click();
-    cy.get('mat-dialog-container').should('be.visible');
+  it('should display the manage categories button', () => {
+    cy.get('[data-test="manage-categories-button"]').should('be.visible');
   });
 
   it('should add a new category', () => {
-    // Click on the add new category button
-    cy.get('[data-test="add-category-button"]').click();
-
-    // Enter category name using force: true to bypass visibility check
-    cy.get('[data-test="input-category"]').type(newCategory, { force: true });
-    cy.wait(300);
-
-    // Click create button
-    cy.get('[data-test="submit-category-button"]').should('not.be.disabled');
-    cy.get('[data-test="submit-category-button"]').click();
-    cy.get('mat-snack-bar-container').should('be.visible');
-
-    // Verify the new category is added
-    cy.get('[data-test="category-title"]').should('contain.text', newCategory);
+    openManageCategoriesDialog();
+    addNewCategory(newCategory);
+    verifyCategoryExists(newCategory);
   });
-
 
   it('should edit an existing category', () => {
-    // Ensure the category is present
-    cy.get('[data-test="category-title"]').contains(newCategory).should('be.visible');
-
-    // Edit the category
-    cy.get('[data-test="category-title"]').contains(newCategory)
-      .parents('.categories')
-      .find('[data-test="edit-category-button"]')
-      .click();
-
-    // Update category name
-    cy.get('[data-test="input-category"]').clear().type(updatedCategory, { force: true });
-    cy.wait(300);
-
-    // Click update button
-    cy.get('[data-test="submit-category-button"]').should('not.be.disabled');
-    cy.get('[data-test="submit-category-button"]').click();
-    cy.get('mat-snack-bar-container').should('be.visible');
-
-    // Verify the category name is updated
-    cy.get('[data-test="category-title"]').should('contain.text', updatedCategory);
+    openManageCategoriesDialog();
+    verifyCategoryExists(newCategory);
+    editCategory(newCategory, updatedCategory);
+    verifyCategoryExists(updatedCategory);
   });
-
 
   it('should delete a category', () => {
-    // Ensure the category is present
-    cy.get('[data-test="category-title"]').contains(updatedCategory).should('be.visible');
+    openManageCategoriesDialog();
+    verifyCategoryExists(updatedCategory);
+    deleteCategory(updatedCategory);
+    verifyCategoryNotExists(updatedCategory);
+  });
 
-    // Delete the category
-    cy.get('[data-test="category-title"]').contains(updatedCategory)
-      .parents('.categories')
-      .find('[data-test="delete-category-button"]')
-      .click();
+  // Open the Manage Categories dialog
+  const openManageCategoriesDialog = () => {
+    cy.get('[data-test="manage-categories-button"]').click();
+    cy.get('mat-dialog-container').should('be.visible');
+  };
 
-    // Confirm deletion in the dialog
+  // Add a new category
+  const addNewCategory = (categoryName: string) => {
+    cy.get('[data-test="add-category-button"]').click();
+    cy.get('[data-test="input-category"]').type(categoryName, {force: true});
+    cy.wait(300);
+    cy.get('[data-test="submit-category-button"]').should('not.be.disabled').click();
+    cy.get('mat-snack-bar-container').should('be.visible');
+  };
+
+  // Edit an existing category
+  const editCategory = (oldCategoryName: string, newCategoryName: string) => {
+    cy.get('[data-test="category-title"]').contains(oldCategoryName).parents('.categories')
+      .find('[data-test="edit-category-button"]').click();
+    cy.get('[data-test="input-category"]').clear().type(newCategoryName, { force: true });
+    cy.wait(300);
+    cy.get('[data-test="submit-category-button"]').should('not.be.disabled').click();
+    cy.get('mat-snack-bar-container').should('be.visible');
+  };
+
+  // Delete a category
+  const deleteCategory = (categoryName: string) => {
+    cy.get('[data-test="category-title"]').contains(categoryName).parents('.categories')
+      .find('[data-test="delete-category-button"]').click();
     cy.get('[data-test="confirm-ok-button"]').click();
     cy.get('mat-snack-bar-container').should('be.visible');
+  };
 
-    // Verify the category is deleted
-    cy.get('[data-test="category-title"]').should('not.contain.text', updatedCategory);
-  });
+  // Verify category exists
+  const verifyCategoryExists = (categoryName: string) => {
+    cy.get('[data-test="category-title"]').should('contain.text', categoryName);
+  };
+
+  // Verify category does not exist
+  const verifyCategoryNotExists = (categoryName: string) => {
+    cy.get('[data-test="category-title"]').should('not.contain.text', categoryName);
+  };
 });

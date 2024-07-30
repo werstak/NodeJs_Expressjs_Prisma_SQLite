@@ -4,30 +4,63 @@ describe('ForgotPasswordComponent', () => {
   const testExampleEmail = CypressEnum.TestExampleEmail;
   const loginEmail = CypressEnum.LoginEmail;
 
-  // Navigate to the forgot password page before each test
   beforeEach(() => {
-    cy.visit('/auth/forgot-password'); // Adjust the route as necessary
+    cy.visit('/auth/forgot-password'); // Navigate to the forgot password page before each test
   });
 
-  // Test to ensure the forgot password form is displayed
   it('should display the forgot password form', () => {
+    verifyForgotPasswordFormIsDisplayed();
+  });
+
+  it('should have an initially disabled submit button', () => {
+    verifySubmitButtonIsDisabled();
+  });
+
+  it('should enable the submit button when the email is valid', () => {
+    fillEmail(testExampleEmail);
+    verifySubmitButtonIsEnabled();
+  });
+
+  it('should display validation errors for email field', () => {
+    displayEmailValidationErrors();
+  });
+
+  it('should submit the form and show success notification', () => {
+    interceptVerifyEmail(200, { message: 'Success' });
+    submitForgotPasswordForm(loginEmail);
+    verifyNotificationIsDisplayed();
+  });
+
+  it('should show error message on failed email verification', () => {
+    interceptVerifyEmail(400, { message: 'Error' });
+    submitForgotPasswordForm(testExampleEmail);
+    verifyNotificationIsDisplayed();
+  });
+
+  it('should navigate back to login page on clicking Back button', () => {
+    navigateBackToLogin();
+    verifyNavigationToLoginPage();
+  });
+
+  // Helper functions
+  const verifyForgotPasswordFormIsDisplayed = () => {
     cy.get('mat-card-title').contains('Forgot Password');
     cy.get('form').should('be.visible');
-  });
+  };
 
-  // Test to ensure the submit button is initially disabled
-  it('should have an initially disabled submit button', () => {
+  const verifySubmitButtonIsDisabled = () => {
     cy.get('button[type="submit"]').should('be.disabled');
-  });
+  };
 
-  // Test to enable the submit button when the email is valid
-  it('should enable the submit button when the email is valid', () => {
-    cy.get('input[formControlName="email"]').type(testExampleEmail);
+  const verifySubmitButtonIsEnabled = () => {
     cy.get('button[type="submit"]').should('not.be.disabled');
-  });
+  };
 
-  // Test to display validation errors for the email field
-  it('should display validation errors for email field', () => {
+  const fillEmail = (email: string) => {
+    cy.get('input[formControlName="email"]').type(email).should('have.value', email);
+  };
+
+  const displayEmailValidationErrors = () => {
     // Trigger required validation error
     cy.get('input[formControlName="email"]').focus().blur();
     cy.get('mat-error').contains('Email required').should('be.visible');
@@ -35,49 +68,30 @@ describe('ForgotPasswordComponent', () => {
     // Trigger invalid email validation error
     cy.get('input[formControlName="email"]').type('invalid-email').blur();
     cy.get('mat-error').contains('Invalid email').should('be.visible');
-  });
+  };
 
-  // Test to submit the form and show success notification
-  it('should submit the form and show success notification', () => {
-    // Intercept the API call
+  const interceptVerifyEmail = (statusCode: number, body: object) => {
     cy.intercept('POST', '/api/auth/verify-email', {
-      statusCode: 200,
-      body: { message: 'Success' },
+      statusCode,
+      body,
     }).as('verifyEmail');
+  };
 
-    // Fill in the form and submit
-    cy.get('input[formControlName="email"]').type(loginEmail);
+  const submitForgotPasswordForm = (email: string) => {
+    fillEmail(email);
     cy.get('button[type="submit"]').click();
-
-    // Wait for the API call to complete
     // cy.wait('@verifyEmail');
+  };
 
-    // Check message availability
+  const verifyNotificationIsDisplayed = () => {
     cy.get('mat-snack-bar-container').should('be.visible');
-  });
+  };
 
-  // Test to show error message on failed email verification
-  it('should show error message on failed email verification', () => {
-    // Intercept the API call and simulate an error
-    cy.intercept('POST', '/api/auth/verify-email', {
-      statusCode: 400,
-      body: { message: 'Error' },
-    }).as('verifyEmailError');
-
-    // Fill in the form and submit
-    cy.get('input[formControlName="email"]').type(testExampleEmail);
-    cy.get('button[type="submit"]').click();
-
-    // Wait for the API call to complete
-    // cy.wait('@verifyEmailError');
-
-    // Check that an error message is shown
-    cy.get('mat-snack-bar-container').should('be.visible');
-  });
-
-  // Test to navigate back to the login page on clicking the Back button
-  it('should navigate back to login page on clicking Back button', () => {
+  const navigateBackToLogin = () => {
     cy.get('a').contains('Back').click();
+  };
+
+  const verifyNavigationToLoginPage = () => {
     cy.url().should('include', '/auth/login'); // Adjust the route as necessary
-  });
+  };
 });
