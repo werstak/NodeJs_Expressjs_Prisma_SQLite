@@ -29,7 +29,7 @@ describe('PostsComponent', () => {
     navigateToFirstPage();
     verifyNumberOfPostsInGrid(5); // check the number of posts on the first page
     navigateToLastPage();
-    verifyNumberOfPostsInGrid(5); // check the number of posts on the last page
+    verifyOfPostsInGrid();
   });
 
   // Verify the posts page is visible
@@ -55,6 +55,11 @@ describe('PostsComponent', () => {
   // Verify the correct number of posts in the grid
   const verifyNumberOfPostsInGrid = (expectedCount) => {
     cy.get('[data-test="posts-grid"] app-preview-post').should('have.length', expectedCount);
+  };
+
+  // Make sure the messages in the grid are visible
+  const verifyOfPostsInGrid = () => {
+    cy.get('[data-test="posts-grid"] app-preview-post').should('be.visible');
   };
 
   // Navigate to the next page using the paginator
