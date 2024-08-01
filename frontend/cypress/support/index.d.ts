@@ -1,3 +1,15 @@
+// declare global {
+//   namespace Cypress {
+//     interface Chainable {
+//       loginAndSaveToken(): Chainable<void>;
+//       setAuthHeader(req: { headers: { [key: string]: string | string[] } }): Chainable<void>;
+//     }
+//   }
+// }
+//
+// export {};
+
+
 import { Method } from 'cypress/types/net-stubbing';
 
 declare global {
