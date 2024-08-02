@@ -1,6 +1,6 @@
 import { CypressEnum } from '../../enums/cypress.enum';
 
-describe('RegisterComponent', () => {
+describe('RegisterTest', () => {
   const registerEmail = CypressEnum.RegisterEmail;
   const password = CypressEnum.Password;
   const firstName = CypressEnum.RegisterFirstName;
@@ -29,7 +29,7 @@ describe('RegisterComponent', () => {
   });
 
   it('should fill out and submit the registration form successfully', () => {
-    interceptRegisterUser(200, { message: 'Registration successful!' });
+    interceptRegisterUser(201, { message: 'Registration successful!' });
     fillAndSubmitRegistrationForm({
       email: registerEmail,
       firstName,
@@ -107,6 +107,8 @@ describe('RegisterComponent', () => {
     cy.get('input[formControlName="password"]').type(password);
     cy.get('input[formControlName="confirmPassword"]').type(password);
     cy.get('input[formControlName="birthAt"]').type(birthDate);
+
+
 
     cy.get('form').submit();
     // cy.wait('@registerUser')

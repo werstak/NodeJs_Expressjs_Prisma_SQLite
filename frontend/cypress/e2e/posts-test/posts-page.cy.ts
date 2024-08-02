@@ -1,6 +1,6 @@
-describe('PostsComponent', () => {
+describe('PostsTest', () => {
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/posts');
     cy.url().should('eq', Cypress.config().baseUrl + '/posts');
   });
@@ -44,6 +44,17 @@ describe('PostsComponent', () => {
 
   // Verify the posts grid is visible
   const verifyPostsGridIsVisible = () => {
+    cy.intercept('GET', '/posts', (req) => {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+      req.continue();
+    }).as('fetchPosts');
+
+    cy.visit('/posts');
+    cy.wait('@fetchPosts').its('response.statusCode').should('eq', 200);
+
     cy.get('[data-test="posts-grid"]').should('be.visible');
   };
 

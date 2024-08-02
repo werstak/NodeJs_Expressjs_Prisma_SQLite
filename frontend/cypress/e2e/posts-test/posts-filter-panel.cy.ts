@@ -1,10 +1,10 @@
-describe('PostsFilterPanel', () => {
+describe('PostsFilterPanelTest', () => {
   let selectedAuthor = '';
   let selectedCategories = '';
   let selectedPublished = '';
 
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
 
     // Verify successful login by checking the URL or a specific element
     cy.visit('/posts');

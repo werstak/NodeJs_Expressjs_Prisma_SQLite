@@ -1,13 +1,13 @@
 import { CypressEnum } from '../../enums/cypress.enum';
 
-describe('AccountSettingsDialog', () => {
+describe('AccountSettingsDialogTest', () => {
   const newUserEmail = CypressEnum.NewUserEmail;
   const newUserFirstName = CypressEnum.NewUserFirstName;
   const newUserLastName = CypressEnum.NewUserLastName;
   const country = CypressEnum.Country;
 
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/');
 
     cy.url().should('eq', Cypress.config().baseUrl + '/');
