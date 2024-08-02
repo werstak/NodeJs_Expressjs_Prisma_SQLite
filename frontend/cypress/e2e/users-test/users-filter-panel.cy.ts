@@ -1,6 +1,6 @@
 import { CypressEnum } from '../../enums/cypress.enum';
 
-describe('UsersFilterPanel', () => {
+describe('UsersFilterPanelTest', () => {
   const superAdmin = CypressEnum.SuperAdmin;
   const projectAdmin = CypressEnum.ProjectAdmin;
   const manager = CypressEnum.Manager;
@@ -8,7 +8,7 @@ describe('UsersFilterPanel', () => {
   const testExampleEmail = CypressEnum.TestExampleEmail;
 
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/users');
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
     cy.get('app-users-filter-panel').should('be.visible');
@@ -113,7 +113,7 @@ describe('UsersFilterPanel', () => {
   const selectRole = (role) => {
     openRolesDropdown();
     cy.get('mat-option').contains(role).click();
-    cy.get('body').click(0, 0); // Close the dropdown
+    cy.get('body').type('{esc}'); // Close the dropdown
     cy.get('mat-select[formControlName="roles"]').should('contain.text', role);
   };
 

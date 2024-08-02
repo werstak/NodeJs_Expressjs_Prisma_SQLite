@@ -1,6 +1,6 @@
 import { CypressEnum } from '../../enums/cypress.enum';
 
-describe('AddUserDialog', () => {
+describe('AddUserDialogTest', () => {
   const newUserEmail = CypressEnum.NewUserEmail;
   const password = CypressEnum.Password;
   const newUserFirstName = CypressEnum.NewUserFirstName;
@@ -9,7 +9,7 @@ describe('AddUserDialog', () => {
   const birthDate = CypressEnum.BirthDate;
 
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/users');
 
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
@@ -29,7 +29,6 @@ describe('AddUserDialog', () => {
   });
 
   it('should close the dialog when the cancel button is clicked', () => {
-    openAddUserDialog();
     cancelForm();
   });
 

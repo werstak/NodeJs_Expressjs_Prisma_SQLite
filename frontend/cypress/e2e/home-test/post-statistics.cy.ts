@@ -1,12 +1,19 @@
-describe('PostStatisticsComponent', () => {
+describe('PostStatisticsTest', () => {
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/');
   });
 
-  it('should display loading spinner while fetching data', () => {
-    cy.intercept('GET', '**/dashboard', { delay: 500 }).as('fetchStatistics');
-    cy.visit('/')
+  it('should display app-post-statistics', () => {
+    cy.intercept('GET', '**/dashboard', (req) => {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+      req.continue();
+    }).as('fetchStatistics');
+
+    cy.visit('/');
     cy.wait('@fetchStatistics');
     cy.get('app-post-statistics').should('be.visible');
   });

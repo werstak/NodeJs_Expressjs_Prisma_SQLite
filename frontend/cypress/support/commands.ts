@@ -38,69 +38,46 @@
 
 
 
-
 import { CypressEnum } from '../enums/cypress.enum';
 
-Cypress.Commands.add('login', () => {
+Cypress.Commands.add('loginAndSaveToken', () => {
   const loginEmail = CypressEnum.LoginEmail;
   const password = CypressEnum.Password;
 
   cy.visit('/auth/login');
 
-  cy.intercept('POST', Cypress.env('api_server') + '/auth/login').as('login');
+  cy.intercept('POST', Cypress.env('api_server') + '/auth/login', (req) => {
+    req.on('response', (res) => {
+      window.localStorage.setItem('accessToken', res.body.accessToken);
+    });
+  }).as('login');
 
   cy.get('input[formControlName="email"]').type(loginEmail);
   cy.get('input[formControlName="password"]').type(password);
   cy.get('button[type="submit"]').click();
-  cy.wait('@login').then((interception) => {
-    expect(interception.response.statusCode).to.eq(200);
-    // console.log('response = ', interception.response);
-  });
+
+  cy.wait('@login').its('response.statusCode').should('eq', 200);
   cy.url().should('eq', Cypress.config().baseUrl + '/');
 });
 
 
 
-
-// import { CypressEnum } from '../enums/cypress.enum';
-//
-// Cypress.Commands.add('loginAndSaveToken', () => {
-//   const loginEmail = CypressEnum.LoginEmail;
-//   const password = CypressEnum.Password;
-//
-//   cy.visit('/auth/login');
-//
-//   cy.intercept('POST', Cypress.env('api_server') + '/auth/login', (req) => {
-//     req.on('response', (res) => {
-//       window.localStorage.setItem('accessToken', res.body.accessToken);
-//     });
-//   }).as('login');
-//
-//   cy.get('input[formControlName="email"]').type(loginEmail);
-//   cy.get('input[formControlName="password"]').type(password);
-//   cy.get('button[type="submit"]').click();
-//
-//   cy.wait('@login').its('response.statusCode').should('eq', 200);
+// Cypress.Commands.add('setAuthHeader', (req: { headers: { [key: string]: string | string[] } }) => {
+//   const token = window.localStorage.getItem('accessToken');
+//   if (token) {
+//     // Ensure the header is set as a single string
+//     req.headers['Authorization'] = Array.isArray(req.headers['Authorization'])
+//       ? req.headers['Authorization'].join(', ')
+//       : `Bearer ${token}`;
+//   }
 // });
-//
-//
-//
-// // Cypress.Commands.add('setAuthHeader', (req: { headers: { [key: string]: string | string[] } }) => {
-// //   const token = window.localStorage.getItem('accessToken');
-// //   if (token) {
-// //     // Ensure the header is set as a single string
-// //     req.headers['Authorization'] = Array.isArray(req.headers['Authorization'])
-// //       ? req.headers['Authorization'].join(', ')
-// //       : `Bearer ${token}`;
-// //   }
-// // });
-//
+
 // Cypress.Commands.add('setAuthHeader', (req: { headers: { [key: string]: string | string[] } }) => {
 //   const token = window.localStorage.getItem('accessToken');
 //   if (token) {
 //     req.headers['Authorization'] = `Bearer ${token}`;
 //   }
 // });
-//
+
 
 

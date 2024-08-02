@@ -1,10 +1,10 @@
 import { CypressEnum } from '../../enums/cypress.enum';
 
-describe('ChangePasswordDialog', () => {
+describe('ChangePasswordDialogTest', () => {
   const newPassword = CypressEnum.NewPassword;
 
   beforeEach(() => {
-    cy.login();
+    cy.loginAndSaveToken();
     cy.visit('/users');
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
     openEditUserDialog();
