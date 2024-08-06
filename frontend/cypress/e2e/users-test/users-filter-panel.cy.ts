@@ -9,7 +9,9 @@ describe('UsersFilterPanelTest', () => {
 
   beforeEach(() => {
     cy.loginAndSaveToken();
+    cy.intercept('GET', '**/users*').as('getUsers');
     cy.visit('/users');
+    cy.wait('@getUsers');
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
     cy.get('app-users-filter-panel').should('be.visible');
   });
@@ -48,10 +50,25 @@ describe('UsersFilterPanelTest', () => {
     verifyAllFiltersCleared();
   });
 
-  it('should update the usersService filters when the form is changed', () => {
+  it('should update the usersService filters and make an API call when the form is changed', () => {
+    const token = window.localStorage.getItem('accessToken');
+
+    cy.intercept('GET', '**/users*', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('filterUsers');
+
     fillFilterFields('Mila', 'Kunis', 'andypetrov114@gmail.com');
     verifyEmailFilter('andypetrov114@gmail.com');
+
+    cy.wait('@filterUsers').its('response.statusCode').should('eq', 304);
     clearAllFilters();
+  });
+
+  it('should handle no results scenario', () => {
+    fillFilterFields('NonExistingFirstName', 'NonExistingLastName', 'nonexisting@example.com');
+    cy.wait('@getUsers');
+    cy.get('[data-test="mat-row"]').should('have.length', 0);
   });
 
   // Helper functions
