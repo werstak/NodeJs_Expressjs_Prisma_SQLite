@@ -22,6 +22,8 @@ describe('AddUserDialogTest', () => {
 
   it('should open the add user dialog, fill out the form, and submit it', () => {
     fillOutForm(newUserEmail, newUserFirstName, newUserLastName, country, password, birthDate);
+
+    // Uncomment the following functions if necessary
     submitForm();
 
     // Verify the user was added (mock or real response verification)
@@ -113,7 +115,15 @@ describe('AddUserDialogTest', () => {
 
   // Function to submit the form
   const submitForm = () => {
+    cy.intercept('POST', '**/users', (req) => {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }).as('addUser');
+
     cy.get('button[type="submit"]').click();
+    cy.wait('@addUser').its('response.statusCode').should('eq', 201);
   };
 
   // Function to verify the user was added
