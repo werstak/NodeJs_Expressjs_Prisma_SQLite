@@ -50,11 +50,17 @@ describe('AccountSettingsDialogTest', () => {
     cy.get('mat-calendar').contains(day.toString()).click();
   };
 
-  // Uncomment the following functions if necessary
-  /*
   // Function to submit the form
   const submitForm = () => {
+    cy.intercept('PUT', '**/users/*', (req) => {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }).as('updateAccountSettings');
+
     cy.get('button[type="submit"]').click();
+    cy.wait('@updateAccountSettings').its('response.statusCode').should('eq', 200);
   };
 
   // Function to verify the user was updated
@@ -62,5 +68,4 @@ describe('AccountSettingsDialogTest', () => {
     cy.get('[data-test="userForm"]').should('not.exist');
     cy.get('mat-snack-bar-container').should('be.visible');
   };
-  */
 });
