@@ -13,7 +13,7 @@ export enum CypressEnum {
   RegisterFirstName = 'RegisterFirstName',
   RegisterLastName = 'RegisterLastName',
 
-  NewUserEmail = 'andypetrov114+113@gmail.com',
+  NewUserEmail = 'andypetrov114+116@gmail.com',
   NewUserFirstName = 'NewUserFirstName',
   NewUserLastName = 'NewUserLastName',
 

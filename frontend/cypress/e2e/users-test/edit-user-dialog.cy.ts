@@ -80,14 +80,22 @@ describe('EditUserDialogTest', () => {
   }
 
   /** Uncomment the code if necessary */
-  // function submitForm() {
-  //   cy.get('button[type="submit"]').click();
-  // }
+  function submitForm() {
+    cy.intercept('PUT', '**/users/*', (req) => {
+      const token = window.localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+    }).as('editUser');
 
-  // function verifyUserUpdate(email) {
-  //   cy.get('mat-dialog-container').should('not.exist');
-  //   cy.get('mat-snack-bar-container').should('be.visible');
-  //   cy.get('app-users-table').should('be.visible');
-  //   cy.get('app-users-table').should('contain', email);
-  // }
+    cy.get('button[type="submit"]').click();
+    cy.wait('@editUser').its('response.statusCode').should('eq', 200);
+  }
+
+  function verifyUserUpdate(email) {
+    cy.get('mat-dialog-container').should('not.exist');
+    cy.get('mat-snack-bar-container').should('be.visible');
+    cy.get('app-users-table').should('be.visible');
+    cy.get('app-users-table').should('contain', email);
+  }
 });

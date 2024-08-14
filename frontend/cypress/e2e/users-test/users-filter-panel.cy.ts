@@ -9,9 +9,13 @@ describe('UsersFilterPanelTest', () => {
 
   beforeEach(() => {
     cy.loginAndSaveToken();
-    cy.intercept('GET', '**/users*').as('getUsers');
+    const token = window.localStorage.getItem('accessToken');
+    cy.intercept('GET', '**/users*', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('getUsers');
+
     cy.visit('/users');
-    cy.wait('@getUsers');
     cy.url().should('eq', Cypress.config().baseUrl + '/users');
     cy.get('app-users-filter-panel').should('be.visible');
   });
@@ -82,6 +86,7 @@ describe('UsersFilterPanelTest', () => {
 
   const selectAllRoles = () => {
     cy.get('mat-option').contains('Select All').click();
+    cy.wait('@getUsers');
   };
 
   const verifyAllRolesSelected = () => {
@@ -94,6 +99,7 @@ describe('UsersFilterPanelTest', () => {
 
   const deselectAllRoles = () => {
     cy.get('mat-option').contains('Deselect All').click();
+    cy.wait('@getUsers');
   };
 
   const verifyAllRolesDeselected = () => {
@@ -112,13 +118,16 @@ describe('UsersFilterPanelTest', () => {
       .each(roleName => {
         cy.wrap(roleName).should('contain.text', role);
       });
+    cy.wait('@getUsers');
     selectAllRoles();
     deselectAllRoles();
   };
 
   const fillFilterFields = (firstName, lastName, email) => {
     cy.get('input[formControlName="firstName"]').type(firstName);
+    cy.wait('@getUsers');
     cy.get('input[formControlName="lastName"]').type(lastName);
+    cy.wait('@getUsers');
     cy.get('input[formControlName="email"]').type(email);
   };
 
@@ -130,6 +139,7 @@ describe('UsersFilterPanelTest', () => {
   const selectRole = (role) => {
     openRolesDropdown();
     cy.get('mat-option').contains(role).click();
+    cy.wait('@getUsers');
     cy.get('body').type('{esc}'); // Close the dropdown
     cy.get('mat-select[formControlName="roles"]').should('contain.text', role);
   };

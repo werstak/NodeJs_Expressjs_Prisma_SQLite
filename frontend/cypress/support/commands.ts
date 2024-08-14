@@ -24,18 +24,6 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
-//
-// declare global {
-//   namespace Cypress {
-//     interface Chainable {
-//       login(email: string, password: string): Chainable<void>
-//       drag(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       dismiss(subject: string, options?: Partial<TypeOptions>): Chainable<Element>
-//       visit(originalFn: CommandOriginalFn, url: string, options: Partial<VisitOptions>): Chainable<Element>
-//     }
-//   }
-// }
-
 
 
 import { CypressEnum } from '../enums/cypress.enum';
@@ -59,25 +47,4 @@ Cypress.Commands.add('loginAndSaveToken', () => {
   cy.wait('@login').its('response.statusCode').should('eq', 200);
   cy.url().should('eq', Cypress.config().baseUrl + '/');
 });
-
-
-
-// Cypress.Commands.add('setAuthHeader', (req: { headers: { [key: string]: string | string[] } }) => {
-//   const token = window.localStorage.getItem('accessToken');
-//   if (token) {
-//     // Ensure the header is set as a single string
-//     req.headers['Authorization'] = Array.isArray(req.headers['Authorization'])
-//       ? req.headers['Authorization'].join(', ')
-//       : `Bearer ${token}`;
-//   }
-// });
-
-// Cypress.Commands.add('setAuthHeader', (req: { headers: { [key: string]: string | string[] } }) => {
-//   const token = window.localStorage.getItem('accessToken');
-//   if (token) {
-//     req.headers['Authorization'] = `Bearer ${token}`;
-//   }
-// });
-
-
 

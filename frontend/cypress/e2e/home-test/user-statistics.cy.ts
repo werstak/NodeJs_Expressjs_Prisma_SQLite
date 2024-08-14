@@ -5,8 +5,8 @@ describe('UserStatisticsTest', () => {
   });
 
   it('should display app-user-statistics', () => {
+    const token = window.localStorage.getItem('accessToken');
     cy.intercept('GET', '**/dashboard', (req) => {
-      const token = window.localStorage.getItem('accessToken');
       if (token) {
         req.headers['Authorization'] = `Bearer ${token}`;
       }

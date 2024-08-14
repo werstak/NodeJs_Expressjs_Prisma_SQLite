@@ -80,7 +80,6 @@ describe('ForgotPasswordTest', () => {
   const submitForgotPasswordForm = (email: string) => {
     fillEmail(email);
     cy.get('button[type="submit"]').click();
-    // cy.wait('@verifyEmail');
   };
 
   const verifyNotificationIsDisplayed = () => {
