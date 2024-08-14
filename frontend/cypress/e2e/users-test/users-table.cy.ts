@@ -7,6 +7,11 @@ describe('UsersTableTest', () => {
 
   beforeEach(() => {
     loginAndVisitUsers();
+    const token = window.localStorage.getItem('accessToken');
+    cy.intercept('GET', '**/users*', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('getUsers');
   });
 
   it('should display a page with a table of users', () => {
@@ -73,6 +78,7 @@ describe('UsersTableTest', () => {
     cy.get('button[type="submit"]').click();
 
     cy.wait('@login').its('response.statusCode').should('eq', 200);
+    // cy.wait('@getUsers').its('response.statusCode').should('eq', 200);
     cy.url().should('eq', Cypress.config().baseUrl + '/');
     cy.visit('/users');
   };
@@ -121,19 +127,24 @@ describe('UsersTableTest', () => {
     cy.get('mat-paginator').find('mat-select').click();
     cy.get('mat-option').contains(pageSize.toString()).click();
     cy.get('tr[mat-row]').should('have.length', pageSize);
+    cy.wait('@getUsers');
   };
 
   const verifyPageNavigation = () => {
     cy.get('.users-table__paginator button[aria-label="Next page"]').click();
+    cy.wait('@getUsers');
     cy.get('.mat-mdc-paginator-range-label').contains('6').should('be.visible');
 
     cy.get('.users-table__paginator button[aria-label="Previous page"]').click();
+    cy.wait('@getUsers');
     cy.get('.mat-mdc-paginator-range-label').contains('1').should('be.visible');
 
     cy.get('.users-table__paginator button[aria-label="Last page"]').click();
+    cy.wait('@getUsers');
     cy.get('.users-table__paginator button[aria-label="Last page"]').should('be.disabled');
 
     cy.get('.users-table__paginator button[aria-label="First page"]').click();
+    cy.wait('@getUsers');
     cy.get('.users-table__paginator button[aria-label="First page"]').should('be.disabled');
   };
 });

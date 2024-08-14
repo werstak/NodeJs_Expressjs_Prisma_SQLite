@@ -32,8 +32,15 @@ describe('EditPostDialogTest', () => {
   const openEditDialog = () => {
     cy.visit(postUrl);
     cy.url().should('eq', postUrl);
+
+    const token = window.localStorage.getItem('accessToken');
+    cy.intercept('GET', '**/posts/*', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('getPost');
     cy.get('[data-test="edit-button"]').should('be.visible').click();
     cy.get('mat-dialog-container').should('be.visible');
+    cy.wait('@getPost');
   };
 
   // Fill in the post details

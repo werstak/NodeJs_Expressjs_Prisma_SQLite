@@ -30,7 +30,14 @@ describe('AddPostDialogTest', () => {
 
   // Open the Add Post dialog
   const openAddPostDialog = () => {
+    const token = window.localStorage.getItem('accessToken');
+    cy.intercept('GET', '**/categories', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('getCategories');
+
     cy.get('[data-test="add-post-button"]').should('be.visible').click();
+    cy.wait('@getCategories');
     cy.get('mat-dialog-container').should('be.visible');
   };
 
@@ -78,7 +85,16 @@ describe('AddPostDialogTest', () => {
 
   // Navigate to the last page using the paginator and check out the new post
   const navigateToLastPage = () => {
+
+    const token = window.localStorage.getItem('accessToken');
+    cy.intercept('GET', '**/posts*', (req) => {
+      req.headers['Authorization'] = `Bearer ${token}`;
+      req.continue();
+    }).as('getPosts');
+
     cy.get('.mat-mdc-paginator-navigation-last').click();
+
+    cy.wait('@getPosts');
     cy.get('[data-test="posts-grid"]').contains(title);
   };
 });
